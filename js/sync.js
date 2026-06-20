@@ -68,3 +68,12 @@ export function stopListeners() {
   if (unsubSessions) { unsubSessions(); unsubSessions = null; }
   if (unsubWater) { unsubWater(); unsubWater = null; }
 }
+
+export function saveUserProfile(uid, user) {
+  setDoc(doc(db, 'users', uid), {
+    email: user.email ?? '',
+    displayName: user.displayName ?? '',
+    photoURL: user.photoURL ?? '',
+    lastSeen: new Date().toISOString()
+  }, { merge: true }).catch(() => {});
+}

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitPlan Admin</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-raised: #1a1a28;
+      --border: #252540;
+      --accent: #e94560;
+      --accent-blue: #3d8ef8;
+      --text: #e0e0e0;
+      --text-muted: #7a8299;
+      --text-dim: #404060;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      font-size: 0.9rem;
+    }
+    a { color: var(--accent-blue); }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    code { font-family: monospace; }
+
+    /* ── Centered screens ── */
+    #auth-screen, #deny-screen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      z-index: 10;
+    }
+    .gate-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+    }
+    .gate-card h1 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .gate-card p  { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px; line-height: 1.6; }
+    .gate-icon { font-size: 2.5rem; margin-bottom: 16px; }
+
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px 20px;
+      background: #fff; color: #3c4043;
+      font-weight: 600; font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      transition: box-shadow 0.15s;
+    }
+    .google-btn:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+
+    .deny-badge {
+      display: inline-block;
+      background: rgba(233,69,96,0.12);
+      border: 1px solid rgba(233,69,96,0.3);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      margin: 8px 0 20px;
+    }
+    .btn-ghost {
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Admin layout ── */
+    #admin-screen {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .admin-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 5;
+    }
+    .admin-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1rem; color: #fff;
+    }
+    .admin-logo .badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .admin-header-right {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    #signout-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    #signout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Main content ── */
+    .admin-body { flex: 1; padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+    #loading {
+      display: none;
+      padding: 48px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    #loading::before { content: ''; display: block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Stat cards ── */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      text-align: center;
+    }
+    .stat-num { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+
+    /* ── User table ── */
+    .user-table { width: 100%; border-collapse: collapse; }
+    .user-table th {
+      text-align: left; font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-dim);
+      padding: 0 12px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .user-table td { padding: 14px 12px; border-bottom: 1px solid rgba(37,37,64,0.5); }
+    .user-table tr:last-child td { border-bottom: none; }
+    .user-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .tc { text-align: center; }
+
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; }
+    .avatar-ph {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: var(--surface-raised); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.82rem; font-weight: 700; color: var(--accent);
+    }
+    .user-name  { font-size: 0.88rem; font-weight: 600; color: #fff; }
+    .user-email { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+    .view-btn {
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: var(--accent-blue);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .view-btn:hover { background: rgba(61,142,248,0.1); border-color: var(--accent-blue); }
+
+    /* ── User detail ── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-muted); font-size: 0.82rem; margin-bottom: 20px;
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .profile-card { display: flex; align-items: center; gap: 20px; }
+    .avatar-lg { width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; }
+    .avatar-lg-ph {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      background: var(--surface-raised); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 700; color: var(--accent);
+    }
+    .profile-name { font-size: 1.25rem; font-weight: 800; color: #fff; }
+
+    .sec-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text-dim);
+      margin: 24px 0 12px;
+    }
+
+    .session-card { margin-bottom: 12px; }
+    .sess-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+    }
+    .day-badge {
+      background: var(--accent); color: #fff;
+      font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .ex-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 7px 0; border-top: 1px solid rgba(37,37,64,0.5);
+      flex-wrap: wrap;
+    }
+    .ex-name { font-size: 0.82rem; font-weight: 600; color: var(--text); min-width: 160px; }
+    .set-pill {
+      display: inline-block;
+      background: var(--surface-raised);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin: 2px 4px 2px 0;
+    }
+
+    .water-table { width: 100%; border-collapse: collapse; }
+    .water-table th {
+      text-align: left; font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-dim);
+      padding: 0 12px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .water-table td { padding: 10px 12px; border-bottom: 1px solid rgba(37,37,64,0.4); }
+    .water-table tr:last-child td { border-bottom: none; }
+
+    .muted     { color: var(--text-muted); font-size: 0.78rem; }
+    .empty     { color: var(--text-dim); font-size: 0.85rem; padding: 20px 0; text-align: center; }
+
+    @media (max-width: 600px) {
+      .admin-body { padding: 16px; }
+      .profile-card { flex-direction: column; align-items: flex-start; }
+      .user-table th:nth-child(4),
+      .user-table td:nth-child(4),
+      .user-table th:nth-child(5),
+      .user-table td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sign-in gate -->
+  <div id="auth-screen">
+    <div class="gate-card">
+      <div class="gate-icon">🔐</div>
+      <h1>Admin Access</h1>
+      <p>Sign in with an authorised Google account to view the FitPlan dashboard.</p>
+      <button id="google-btn" class="google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        Sign in with Google
+      </button>
+    </div>
+  </div>
+
+  <!-- Access denied -->
+  <div id="deny-screen" style="display:none">
+    <div class="gate-card">
+      <div class="gate-icon">🚫</div>
+      <h1>Access Denied</h1>
+      <p>This account is not authorised to view the admin dashboard.</p>
+      <div class="deny-badge" id="deny-email"></div>
+      <br />
+      <button id="signout-btn" class="btn-ghost">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="admin-screen" style="display:none">
+
+    <header class="admin-header">
+      <div class="admin-logo">
+        💪 FitPlan <span class="badge">Admin</span>
+      </div>
+      <div class="admin-header-right">
+        <span id="admin-user"></span>
+        <button id="signout-btn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="admin-body">
+      <div id="loading">Loading users…</div>
+      <div id="main-content"></div>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

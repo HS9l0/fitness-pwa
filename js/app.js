@@ -3,7 +3,7 @@ import { renderPlan } from './screens/plan.js';
 import { renderWorkout } from './screens/workout.js';
 import { renderHistory } from './screens/history.js';
 import { auth } from './firebase.js';
-import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners } from './sync.js';
+import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners, saveUserProfile } from './sync.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const screens = {
@@ -72,6 +72,7 @@ onAuthStateChanged(auth, async (user) => {
     signinScreen.style.display = 'none';
     appEl.style.display = 'flex';
     updateSidebarUser(user);
+    saveUserProfile(user.uid, user);
     try {
       await pullFromFirestore(user.uid);
     } catch {
