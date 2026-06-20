@@ -14,27 +14,47 @@ const adminEl = document.getElementById('admin-screen');
 const mainEl  = document.getElementById('main-content');
 const loadEl  = document.getElementById('loading');
 
-document.getElementById('google-btn').addEventListener('click', () =>
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message))
-);
-document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
+// ── Login buttons ─────────────────────────────────────────
+document.getElementById('user-btn').addEventListener('click', () => {
+  sessionStorage.setItem('loginMode', 'user');
+  signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
+});
 
+document.getElementById('staff-btn').addEventListener('click', () => {
+  sessionStorage.setItem('loginMode', 'staff');
+  signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
+});
+
+document.getElementById('signout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('loginMode');
+  signOut(auth);
+});
+
+// ── Auth gate ─────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) {
-    authEl.style.display = 'flex';
+    authEl.style.display  = 'flex';
     adminEl.style.display = 'none';
     return;
   }
-  authEl.style.display = 'none';
-  if (!ADMIN_EMAILS.includes(user.email)) {
+
+  const mode = sessionStorage.getItem('loginMode') ?? 'auto';
+  sessionStorage.removeItem('loginMode');
+
+  // Regular-user button OR not an admin email → go to main app
+  if (mode === 'user' || !ADMIN_EMAILS.includes(user.email)) {
     window.location.href = './index.html';
     return;
   }
+
+  // Admin
+  authEl.style.display  = 'none';
   adminEl.style.display = 'flex';
   document.getElementById('admin-user').textContent = user.displayName ?? user.email;
   loadAndRender();
 });
 
+// ── Data loading ──────────────────────────────────────────
 async function loadAndRender() {
   loadEl.style.display = 'block';
   mainEl.innerHTML = '';
@@ -55,17 +75,81 @@ async function loadAndRender() {
     loadEl.style.display = 'none';
     renderUserList(users);
   } catch (e) {
-    loadEl.innerHTML = `<span style="color:#e94560">⚠ ${e.message}</span>`;
+    loadEl.style.display = 'none';
+    if (e.code === 'permission-denied') {
+      showRulesError();
+    } else {
+      mainEl.innerHTML = `<div class="card"><p style="color:var(--accent)">⚠ ${e.message}</p></div>`;
+    }
   }
 }
 
-/* ── User list ─────────────────────────────────────────── */
+function showRulesError() {
+  const rules = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null &&
+        request.auth.token.email in [
+          'lusi.genova@gmail.com',
+          'ranov.insta@gmail.com'
+        ];
+    }
+    match /users/{uid} {
+      allow read, write: if request.auth.uid == uid || isAdmin();
+      match /sessions/{id} {
+        allow read, write: if request.auth.uid == uid || isAdmin();
+      }
+      match /water/{id} {
+        allow read, write: if request.auth.uid == uid || isAdmin();
+      }
+    }
+  }
+}`;
+
+  mainEl.innerHTML = `
+    <div class="card rules-card">
+      <div class="rules-icon">🔒</div>
+      <h3>One more step — update Firestore rules</h3>
+      <p class="muted">
+        The admin dashboard needs permission to read all users.<br>
+        Copy the rules below, then publish them in the Firebase Console.
+      </p>
+
+      <ol class="steps">
+        <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+        <li>Select project <strong>fitness-pwa-5af52</strong></li>
+        <li>Left menu → <strong>Firestore Database</strong> → <strong>Rules</strong> tab</li>
+        <li>Replace everything with the rules below, then click <strong>Publish</strong></li>
+      </ol>
+
+      <div class="rules-wrap">
+        <pre id="rules-pre" class="rules-pre">${rules}</pre>
+        <button class="copy-btn" id="copy-btn">Copy</button>
+      </div>
+
+      <button class="retry-btn" id="retry-btn">Retry →</button>
+    </div>
+  `;
+
+  document.getElementById('copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(rules).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ Copied';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+  });
+
+  document.getElementById('retry-btn').addEventListener('click', loadAndRender);
+}
+
+// ── User list ─────────────────────────────────────────────
 function renderUserList(users) {
   const totalSessions = users.reduce((n, u) => n + u.sessions.length, 0);
-  const today         = new Date().toISOString().slice(0, 10);
-  const weekAgo       = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
-  const activeToday   = users.filter(u => u.sessions.some(s => s.date === today)).length;
-  const activeWeek    = users.filter(u => u.sessions.some(s => s.date >= weekAgo)).length;
+  const today    = new Date().toISOString().slice(0, 10);
+  const weekAgo  = new Date(Date.now() - 6 * 864e5).toISOString().slice(0, 10);
+  const activeToday = users.filter(u => u.sessions.some(s => s.date === today)).length;
+  const activeWeek  = users.filter(u => u.sessions.some(s => s.date >= weekAgo)).length;
 
   mainEl.innerHTML = `
     <div class="stats-row">
@@ -77,17 +161,10 @@ function renderUserList(users) {
 
     <div class="card">
       ${users.length === 0
-        ? `<p class="empty">No users yet — users appear here after they sign in to the app at least once.</p>`
+        ? `<p class="empty">No users yet — they appear here after signing in to the app.</p>`
         : `<table class="user-table">
             <thead>
-              <tr>
-                <th>User</th>
-                <th>Sessions</th>
-                <th>Last Workout</th>
-                <th>Water Days</th>
-                <th>Last Seen</th>
-                <th></th>
-              </tr>
+              <tr><th>User</th><th>Sessions</th><th>Last Workout</th><th>Water Days</th><th>Last Seen</th><th></th></tr>
             </thead>
             <tbody>
               ${users.map(u => `
@@ -124,7 +201,7 @@ function renderUserList(users) {
   );
 }
 
-/* ── User detail ───────────────────────────────────────── */
+// ── User detail ───────────────────────────────────────────
 function renderUserDetail(user) {
   const waterDays  = Object.keys(user.water).length;
   const totalWater = Object.values(user.water).reduce((s, v) => s + v, 0);
@@ -212,7 +289,7 @@ function renderWater(water) {
             <td>
               <div style="display:flex;align-items:center;gap:8px">
                 <div style="flex:1;height:6px;background:#1a1a28;border-radius:3px;overflow:hidden">
-                  <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;transition:width 0.4s"></div>
+                  <div style="width:${pct}%;height:100%;background:${color};border-radius:3px"></div>
                 </div>
                 <span style="width:32px;font-size:0.72rem;color:${color}">${pct}%</span>
               </div>
