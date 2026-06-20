@@ -7,7 +7,13 @@ import { auth } from './firebase.js';
 import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners, saveUserProfile } from './sync.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-const ADMIN_EMAILS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
+const BASE_ADMINS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
+function getAdminEmails() {
+  try {
+    const s = JSON.parse(localStorage.getItem('fit_admin_emails') ?? 'null');
+    return Array.isArray(s) && s.length ? s : BASE_ADMINS;
+  } catch { return BASE_ADMINS; }
+}
 
 const screens = {
   home:      document.getElementById('screen-home'),
@@ -81,7 +87,7 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     const loginMode = sessionStorage.getItem('loginMode');
     sessionStorage.removeItem('loginMode');
-    if (loginMode === 'staff' && ADMIN_EMAILS.includes(user.email)) {
+    if (loginMode === 'staff' && getAdminEmails().includes(user.email)) {
       window.location.href = './admin.html';
       return;
     }

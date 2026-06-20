@@ -4,7 +4,6 @@ const CIRC  = 314.16; // 2π × r50
 const MODEL = 'gemini-1.5-flash';
 
 function getKey() { return localStorage.getItem('fit_gemini_key') ?? ''; }
-function setKey(k) { localStorage.setItem('fit_gemini_key', k.trim()); }
 function nowTime() {
   const d = new Date();
   return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;

@@ -202,11 +202,18 @@
     .empty { color: var(--text-dim); font-size: 0.84rem; padding: 20px 0; text-align: center; }
 
     /* ── Settings panel ── */
-    .settings-grid     { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .settings-sec-title{ font-size: 0.62rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
-    .unit-toggle       { display: flex; gap: 16px; padding: 8px 12px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-sm); }
-    .unit-opt          { display: flex; align-items: center; gap: 6px; font-size: 0.84rem; color: var(--text); cursor: pointer; }
-    .unit-opt input    { accent-color: var(--accent); cursor: pointer; width: 14px; height: 14px; }
+    .settings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .unit-toggle   { display: flex; gap: 16px; padding: 8px 12px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .unit-opt      { display: flex; align-items: center; gap: 6px; font-size: 0.84rem; color: var(--text); cursor: pointer; }
+    .unit-opt input{ accent-color: var(--accent); cursor: pointer; width: 14px; height: 14px; }
+
+    /* ── Admin access panel ── */
+    .admin-emails-list  { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .admin-email-row    { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+    .admin-email-info   { display: flex; align-items: center; gap: 8px; }
+    .admin-email-addr   { font-size: 0.84rem; color: var(--text); font-family: monospace; }
+    .admin-you-badge    { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; border-radius: 10px; background: rgba(249,115,22,0.15); color: var(--accent); border: 1px solid rgba(249,115,22,0.3); }
+    .add-admin-row      { display: flex; gap: 8px; align-items: center; }
 
     @media (max-width: 600px) {
       .admin-body { padding: 14px; }

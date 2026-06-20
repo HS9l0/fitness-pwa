@@ -6,8 +6,18 @@ import {
   collection, getDocs, deleteDoc, doc, updateDoc, writeBatch
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-const ADMIN_EMAILS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
-const DAY_LABELS   = { 1: 'Cardio', 2: 'Legs', 3: 'Arms' };
+const BASE_ADMINS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
+const DAY_LABELS  = { 1: 'Cardio', 2: 'Legs', 3: 'Arms' };
+
+function getAdminEmails() {
+  try {
+    const s = JSON.parse(localStorage.getItem('fit_admin_emails') ?? 'null');
+    return Array.isArray(s) && s.length ? s : [...BASE_ADMINS];
+  } catch { return [...BASE_ADMINS]; }
+}
+function saveAdminEmails(list) {
+  localStorage.setItem('fit_admin_emails', JSON.stringify(list));
+}
 const STATUS_META  = {
   active:   { label: 'Active',   color: '#22c55e' },
   flagged:  { label: 'Flagged',  color: '#e94560' },
@@ -24,7 +34,7 @@ document.getElementById('signout-btn').addEventListener('click', () => signOut(a
 // ── Auth gate ─────────────────────────────────────────────
 onAuthStateChanged(auth, user => {
   loadingEl.style.display = 'none';
-  if (!user || !ADMIN_EMAILS.includes(user.email)) {
+  if (!user || !getAdminEmails().includes(user.email)) {
     window.location.href = './index.html';
     return;
   }
@@ -235,6 +245,7 @@ function renderUserList(users) {
           </table>`}
     </div>
 
+    ${renderAdminPanel()}
     ${renderSettingsPanel()}`;
 
   document.getElementById('search')?.addEventListener('input', e => {
@@ -252,27 +263,77 @@ function renderUserList(users) {
   );
 
   document.getElementById('save-settings-btn').addEventListener('click', () => {
-    const key  = document.getElementById('s-api-key').value.trim();
     const cal  = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
     const wat  = parseInt(document.getElementById('s-water-goal').value)   || 2000;
     const unit = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
-
-    localStorage.setItem('fit_gemini_key', key);
     let cfg = {};
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
     cfg.calorieGoalKcal = cal;
     cfg.waterGoalMl     = wat;
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
-
     const savedEl = document.getElementById('settings-saved-msg');
     if (savedEl) { savedEl.style.opacity = '1'; setTimeout(() => { savedEl.style.opacity = '0'; }, 2200); }
     toast('Settings saved');
   });
+
+  // ── Admin adder events ───────────────────────────────────
+  document.getElementById('add-admin-btn').addEventListener('click', () => {
+    const input = document.getElementById('new-admin-email');
+    const email = input.value.trim().toLowerCase();
+    if (!email || !email.includes('@')) { toast('Enter a valid email', 'error'); return; }
+    const list = getAdminEmails();
+    if (list.includes(email)) { toast('Already an admin', 'error'); return; }
+    list.push(email);
+    saveAdminEmails(list);
+    input.value = '';
+    toast(`${email} added as admin`);
+    renderUserList(window._adminUsers);
+  });
+
+  mainEl.querySelectorAll('.remove-admin-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const email = btn.dataset.email;
+      const list  = getAdminEmails().filter(e => e !== email);
+      if (!list.length) { toast('Cannot remove the only admin', 'error'); return; }
+      saveAdminEmails(list);
+      toast(`${email} removed`);
+      renderUserList(window._adminUsers);
+    });
+  });
+}
+
+function renderAdminPanel() {
+  const admins = getAdminEmails();
+  const me     = auth.currentUser?.email ?? '';
+  return `
+    <h3 class="sec-title" style="margin-top:28px">Admin Access</h3>
+    <div class="card">
+      <div class="admin-emails-list">
+        ${admins.map(email => `
+          <div class="admin-email-row">
+            <div class="admin-email-info">
+              <span class="admin-email-addr">${email}</span>
+              ${email === me ? '<span class="admin-you-badge">you</span>' : ''}
+            </div>
+            ${email === me
+              ? '<span class="muted" style="font-size:0.72rem">cannot remove self</span>'
+              : `<button class="action-btn action-danger remove-admin-btn" data-email="${email}" style="padding:4px 10px;font-size:0.72rem">Remove</button>`}
+          </div>
+        `).join('')}
+      </div>
+      <div class="add-admin-row">
+        <input id="new-admin-email" class="ctrl-input" type="email" placeholder="Email address to add as admin…" style="flex:1"/>
+        <button class="action-btn" id="add-admin-btn">Add Admin</button>
+      </div>
+      <p style="font-size:0.68rem;color:var(--text-dim);margin-top:10px">
+        ⚠ Admins can view, edit, and delete all user data from this dashboard.
+      </p>
+    </div>
+  `;
 }
 
 function renderSettingsPanel() {
-  const key  = localStorage.getItem('fit_gemini_key') ?? '';
   let cfg    = {};
   try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
   const cal  = cfg.calorieGoalKcal ?? 2000;
@@ -283,34 +344,24 @@ function renderSettingsPanel() {
     <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
     <div class="card">
       <div class="settings-grid">
-        <div>
-          <div class="settings-sec-title">AI &amp; Nutrition</div>
-          <div class="ctrl-group" style="margin-bottom:12px">
-            <label class="ctrl-label">Gemini API key <span class="muted">(food scanner)</span></label>
-            <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
-          </div>
-          <div class="ctrl-group">
-            <label class="ctrl-label">Daily calorie goal (kcal)</label>
-            <input id="s-calorie-goal" class="ctrl-input" type="number" value="${cal}" min="500" max="10000" step="50"/>
-          </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Daily calorie goal (kcal)</label>
+          <input id="s-calorie-goal" class="ctrl-input" type="number" value="${cal}" min="500" max="10000" step="50"/>
         </div>
-        <div>
-          <div class="settings-sec-title">Hydration &amp; Units</div>
-          <div class="ctrl-group" style="margin-bottom:12px">
-            <label class="ctrl-label">Daily water goal (ml)</label>
-            <input id="s-water-goal" class="ctrl-input" type="number" value="${wat}" min="500" max="5000" step="100"/>
-          </div>
-          <div class="ctrl-group">
-            <label class="ctrl-label">Weight unit</label>
-            <div class="unit-toggle">
-              <label class="unit-opt"><input type="radio" name="weight-unit" value="kg"  ${unit === 'kg'  ? 'checked' : ''}/> kg</label>
-              <label class="unit-opt"><input type="radio" name="weight-unit" value="lbs" ${unit === 'lbs' ? 'checked' : ''}/> lbs</label>
-            </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Daily water goal (ml)</label>
+          <input id="s-water-goal" class="ctrl-input" type="number" value="${wat}" min="500" max="5000" step="100"/>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Weight unit</label>
+          <div class="unit-toggle">
+            <label class="unit-opt"><input type="radio" name="weight-unit" value="kg"  ${unit === 'kg'  ? 'checked' : ''}/> kg</label>
+            <label class="unit-opt"><input type="radio" name="weight-unit" value="lbs" ${unit === 'lbs' ? 'checked' : ''}/> lbs</label>
           </div>
         </div>
       </div>
       <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
-        <button class="action-btn" id="save-settings-btn">Save all settings</button>
+        <button class="action-btn" id="save-settings-btn">Save settings</button>
         <span id="settings-saved-msg" style="font-size:0.75rem;color:var(--accent-2);opacity:0;transition:opacity 0.3s">✓ Saved</span>
       </div>
     </div>
