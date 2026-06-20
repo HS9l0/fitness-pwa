@@ -266,12 +266,14 @@ function renderUserList(users) {
     const cal  = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
     const wat  = parseInt(document.getElementById('s-water-goal').value)   || 2000;
     const unit = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
+    const key  = document.getElementById('s-api-key').value.trim();
     let cfg = {};
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
     cfg.calorieGoalKcal = cal;
     cfg.waterGoalMl     = wat;
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
+    localStorage.setItem('fit_gemini_key', key);
     const savedEl = document.getElementById('settings-saved-msg');
     if (savedEl) { savedEl.style.opacity = '1'; setTimeout(() => { savedEl.style.opacity = '0'; }, 2200); }
     toast('Settings saved');
@@ -339,6 +341,7 @@ function renderSettingsPanel() {
   const cal  = cfg.calorieGoalKcal ?? 2000;
   const wat  = cfg.waterGoalMl     ?? 2000;
   const unit = cfg.weightUnit       ?? 'kg';
+  const key  = localStorage.getItem('fit_gemini_key') ?? '';
 
   return `
     <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
@@ -358,6 +361,10 @@ function renderSettingsPanel() {
             <label class="unit-opt"><input type="radio" name="weight-unit" value="kg"  ${unit === 'kg'  ? 'checked' : ''}/> kg</label>
             <label class="unit-opt"><input type="radio" name="weight-unit" value="lbs" ${unit === 'lbs' ? 'checked' : ''}/> lbs</label>
           </div>
+        </div>
+        <div class="ctrl-group" style="grid-column:1/-1">
+          <label class="ctrl-label">Gemini API key <span class="muted">(food AI scanner)</span></label>
+          <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
         </div>
       </div>
       <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
