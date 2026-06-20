@@ -6,6 +6,8 @@ import { auth } from './firebase.js';
 import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners, saveUserProfile } from './sync.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
+const ADMIN_EMAILS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
+
 const screens = {
   home: document.getElementById('screen-home'),
   workout: document.getElementById('screen-workout'),
@@ -61,14 +63,24 @@ document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
   btn.addEventListener('click', () => navigateTo(btn.dataset.screen));
 });
 
-// Sign-in button
+// Sign-in buttons
 document.getElementById('google-signin-btn')?.addEventListener('click', () => {
   signInWithGoogle().catch(err => console.error('Sign in failed:', err));
+});
+document.getElementById('staff-login-btn')?.addEventListener('click', () => {
+  sessionStorage.setItem('loginMode', 'staff');
+  signInWithGoogle().catch(err => console.error('Staff sign in failed:', err));
 });
 
 // Auth state — main entry point
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+    const loginMode = sessionStorage.getItem('loginMode');
+    sessionStorage.removeItem('loginMode');
+    if (loginMode === 'staff' && ADMIN_EMAILS.includes(user.email)) {
+      window.location.href = './admin.html';
+      return;
+    }
     signinScreen.style.display = 'none';
     appEl.style.display = 'flex';
     updateSidebarUser(user);

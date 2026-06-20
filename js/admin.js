@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import {
-  signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged
+  signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   collection, getDocs, deleteDoc, doc, updateDoc, writeBatch
@@ -14,34 +14,20 @@ const STATUS_META  = {
   inactive: { label: 'Inactive', color: '#7a8299' }
 };
 
-const authEl  = document.getElementById('auth-screen');
-const adminEl = document.getElementById('admin-screen');
-const mainEl  = document.getElementById('main-content');
-const loadEl  = document.getElementById('loading');
+const loadingEl = document.getElementById('auth-loading');
+const adminEl   = document.getElementById('admin-screen');
+const mainEl    = document.getElementById('main-content');
+const loadEl    = document.getElementById('loading');
 
-// ── Login buttons ─────────────────────────────────────────
-document.getElementById('user-btn').addEventListener('click', () => {
-  sessionStorage.setItem('loginMode', 'user');
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
-});
-document.getElementById('staff-btn').addEventListener('click', () => {
-  sessionStorage.setItem('loginMode', 'staff');
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
-});
-document.getElementById('signout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem('loginMode');
-  signOut(auth);
-});
+document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
 
 // ── Auth gate ─────────────────────────────────────────────
-onAuthStateChanged(auth, async user => {
-  if (!user) { authEl.style.display = 'flex'; adminEl.style.display = 'none'; return; }
-  const mode = sessionStorage.getItem('loginMode') ?? 'auto';
-  sessionStorage.removeItem('loginMode');
-  if (mode === 'user' || !ADMIN_EMAILS.includes(user.email)) {
-    window.location.href = './index.html'; return;
+onAuthStateChanged(auth, user => {
+  loadingEl.style.display = 'none';
+  if (!user || !ADMIN_EMAILS.includes(user.email)) {
+    window.location.href = './index.html';
+    return;
   }
-  authEl.style.display  = 'none';
   adminEl.style.display = 'flex';
   document.getElementById('admin-user').textContent = user.displayName ?? user.email;
   loadAndRender();
