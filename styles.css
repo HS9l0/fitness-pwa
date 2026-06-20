@@ -34,13 +34,15 @@ a { color: inherit; text-decoration: none; }
 .screen.active { opacity: 1; pointer-events: auto; }
 
 /* ── Screen slide animations ────────────────────────────── */
+/* Only animate transform — opacity is controlled by .active class,
+   so a delayed/blocked animation never hides the screen. */
 @keyframes slide-from-right {
-  from { opacity: 0; transform: translateX(36px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(36px); }
+  to   { transform: none; }
 }
 @keyframes slide-from-left {
-  from { opacity: 0; transform: translateX(-36px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { transform: translateX(-36px); }
+  to   { transform: none; }
 }
 .screen.slide-right { animation: slide-from-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; z-index: 2; }
 .screen.slide-left  { animation: slide-from-left  0.3s cubic-bezier(0.16, 1, 0.3, 1) both; z-index: 2; }
@@ -487,8 +489,8 @@ a { color: inherit; text-decoration: none; }
   z-index: 100;
 }
 @keyframes signin-pop {
-  from { opacity: 0; transform: scale(0.93) translateY(14px); }
-  to   { opacity: 1; transform: none; }
+  from { transform: scale(0.93) translateY(14px); }
+  to   { transform: none; }
 }
 .signin-card {
   background: var(--surface);
