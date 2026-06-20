@@ -27,8 +27,8 @@ onAuthStateChanged(auth, async user => {
   if (!user) { show(authEl); hide(denyEl); hide(adminEl); return; }
   hide(authEl);
   if (!ADMIN_EMAILS.includes(user.email)) {
-    show(denyEl); hide(adminEl);
-    document.getElementById('deny-email').textContent = user.email;
+    // Regular user — redirect to the main app (already authenticated via Firebase)
+    window.location.href = './index.html';
     return;
   }
   hide(denyEl); show(adminEl);
