@@ -244,7 +244,7 @@ export const WORKOUTS = [
         defaultSets: 3,
         setsLabel: '3×15',
         isCardio: false,
-        videoId: 'Hol9RPBwVb4',
+        videoId: 't4_ii8WbOq4',
         howTo: "Attach a rope to the high cable pulley at roughly face height. Step back, hold the rope with both hands, palms facing each other. Pull the rope toward your face, spreading your hands apart as it comes in — elbows stay high and flare out to the sides. Squeeze your rear delts at the end position for 1 second. 3 sets of 15.",
         keyPoints: "Elbows high and wide the whole time — this is what hits the rear delts and rotator cuff, not the traps. This exercise protects your shoulder joints and fixes the muscle imbalance caused by lots of pressing and curling.",
         settings: 'Light weight, high reps. This is a health exercise as much as a strength one. Never go heavy on face pulls.',
