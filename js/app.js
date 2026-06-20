@@ -20,7 +20,7 @@ const SCREEN_ORDER = ['home', 'workout', 'history', 'plan'];
 let currentScreen = null;
 
 export function navigateTo(name) {
-  // Re-render only if already on this screen (Firestore update triggered)
+  // Firestore-triggered re-render — no animation, just refresh content
   if (name === currentScreen) {
     if (name === 'home') renderHome(screens.home, navigateTo);
     if (name === 'plan') renderPlan(screens.plan);
@@ -30,12 +30,20 @@ export function navigateTo(name) {
 
   const fromIdx = SCREEN_ORDER.indexOf(currentScreen ?? 'home');
   const toIdx = SCREEN_ORDER.indexOf(name);
-  const slideClass = toIdx >= fromIdx ? 'slide-right' : 'slide-left';
+  const isForward = toIdx >= fromIdx;
 
-  Object.entries(screens).forEach(([key, el]) => {
-    el.classList.remove('active', 'slide-right', 'slide-left');
-    if (key === name) el.classList.add('active', slideClass);
-  });
+  // Fade out the leaving screen
+  if (currentScreen) {
+    const leaving = screens[currentScreen];
+    leaving.classList.add('leaving');
+    setTimeout(() => leaving.classList.remove('active', 'leaving'), 260);
+  }
+
+  // Slide in the entering screen (force reflow so animation replays cleanly)
+  const entering = screens[name];
+  entering.classList.remove('slide-right', 'slide-left', 'leaving');
+  void entering.offsetHeight;
+  entering.classList.add('active', isForward ? 'slide-right' : 'slide-left');
 
   currentScreen = name;
 

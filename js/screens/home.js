@@ -1,5 +1,17 @@
 import { WORKOUTS, getNextWorkoutDay } from '../data.js';
 import { getSessions, getWater, addWater, getSettings, today } from '../store.js';
+
+function showWaterFloat(ml, btn) {
+  const rect = btn.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'water-float';
+  el.textContent = ml > 0 ? `+${ml} ml` : `−${Math.abs(ml)} ml`;
+  if (ml < 0) el.style.color = 'var(--text-dim)';
+  el.style.left = `${rect.left + rect.width / 2}px`;
+  el.style.top = `${rect.top}px`;
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
 import { signOutUser, stopListeners } from '../sync.js';
 
 function isIos() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
@@ -128,8 +140,24 @@ export function renderHome(container, navigate) {
 
   container.querySelectorAll('.water-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      addWater(todayStr, parseInt(btn.dataset.ml));
-      renderHome(container, navigate);
+      const ml = parseInt(btn.dataset.ml);
+      addWater(todayStr, ml);
+
+      // Update water display in-place so the bar width transition animates
+      const newMl = getWater(todayStr);
+      const goalMl = getSettings().waterGoalMl;
+      const pct = Math.min(100, (newMl / goalMl) * 100);
+      const fill = container.querySelector('.water-bar-fill');
+      const lbl = container.querySelector('.water-label');
+      if (fill) fill.style.width = `${pct}%`;
+      if (lbl) lbl.innerHTML = `
+        <span>💧 ${newMl} ml</span>
+        <span style="color:${newMl >= goalMl ? 'var(--accent)' : 'var(--text-muted)'}">
+          ${newMl >= goalMl ? '✓ Goal reached!' : `Goal: ${goalMl} ml`}
+        </span>
+      `;
+
+      showWaterFloat(ml, btn);
     });
   });
 
