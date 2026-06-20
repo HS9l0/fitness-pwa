@@ -74,12 +74,14 @@ document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
 });
 
 // Sign-in buttons
+function rememberChecked() { return document.getElementById('remember-me')?.checked ?? true; }
+
 document.getElementById('google-signin-btn')?.addEventListener('click', () => {
-  signInWithGoogle().catch(err => console.error('Sign in failed:', err));
+  signInWithGoogle(rememberChecked()).catch(err => console.error('Sign in failed:', err));
 });
 document.getElementById('staff-login-btn')?.addEventListener('click', () => {
   sessionStorage.setItem('loginMode', 'staff');
-  signInWithGoogle().catch(err => console.error('Staff sign in failed:', err));
+  signInWithGoogle(rememberChecked()).catch(err => console.error('Staff sign in failed:', err));
 });
 
 // Auth state — main entry point

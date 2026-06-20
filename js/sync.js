@@ -1,6 +1,7 @@
 import { auth, db } from './firebase.js';
 import {
-  signInWithPopup, GoogleAuthProvider, signOut
+  signInWithPopup, GoogleAuthProvider, signOut,
+  setPersistence, browserLocalPersistence, browserSessionPersistence
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
   collection, doc, setDoc, getDocs, onSnapshot
@@ -8,9 +9,9 @@ import {
 
 const KEYS = { sessions: 'fit_sessions', water: 'fit_water' };
 
-export async function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+export async function signInWithGoogle(remember = true) {
+  await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+  return signInWithPopup(auth, new GoogleAuthProvider());
 }
 
 export async function signOutUser() {
