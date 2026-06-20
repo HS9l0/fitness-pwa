@@ -233,7 +233,9 @@ function renderUserList(users) {
               `).join('')}
             </tbody>
           </table>`}
-    </div>`;
+    </div>
+
+    ${renderSettingsPanel()}`;
 
   document.getElementById('search')?.addEventListener('input', e => {
     const q = e.target.value.toLowerCase();
@@ -248,6 +250,71 @@ function renderUserList(users) {
       if (u) renderUserDetail(u);
     })
   );
+
+  document.getElementById('save-settings-btn').addEventListener('click', () => {
+    const key  = document.getElementById('s-api-key').value.trim();
+    const cal  = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
+    const wat  = parseInt(document.getElementById('s-water-goal').value)   || 2000;
+    const unit = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
+
+    localStorage.setItem('fit_gemini_key', key);
+    let cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
+    cfg.calorieGoalKcal = cal;
+    cfg.waterGoalMl     = wat;
+    cfg.weightUnit      = unit;
+    localStorage.setItem('fit_settings', JSON.stringify(cfg));
+
+    const savedEl = document.getElementById('settings-saved-msg');
+    if (savedEl) { savedEl.style.opacity = '1'; setTimeout(() => { savedEl.style.opacity = '0'; }, 2200); }
+    toast('Settings saved');
+  });
+}
+
+function renderSettingsPanel() {
+  const key  = localStorage.getItem('fit_gemini_key') ?? '';
+  let cfg    = {};
+  try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
+  const cal  = cfg.calorieGoalKcal ?? 2000;
+  const wat  = cfg.waterGoalMl     ?? 2000;
+  const unit = cfg.weightUnit       ?? 'kg';
+
+  return `
+    <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
+    <div class="card">
+      <div class="settings-grid">
+        <div>
+          <div class="settings-sec-title">AI &amp; Nutrition</div>
+          <div class="ctrl-group" style="margin-bottom:12px">
+            <label class="ctrl-label">Gemini API key <span class="muted">(food scanner)</span></label>
+            <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
+          </div>
+          <div class="ctrl-group">
+            <label class="ctrl-label">Daily calorie goal (kcal)</label>
+            <input id="s-calorie-goal" class="ctrl-input" type="number" value="${cal}" min="500" max="10000" step="50"/>
+          </div>
+        </div>
+        <div>
+          <div class="settings-sec-title">Hydration &amp; Units</div>
+          <div class="ctrl-group" style="margin-bottom:12px">
+            <label class="ctrl-label">Daily water goal (ml)</label>
+            <input id="s-water-goal" class="ctrl-input" type="number" value="${wat}" min="500" max="5000" step="100"/>
+          </div>
+          <div class="ctrl-group">
+            <label class="ctrl-label">Weight unit</label>
+            <div class="unit-toggle">
+              <label class="unit-opt"><input type="radio" name="weight-unit" value="kg"  ${unit === 'kg'  ? 'checked' : ''}/> kg</label>
+              <label class="unit-opt"><input type="radio" name="weight-unit" value="lbs" ${unit === 'lbs' ? 'checked' : ''}/> lbs</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
+        <button class="action-btn" id="save-settings-btn">Save all settings</button>
+        <span id="settings-saved-msg" style="font-size:0.75rem;color:var(--accent-2);opacity:0;transition:opacity 0.3s">✓ Saved</span>
+      </div>
+    </div>
+  `;
 }
 
 // ── User detail ───────────────────────────────────────────

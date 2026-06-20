@@ -1,4 +1,4 @@
-import { today, getFoodLog, addFoodEntry, removeFoodEntry, getSettings, saveSettings } from '../store.js';
+import { today, getFoodLog, addFoodEntry, removeFoodEntry, getSettings } from '../store.js';
 
 const CIRC  = 314.16; // 2π × r50
 const MODEL = 'gemini-1.5-flash';
@@ -114,22 +114,16 @@ export function renderNutrition(container) {
         </div>
       `}
 
-      <details class="card nutri-settings" style="margin-top:20px" ${!hasKey ? 'open' : ''}>
-        <summary class="nutri-settings-summary">⚙ Settings</summary>
-        <div class="nutri-settings-body">
-          <div class="ctrl-label-nut">Daily calorie goal</div>
-          <div class="nutri-goal-row">
-            <input type="number" id="goal-input" value="${goal}" min="500" max="10000" step="50"/>
-            <button class="btn-ghost" id="save-goal-btn">Save</button>
+      ${!hasKey ? `
+        <div class="nutri-setup-notice">
+          <div class="nutri-setup-title">Setup required</div>
+          <div class="nutri-setup-body">
+            Add your Gemini API key and calorie goal in the
+            <a href="./admin.html" style="color:var(--accent-blue)">admin dashboard</a>
+            to enable AI food scanning.
           </div>
-          <div class="ctrl-label-nut" style="margin-top:14px">Gemini AI API key</div>
-          <input type="password" id="api-key-input" value="${getKey()}" placeholder="Paste your key here…" style="margin-bottom:6px"/>
-          <div class="nutri-key-hint">
-            Get a free key at <a href="https://aistudio.google.com" target="_blank" rel="noopener" style="color:var(--accent-blue)">aistudio.google.com</a> · stored on device only
-          </div>
-          <button class="btn-ghost" id="save-key-btn" style="margin-top:10px">Save key</button>
         </div>
-      </details>
+      ` : ''}
 
     </div>
   `;
@@ -142,9 +136,8 @@ export function renderNutrition(container) {
 
   scanBtn.addEventListener('click', () => {
     if (!getKey()) {
-      container.querySelector('.nutri-settings').setAttribute('open', '');
-      container.querySelector('#api-key-input').focus();
-      showToast(container, 'Enter your Gemini API key first');
+      container.querySelector('.nutri-setup-notice')?.scrollIntoView({ behavior: 'smooth' });
+      showToast(container, 'Set up your API key in the admin dashboard');
       return;
     }
     cameraIn.click();
@@ -180,17 +173,6 @@ export function renderNutrition(container) {
       removeFoodEntry(date, btn.dataset.id);
       renderNutrition(container);
     });
-  });
-
-  container.querySelector('#save-goal-btn').addEventListener('click', () => {
-    const val = parseInt(container.querySelector('#goal-input').value);
-    if (val >= 500 && val <= 10000) { saveSettings({ calorieGoalKcal: val }); renderNutrition(container); }
-  });
-
-  container.querySelector('#save-key-btn').addEventListener('click', () => {
-    const k = container.querySelector('#api-key-input').value.trim();
-    setKey(k);
-    showToast(container, k ? 'API key saved' : 'API key cleared');
   });
 }
 

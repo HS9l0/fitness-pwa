@@ -528,19 +528,11 @@ body { overscroll-behavior: none; }
 .food-empty-text { font-weight: 600; margin-bottom: 4px; }
 .food-empty-sub  { font-size: 0.72rem; color: var(--text-dim); }
 
-/* Settings */
-.nutri-settings { padding: 0; overflow: hidden; }
-.nutri-settings-summary {
-  list-style: none; padding: 14px 16px; cursor: pointer; font-size: 0.82rem;
-  font-weight: 600; color: var(--text-muted); user-select: none;
-  display: flex; align-items: center; gap: 6px;
-}
-.nutri-settings-summary::-webkit-details-marker { display: none; }
-.nutri-settings-body  { padding: 0 16px 16px; }
-.ctrl-label-nut       { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
-.nutri-goal-row       { display: flex; gap: 8px; }
-.nutri-goal-row input { flex: 1; }
-.nutri-key-hint       { font-size: 0.67rem; color: var(--text-dim); line-height: 1.5; }
+
+/* Setup notice (no API key) */
+.nutri-setup-notice { background: rgba(249,115,22,0.06); border: 1px solid rgba(249,115,22,0.25); border-radius: var(--radius); padding: 14px 16px; margin-top: 8px; }
+.nutri-setup-title  { font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.nutri-setup-body   { font-size: 0.74rem; color: var(--text-muted); line-height: 1.55; }
 
 /* AI states */
 .ai-loading     { display: flex; align-items: center; gap: 12px; padding: 16px; margin-top: 8px; }
