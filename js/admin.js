@@ -3,7 +3,7 @@ import {
   signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
-  collection, getDocs, deleteDoc, doc, updateDoc, writeBatch
+  collection, getDocs, deleteDoc, doc, setDoc, updateDoc, writeBatch
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const BASE_ADMINS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
@@ -262,7 +262,7 @@ function renderUserList(users) {
     })
   );
 
-  document.getElementById('save-settings-btn').addEventListener('click', () => {
+  document.getElementById('save-settings-btn').addEventListener('click', async () => {
     const cal  = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
     const wat  = parseInt(document.getElementById('s-water-goal').value)   || 2000;
     const unit = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
@@ -274,6 +274,11 @@ function renderUserList(users) {
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
     localStorage.setItem('fit_gemini_key', key);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), { geminiKey: key }, { merge: true });
+      } catch {}
+    }
     const savedEl = document.getElementById('settings-saved-msg');
     if (savedEl) { savedEl.style.opacity = '1'; setTimeout(() => { savedEl.style.opacity = '0'; }, 2200); }
     toast('Settings saved');

@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v10';
+const CACHE = 'fitplan-v11';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',

@@ -4,7 +4,7 @@ import {
   setPersistence, browserLocalPersistence, browserSessionPersistence
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import {
-  collection, doc, setDoc, getDocs, onSnapshot
+  collection, doc, setDoc, getDoc, getDocs, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const KEYS = { sessions: 'fit_sessions', water: 'fit_water' };
@@ -19,10 +19,16 @@ export async function signOutUser() {
 }
 
 export async function pullFromFirestore(uid) {
-  const [sessionsSnap, waterSnap] = await Promise.all([
+  const [profileSnap, sessionsSnap, waterSnap] = await Promise.all([
+    getDoc(doc(db, 'users', uid)),
     getDocs(collection(db, 'users', uid, 'sessions')),
     getDocs(collection(db, 'users', uid, 'water'))
   ]);
+
+  const profile = profileSnap.data();
+  if (profile?.geminiKey) {
+    localStorage.setItem('fit_gemini_key', profile.geminiKey);
+  }
 
   const sessions = [];
   sessionsSnap.forEach(d => sessions.push(d.data()));
