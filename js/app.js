@@ -2,6 +2,7 @@ import { renderHome } from './screens/home.js';
 import { renderPlan } from './screens/plan.js';
 import { renderWorkout } from './screens/workout.js';
 import { renderHistory } from './screens/history.js';
+import { renderNutrition } from './screens/nutrition.js';
 import { auth } from './firebase.js';
 import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners, saveUserProfile } from './sync.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -9,24 +10,26 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/f
 const ADMIN_EMAILS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
 
 const screens = {
-  home: document.getElementById('screen-home'),
-  workout: document.getElementById('screen-workout'),
-  history: document.getElementById('screen-history'),
-  plan: document.getElementById('screen-plan')
+  home:      document.getElementById('screen-home'),
+  workout:   document.getElementById('screen-workout'),
+  history:   document.getElementById('screen-history'),
+  plan:      document.getElementById('screen-plan'),
+  nutrition: document.getElementById('screen-nutrition')
 };
 
 const signinScreen = document.getElementById('signin-screen');
 const appEl = document.getElementById('app');
 
-const SCREEN_ORDER = ['home', 'workout', 'history', 'plan'];
+const SCREEN_ORDER = ['home', 'workout', 'history', 'plan', 'nutrition'];
 let currentScreen = null;
 
 export function navigateTo(name) {
   // Firestore-triggered re-render — no animation, just refresh content
   if (name === currentScreen) {
-    if (name === 'home') renderHome(screens.home, navigateTo);
-    if (name === 'plan') renderPlan(screens.plan);
-    if (name === 'history') renderHistory(screens.history);
+    if (name === 'home')      renderHome(screens.home, navigateTo);
+    if (name === 'plan')      renderPlan(screens.plan);
+    if (name === 'history')   renderHistory(screens.history);
+    if (name === 'nutrition') renderNutrition(screens.nutrition);
     return;
   }
 
@@ -52,10 +55,11 @@ export function navigateTo(name) {
   document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
   });
-  if (name === 'home') renderHome(screens.home, navigateTo);
-  if (name === 'plan') renderPlan(screens.plan);
-  if (name === 'history') renderHistory(screens.history);
-  if (name === 'workout') renderWorkout(screens.workout, navigateTo);
+  if (name === 'home')      renderHome(screens.home, navigateTo);
+  if (name === 'plan')      renderPlan(screens.plan);
+  if (name === 'history')   renderHistory(screens.history);
+  if (name === 'workout')   renderWorkout(screens.workout, navigateTo);
+  if (name === 'nutrition') renderNutrition(screens.nutrition);
 }
 
 // Wire nav buttons (bottom nav + sidebar)

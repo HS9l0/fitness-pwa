@@ -1,7 +1,7 @@
 import { pushSession as _pushSession, pushWater as _pushWater } from './sync.js';
 import { auth } from './firebase.js';
 
-const KEYS = { sessions: 'fit_sessions', water: 'fit_water', settings: 'fit_settings' };
+const KEYS = { sessions: 'fit_sessions', water: 'fit_water', settings: 'fit_settings', food: 'fit_food' };
 
 function read(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -46,6 +46,18 @@ export function getLastWeights(exerciseName) {
 
 export function today() {
   return new Date().toISOString().slice(0, 10);
+}
+
+export function getFoodLog(date) { return (read(KEYS.food, {}))[date] ?? []; }
+export function addFoodEntry(date, entry) {
+  const food = read(KEYS.food, {});
+  food[date] = [entry, ...(food[date] ?? [])];
+  write(KEYS.food, food);
+}
+export function removeFoodEntry(date, id) {
+  const food = read(KEYS.food, {});
+  food[date] = (food[date] ?? []).filter(e => e.id !== id);
+  write(KEYS.food, food);
 }
 
 export function getSessionsForMonth(year, month) {

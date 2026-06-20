@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v6';
+const CACHE = 'fitplan-v7';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',
@@ -13,6 +13,7 @@ const ASSETS = [
   BASE + '/js/screens/plan.js',
   BASE + '/js/screens/workout.js',
   BASE + '/js/screens/history.js',
+  BASE + '/js/screens/nutrition.js',
   BASE + '/manifest.json',
   BASE + '/icons/icon-192.svg',
   BASE + '/icons/icon-512.svg'
@@ -33,11 +34,14 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Don't cache Firebase API calls — they need live network
+  // Don't cache live API calls
   if (e.request.url.includes('firestore.googleapis.com') ||
       e.request.url.includes('identitytoolkit.googleapis.com') ||
       e.request.url.includes('securetoken.googleapis.com') ||
-      e.request.url.includes('gstatic.com/firebasejs')) {
+      e.request.url.includes('gstatic.com/firebasejs') ||
+      e.request.url.includes('generativelanguage.googleapis.com') ||
+      e.request.url.includes('youtube.com') ||
+      e.request.url.includes('ytimg.com')) {
     return;
   }
   e.respondWith(
