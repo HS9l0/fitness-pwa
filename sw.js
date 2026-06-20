@@ -1,18 +1,19 @@
 const CACHE = 'fitplan-v1';
+const BASE = '/fitness-pwa';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/js/app.js',
-  '/js/data.js',
-  '/js/store.js',
-  '/js/screens/home.js',
-  '/js/screens/plan.js',
-  '/js/screens/workout.js',
-  '/js/screens/history.js',
-  '/manifest.json',
-  '/icons/icon-192.svg',
-  '/icons/icon-512.svg'
+  BASE + '/',
+  BASE + '/index.html',
+  BASE + '/styles.css',
+  BASE + '/js/app.js',
+  BASE + '/js/data.js',
+  BASE + '/js/store.js',
+  BASE + '/js/screens/home.js',
+  BASE + '/js/screens/plan.js',
+  BASE + '/js/screens/workout.js',
+  BASE + '/js/screens/history.js',
+  BASE + '/manifest.json',
+  BASE + '/icons/icon-192.svg',
+  BASE + '/icons/icon-512.svg'
 ];
 
 self.addEventListener('install', e => {
