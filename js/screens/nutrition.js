@@ -1,7 +1,7 @@
 import { today, getFoodLog, addFoodEntry, removeFoodEntry, getSettings } from '../store.js';
 
 const CIRC  = 314.16; // 2π × r50
-const MODEL = 'gemini-1.5-flash';
+const MODEL = 'gemini-2.0-flash';
 
 function getKey() { return localStorage.getItem('fit_gemini_key') ?? ''; }
 function nowTime() {
