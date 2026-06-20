@@ -263,10 +263,11 @@ function renderUserList(users) {
   );
 
   document.getElementById('save-settings-btn').addEventListener('click', async () => {
-    const cal  = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
-    const wat  = parseInt(document.getElementById('s-water-goal').value)   || 2000;
-    const unit = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
-    const key  = document.getElementById('s-api-key').value.trim();
+    const cal     = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
+    const wat     = parseInt(document.getElementById('s-water-goal').value)   || 2000;
+    const unit    = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
+    const key     = document.getElementById('s-api-key').value.trim();
+    const nutriOn = document.getElementById('s-nutrition-enabled').checked;
     let cfg = {};
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
     cfg.calorieGoalKcal = cal;
@@ -274,10 +275,11 @@ function renderUserList(users) {
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
     localStorage.setItem('fit_gemini_key', key);
+    localStorage.setItem('fit_nutrition_enabled', nutriOn ? 'true' : 'false');
     try {
       const usersSnap = await getDocs(collection(db, 'users'));
       const batch = writeBatch(db);
-      usersSnap.docs.forEach(d => batch.set(d.ref, { geminiKey: key }, { merge: true }));
+      usersSnap.docs.forEach(d => batch.set(d.ref, { geminiKey: key, nutritionEnabled: nutriOn }, { merge: true }));
       await batch.commit();
     } catch {}
     const savedEl = document.getElementById('settings-saved-msg');
@@ -344,10 +346,11 @@ function renderAdminPanel() {
 function renderSettingsPanel() {
   let cfg    = {};
   try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
-  const cal  = cfg.calorieGoalKcal ?? 2000;
-  const wat  = cfg.waterGoalMl     ?? 2000;
-  const unit = cfg.weightUnit       ?? 'kg';
-  const key  = localStorage.getItem('fit_gemini_key') ?? '';
+  const cal     = cfg.calorieGoalKcal ?? 2000;
+  const wat     = cfg.waterGoalMl     ?? 2000;
+  const unit    = cfg.weightUnit       ?? 'kg';
+  const key     = localStorage.getItem('fit_gemini_key') ?? '';
+  const nutriOn = localStorage.getItem('fit_nutrition_enabled') === 'true';
 
   return `
     <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
@@ -371,6 +374,13 @@ function renderSettingsPanel() {
         <div class="ctrl-group" style="grid-column:1/-1">
           <label class="ctrl-label">Gemini API key <span class="muted">(food AI scanner)</span></label>
           <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
+        </div>
+        <div class="ctrl-group" style="grid-column:1/-1">
+          <label class="ctrl-label">Nutrition tab</label>
+          <label class="unit-opt" style="gap:8px;cursor:pointer">
+            <input type="checkbox" id="s-nutrition-enabled" ${nutriOn ? 'checked' : ''}/>
+            Enable for all users
+          </label>
         </div>
       </div>
       <div style="margin-top:18px;display:flex;align-items:center;gap:12px">

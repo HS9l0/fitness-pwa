@@ -30,6 +30,7 @@ const SCREEN_ORDER = ['home', 'workout', 'history', 'plan', 'nutrition'];
 let currentScreen = null;
 
 export function navigateTo(name) {
+  if (name === 'nutrition' && localStorage.getItem('fit_nutrition_enabled') !== 'true') return;
   // Firestore-triggered re-render — no animation, just refresh content
   if (name === currentScreen) {
     if (name === 'home')      renderHome(screens.home, navigateTo);
@@ -102,6 +103,7 @@ onAuthStateChanged(auth, async (user) => {
     } catch {
       // Offline — localStorage already has data, continue
     }
+    applyNutritionVisibility();
     navigateTo('home');
     startListeners(user.uid, () => {
       // Re-render active screen on remote data change; skip workout to avoid wiping in-progress session
@@ -137,6 +139,13 @@ function updateSidebarUser(user) {
   document.getElementById('sidebar-signout-btn')?.addEventListener('click', async () => {
     stopListeners();
     await signOutUser();
+  });
+}
+
+function applyNutritionVisibility() {
+  const enabled = localStorage.getItem('fit_nutrition_enabled') === 'true';
+  document.querySelectorAll('[data-screen="nutrition"]').forEach(el => {
+    el.style.display = enabled ? '' : 'none';
   });
 }
 

@@ -29,6 +29,9 @@ export async function pullFromFirestore(uid) {
   if (profile?.geminiKey) {
     localStorage.setItem('fit_gemini_key', profile.geminiKey);
   }
+  if (profile?.nutritionEnabled !== undefined) {
+    localStorage.setItem('fit_nutrition_enabled', profile.nutritionEnabled ? 'true' : 'false');
+  }
 
   const sessions = [];
   sessionsSnap.forEach(d => sessions.push(d.data()));
