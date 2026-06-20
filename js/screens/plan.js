@@ -7,12 +7,12 @@ export function renderPlan(container) {
     <div class="screen-header">
       <div class="badge">Full Program</div>
       <h1>Your Plan</h1>
-      <p>All exercises with instructions</p>
+      <p>3 days · 17 exercises · videos included</p>
     </div>
     <div class="plan-tabs">
       ${WORKOUTS.map((w, i) => `
         <button class="plan-tab ${i === activeTab ? 'active' : ''}" data-tab="${i}">
-          Day ${w.day}
+          ${w.label.split('—')[1]?.trim() ?? `Day ${w.day}`}
         </button>
       `).join('')}
     </div>
@@ -33,36 +33,72 @@ export function renderPlan(container) {
 function renderPlanTab(container, tabIndex) {
   const workout = WORKOUTS[tabIndex];
   const content = container.querySelector('#plan-content');
+
   content.innerHTML = `
-    <div class="card" style="margin-bottom:12px;background:rgba(255,165,0,0.06);border-color:rgba(255,165,0,0.2)">
+    <div class="plan-overview">
+      <div class="plan-ov-item"><span>${workout.durationMin}</span> min</div>
+      <div class="plan-ov-sep"></div>
+      <div class="plan-ov-item"><span>${workout.exercises.length}</span> exercises</div>
+      <div class="plan-ov-sep"></div>
+      <div class="plan-ov-item"><span>${workout.weekday}</span></div>
+    </div>
+
+    <div class="card warmup-card">
       <div style="display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:1.3rem;flex-shrink:0">🔥</span>
+        <span style="font-size:1.2rem;flex-shrink:0">🔥</span>
         <div>
-          <div style="font-size:0.78rem;font-weight:700;color:#f0a500;margin-bottom:4px">Warm-Up (5 min)</div>
-          <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5">${workout.warmup}</div>
+          <div class="warmup-title">Warm-Up · 5 min</div>
+          <div class="warmup-body">${workout.warmup}</div>
         </div>
       </div>
     </div>
+
     <div class="plan-exercise-grid">
       ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, false)).join('')}
     </div>
-    <div class="card" style="margin-top:4px;background:rgba(61,142,248,0.06);border-color:rgba(61,142,248,0.2)">
-      <div style="font-size:0.78rem;font-weight:700;color:var(--accent-blue);margin-bottom:8px">❄️ Cool-Down</div>
-      <ul style="padding-left:16px">
-        ${workout.cooldown.map(c => `<li style="font-size:0.8rem;color:var(--text-muted);padding:3px 0;line-height:1.5">${c}</li>`).join('')}
+
+    <div class="card cooldown-card">
+      <div class="cooldown-title">❄️ Cool-Down</div>
+      <ul class="cooldown-list">
+        ${workout.cooldown.map(c => `<li>${c}</li>`).join('')}
       </ul>
     </div>
   `;
 
-  content.querySelectorAll('.exercise-card').forEach(card => {
-    card.querySelector('.ex-header').addEventListener('click', () => {
-      card.classList.toggle('open');
-    });
+  content.querySelectorAll('.exercise-card .ex-header').forEach(header => {
+    header.addEventListener('click', () => header.closest('.exercise-card').classList.toggle('open'));
+  });
+
+  content.querySelectorAll('.video-thumb').forEach(thumb => {
+    thumb.addEventListener('click', e => { e.stopPropagation(); embedVideo(thumb); });
   });
 }
 
+export function embedVideo(thumb) {
+  const vid = thumb.dataset.vid;
+  const iframe = document.createElement('iframe');
+  iframe.className = 'video-frame';
+  iframe.src = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('allow', 'autoplay; encrypted-media');
+  iframe.setAttribute('frameborder', '0');
+  thumb.replaceWith(iframe);
+}
+
 export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
+  const videoHtml = ex.videoId ? `
+    <div class="video-wrap">
+      <div class="video-thumb" data-vid="${ex.videoId}">
+        <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
+        <div class="play-overlay">
+          <div class="play-circle">▶</div>
+          <span class="play-label">Watch tutorial</span>
+        </div>
+      </div>
+    </div>` : '';
+
   const detailsHtml = `
+    ${videoHtml}
     <div class="detail-grid">
       <div class="detail-box"><div class="d-label">How to do it</div><div class="d-val">${ex.howTo}</div></div>
       <div class="detail-box"><div class="d-label">Key points</div><div class="d-val">${ex.keyPoints}</div></div>
@@ -72,7 +108,16 @@ export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
     <div class="tip-box"><strong>Common mistake:</strong> ${ex.commonMistake}</div>
   `;
 
-  const bodyHtml = isWorkoutMode ? renderSetRows(ex, lastWeights) : detailsHtml;
+  const workoutBodyHtml = `
+    ${renderSetRows(ex, lastWeights)}
+    ${videoHtml ? `<div class="workout-video-toggle">
+      <div class="video-wrap" style="margin-top:14px">${videoHtml.replace('<div class="video-wrap">', '').replace('</div>', '').trimEnd().slice(0, -6)}</div>
+    </div>` : ''}
+  `;
+
+  const bodyHtml = isWorkoutMode
+    ? renderSetRowsWithVideo(ex, lastWeights)
+    : detailsHtml;
 
   return `
     <div class="exercise-card" data-ex-name="${ex.name}">
@@ -92,10 +137,25 @@ export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
   `;
 }
 
+function renderSetRowsWithVideo(ex, lastWeights) {
+  const setHtml = renderSetRows(ex, lastWeights);
+  const videoHtml = ex.videoId ? `
+    <div class="video-wrap" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+      <div class="video-thumb" data-vid="${ex.videoId}">
+        <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
+        <div class="play-overlay">
+          <div class="play-circle">▶</div>
+          <span class="play-label">Watch tutorial</span>
+        </div>
+      </div>
+    </div>` : '';
+  return setHtml + videoHtml;
+}
+
 function renderSetRows(ex, lastWeights) {
   const lastHint = lastWeights
     ? (ex.isCardio
-        ? (lastWeights.note ? `Last: ${lastWeights.note}` : 'Done before')
+        ? (lastWeights.note ? `Last time: ${lastWeights.note}` : 'Done before')
         : `Last: ${lastWeights.weight ?? '?'} kg × ${lastWeights.reps ?? '?'} reps`)
     : 'First time — start light';
 
@@ -126,14 +186,11 @@ function renderSetRows(ex, lastWeights) {
   `).join('');
 
   return `
-    <div style="font-size:0.72rem;color:var(--text-dim);padding:10px 0 6px">${lastHint}</div>
+    <div style="font-size:0.72rem;color:var(--text-dim);padding:8px 0 6px">${lastHint}</div>
     <div class="sets-header">
-      <div></div>
-      <div>Weight</div>
-      <div>Reps</div>
-      <div></div>
+      <div></div><div>Weight</div><div>Reps</div><div></div>
     </div>
     ${rows}
-    <div style="font-size:0.71rem;color:var(--text-dim);padding:8px 0 0">Tap ✓ after completing each set</div>
+    <div style="font-size:0.7rem;color:var(--text-dim);padding:8px 0 0">Tap ✓ after each set</div>
   `;
 }
