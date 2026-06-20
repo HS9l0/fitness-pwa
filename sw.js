@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v1';
+const CACHE = 'fitplan-v2';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',
@@ -7,6 +7,8 @@ const ASSETS = [
   BASE + '/js/app.js',
   BASE + '/js/data.js',
   BASE + '/js/store.js',
+  BASE + '/js/firebase.js',
+  BASE + '/js/sync.js',
   BASE + '/js/screens/home.js',
   BASE + '/js/screens/plan.js',
   BASE + '/js/screens/workout.js',
@@ -31,6 +33,13 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Don't cache Firebase API calls — they need live network
+  if (e.request.url.includes('firestore.googleapis.com') ||
+      e.request.url.includes('identitytoolkit.googleapis.com') ||
+      e.request.url.includes('securetoken.googleapis.com') ||
+      e.request.url.includes('gstatic.com/firebasejs')) {
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

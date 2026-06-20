@@ -43,7 +43,9 @@ function renderPlanTab(container, tabIndex) {
         </div>
       </div>
     </div>
-    ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, false)).join('')}
+    <div class="plan-exercise-grid">
+      ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, false)).join('')}
+    </div>
     <div class="card" style="margin-top:4px;background:rgba(61,142,248,0.06);border-color:rgba(61,142,248,0.2)">
       <div style="font-size:0.78rem;font-weight:700;color:var(--accent-blue);margin-bottom:8px">❄️ Cool-Down</div>
       <ul style="padding-left:16px">

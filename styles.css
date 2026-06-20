@@ -311,12 +311,120 @@ a { color: inherit; text-decoration: none; }
 .rest-day-card h3 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
 .rest-day-card p { font-size: 0.82rem; color: var(--text-muted); }
 
+/* ── Sidebar ──────────────────────────────────────────────── */
+#sidebar {
+  display: none;
+  width: 240px;
+  flex-shrink: 0;
+  flex-direction: column;
+  background: #0d0d14;
+  border-right: 1px solid var(--border);
+  height: 100dvh;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px 20px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px;
+  gap: 4px;
+}
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  transition: background 0.15s, color 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.sidebar-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sidebar-btn:hover { background: var(--surface); color: var(--text-muted); }
+.sidebar-btn.active { background: rgba(233,69,96,0.12); color: var(--accent); }
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid var(--border);
+  min-height: 68px;
+}
+
+/* ── Sign-in screen ──────────────────────────────────────── */
+#signin-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.signin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 36px;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+}
+.signin-icon { font-size: 3rem; margin-bottom: 16px; }
+.signin-card h1 { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+.signin-card > p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; }
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: #fff;
+  color: #3c4043;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  transition: box-shadow 0.15s;
+  margin-bottom: 16px;
+}
+.google-btn:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+.signin-note { font-size: 0.72rem; color: var(--text-dim); margin: 0; }
+
 /* ── Desktop layout ─────────────────────────────────────── */
 @media (min-width: 768px) {
-  #app { max-width: 480px; margin: 0 auto; box-shadow: 0 0 60px rgba(0,0,0,0.6); }
   html { background: #050508; }
+  #app { flex-direction: row; max-width: none; margin: 0; box-shadow: none; }
+  #sidebar { display: flex; }
+  #bottom-nav { display: none; }
+  #screens { flex: 1; min-width: 0; }
   .screen-header { padding-top: 32px; }
   .workout-header { padding-top: 32px; }
+
+  /* Home two-column */
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: start; }
+
+  /* History side-by-side */
+  .history-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; align-items: start; }
+
+  /* Plan exercise 2-column grid */
+  .plan-exercise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .plan-exercise-grid .exercise-card { margin-bottom: 0; }
 }
 
 /* ── Mobile tweaks ──────────────────────────────────────── */

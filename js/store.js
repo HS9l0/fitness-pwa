@@ -1,3 +1,6 @@
+import { pushSession as _pushSession, pushWater as _pushWater } from './sync.js';
+import { auth } from './firebase.js';
+
 const KEYS = { sessions: 'fit_sessions', water: 'fit_water', settings: 'fit_settings' };
 
 function read(key, fallback) {
@@ -10,6 +13,7 @@ export function getSessions() { return read(KEYS.sessions, []); }
 export function saveSession(session) {
   const sessions = getSessions().filter(s => s.date !== session.date || s.day !== session.day);
   write(KEYS.sessions, [session, ...sessions]);
+  if (auth.currentUser) _pushSession(auth.currentUser.uid, session);
 }
 
 export function getWater(date) { return (read(KEYS.water, {}))[date] ?? 0; }
@@ -17,6 +21,7 @@ export function addWater(date, ml) {
   const water = read(KEYS.water, {});
   water[date] = Math.max(0, (water[date] ?? 0) + ml);
   write(KEYS.water, water);
+  if (auth.currentUser) _pushWater(auth.currentUser.uid, date, water[date]);
   return water[date];
 }
 

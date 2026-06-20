@@ -35,35 +35,40 @@ export function renderHistory(container) {
       <p>${allSessions.length} session${allSessions.length !== 1 ? 's' : ''} logged</p>
     </div>
     <div class="section">
-      <div class="card">
-        <div class="cal-nav">
-          <button id="cal-prev">‹</button>
-          <h3>${monthName}</h3>
-          <button id="cal-next">›</button>
-        </div>
-        <div class="cal-grid">
-          ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-day-hdr">${d}</div>`).join('')}
-          ${cells.join('')}
-        </div>
-      </div>
-      <div id="session-detail"></div>
-    </div>
-    <div class="section" style="padding-top:0">
-      <div class="section-title">Recent Sessions</div>
-      ${allSessions.length
-        ? allSessions.slice(0, 20).map(s => `
-          <div class="card" style="margin-bottom:10px;cursor:pointer" data-date="${s.date}">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:0.88rem;font-weight:700">${WORKOUTS[s.day - 1]?.label ?? 'Workout'}</div>
-                <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px">${s.date} · ${s.durationMin ?? '?'} min</div>
-              </div>
-              <div style="font-size:0.72rem;color:var(--accent);font-weight:700">${s.exercises?.length ?? 0} exercises →</div>
+      <div class="history-layout">
+        <div>
+          <div class="card">
+            <div class="cal-nav">
+              <button id="cal-prev">‹</button>
+              <h3>${monthName}</h3>
+              <button id="cal-next">›</button>
+            </div>
+            <div class="cal-grid">
+              ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => `<div class="cal-day-hdr">${d}</div>`).join('')}
+              ${cells.join('')}
             </div>
           </div>
-        `).join('')
-        : '<div style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:28px 0">No sessions yet.<br/>Complete a workout to see it here.</div>'
-      }
+          <div id="session-detail"></div>
+        </div>
+
+        <div>
+          <div class="section-title">Recent Sessions</div>
+          ${allSessions.length
+            ? allSessions.slice(0, 20).map(s => `
+              <div class="card session-row" style="margin-bottom:10px;cursor:pointer" data-date="${s.date}">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-size:0.88rem;font-weight:700">${WORKOUTS[s.day - 1]?.label ?? 'Workout'}</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px">${s.date} · ${s.durationMin ?? '?'} min</div>
+                  </div>
+                  <div style="font-size:0.72rem;color:var(--accent);font-weight:700">${s.exercises?.length ?? 0} exercises →</div>
+                </div>
+              </div>
+            `).join('')
+            : '<div style="color:var(--text-dim);font-size:0.85rem;text-align:center;padding:28px 0">No sessions yet.<br/>Complete a workout to see it here.</div>'
+          }
+        </div>
+      </div>
     </div>
   `;
 
@@ -85,19 +90,17 @@ export function renderHistory(container) {
     el.addEventListener('click', () => {
       const date = el.dataset.date;
       selectedDate = selectedDate === date ? null : date;
-      if (selectedDate) {
-        const session = sessionMap[date];
-        if (session) renderSessionDetail(container.querySelector('#session-detail'), session);
+      if (selectedDate && sessionMap[date]) {
+        renderSessionDetail(container.querySelector('#session-detail'), sessionMap[date]);
       } else {
         container.querySelector('#session-detail').innerHTML = '';
+        selectedDate = null;
       }
       renderHistory(container);
     });
   });
 
-  // Tap on recent session cards
-  container.querySelectorAll('.section [data-date]').forEach(el => {
-    if (el.classList.contains('cal-day')) return;
+  container.querySelectorAll('.session-row').forEach(el => {
     el.addEventListener('click', () => {
       const date = el.dataset.date;
       const session = allSessions.find(s => s.date === date);
@@ -105,15 +108,14 @@ export function renderHistory(container) {
         selectedDate = date;
         renderSessionDetail(container.querySelector('#session-detail'), session);
         container.scrollTo({ top: 0, behavior: 'smooth' });
+        renderHistory(container);
       }
     });
   });
 
-  // Restore selected session detail after re-render
-  if (selectedDate && sessionMap[selectedDate]) {
-    renderSessionDetail(container.querySelector('#session-detail'), sessionMap[selectedDate]);
-  } else if (selectedDate) {
-    const session = allSessions.find(s => s.date === selectedDate);
+  // Restore selected detail after re-render
+  if (selectedDate) {
+    const session = sessionMap[selectedDate] || allSessions.find(s => s.date === selectedDate);
     if (session) renderSessionDetail(container.querySelector('#session-detail'), session);
   }
 }
