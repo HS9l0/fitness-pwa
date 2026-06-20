@@ -16,10 +16,29 @@ const screens = {
 const signinScreen = document.getElementById('signin-screen');
 const appEl = document.getElementById('app');
 
+const SCREEN_ORDER = ['home', 'workout', 'history', 'plan'];
+let currentScreen = null;
+
 export function navigateTo(name) {
+  // Re-render only if already on this screen (Firestore update triggered)
+  if (name === currentScreen) {
+    if (name === 'home') renderHome(screens.home, navigateTo);
+    if (name === 'plan') renderPlan(screens.plan);
+    if (name === 'history') renderHistory(screens.history);
+    return;
+  }
+
+  const fromIdx = SCREEN_ORDER.indexOf(currentScreen ?? 'home');
+  const toIdx = SCREEN_ORDER.indexOf(name);
+  const slideClass = toIdx >= fromIdx ? 'slide-right' : 'slide-left';
+
   Object.entries(screens).forEach(([key, el]) => {
-    el.classList.toggle('active', key === name);
+    el.classList.remove('active', 'slide-right', 'slide-left');
+    if (key === name) el.classList.add('active', slideClass);
   });
+
+  currentScreen = name;
+
   document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
   });

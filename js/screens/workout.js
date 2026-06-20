@@ -162,7 +162,13 @@ function renderActiveWorkout(container, workout, navigate) {
     const durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
     session.durationMin = durationMin;
     saveSession(session);
-    activeSession = null;
-    navigate('home');
+
+    const btn = container.querySelector('#finish-btn');
+    btn.classList.add('finishing');
+    btn.textContent = '🎉 Workout saved!';
+    setTimeout(() => {
+      activeSession = null;
+      navigate('home');
+    }, 600);
   });
 }

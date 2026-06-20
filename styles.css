@@ -26,8 +26,24 @@ a { color: inherit; text-decoration: none; }
 /* ── App shell ──────────────────────────────────────────── */
 #app { display: flex; flex-direction: column; height: 100dvh; }
 #screens { flex: 1; overflow: hidden; position: relative; }
-.screen { position: absolute; inset: 0; overflow-y: auto; padding-bottom: 16px; display: none; }
-.screen.active { display: block; }
+.screen {
+  position: absolute; inset: 0;
+  overflow-y: auto; padding-bottom: 16px;
+  opacity: 0; pointer-events: none;
+}
+.screen.active { opacity: 1; pointer-events: auto; }
+
+/* ── Screen slide animations ────────────────────────────── */
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-36px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.screen.slide-right { animation: slide-from-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.screen.slide-left  { animation: slide-from-left  0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* ── Bottom nav ─────────────────────────────────────────── */
 #bottom-nav {
@@ -48,12 +64,13 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   gap: 4px;
   color: var(--text-dim);
-  transition: color 0.15s;
+  transition: color 0.15s, transform 0.12s ease;
   padding: 8px 0;
 }
 .nav-btn svg { width: 22px; height: 22px; }
 .nav-btn span { font-size: 0.68rem; letter-spacing: 0.3px; }
 .nav-btn.active { color: var(--accent); }
+.nav-btn:active { transform: scale(0.88); }
 
 /* ── Cards ──────────────────────────────────────────────── */
 .card {
@@ -75,9 +92,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.95rem;
   border-radius: var(--radius-sm);
   text-align: center;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.12s ease;
 }
-.btn-primary:active { opacity: 0.8; }
+.btn-primary:active { opacity: 0.85; transform: scale(0.98); }
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -87,9 +104,24 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius-sm);
   font-size: 0.82rem;
   color: var(--text-muted);
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, transform 0.12s ease;
 }
-.btn-ghost:active { border-color: var(--accent); color: var(--accent); }
+.btn-ghost:active { border-color: var(--accent); color: var(--accent); transform: scale(0.97); }
+
+/* ── Begin workout button pulse ─────────────────────────── */
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.5); }
+  50%       { box-shadow: 0 0 0 10px rgba(233, 69, 96, 0); }
+}
+#begin-btn { animation: btn-pulse 2s ease-in-out infinite; }
+
+/* ── Finish workout celebration ─────────────────────────── */
+@keyframes finish-flash {
+  0%   { background: var(--accent); transform: scale(1); }
+  35%  { background: #22c55e; box-shadow: 0 0 28px rgba(34,197,94,0.5); transform: scale(1.03); }
+  100% { background: #22c55e; transform: scale(1); }
+}
+#finish-btn.finishing { animation: finish-flash 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: none; }
 
 /* ── Screen header ──────────────────────────────────────── */
 .screen-header {
@@ -127,7 +159,7 @@ a { color: inherit; text-decoration: none; }
 /* ── Water tracker ──────────────────────────────────────── */
 .water-bar-wrap { margin: 10px 0 14px; }
 .water-bar-bg { height: 8px; background: var(--surface-raised); border-radius: 4px; overflow: hidden; }
-.water-bar-fill { height: 100%; background: var(--accent-blue); border-radius: 4px; transition: width 0.4s ease; }
+.water-bar-fill { height: 100%; background: var(--accent-blue); border-radius: 4px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .water-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
 .water-btns { display: flex; gap: 8px; }
 .water-btn {
@@ -139,9 +171,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.82rem;
   color: var(--accent-blue);
   font-weight: 600;
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.12s ease;
 }
-.water-btn:active { background: #1a2a4a; }
+.water-btn:active { background: #1a2a4a; transform: scale(0.92); }
 
 /* ── Streak dots ────────────────────────────────────────── */
 .streak-row { display: flex; gap: 6px; justify-content: space-between; }
@@ -161,6 +193,7 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: 0.65rem;
   color: var(--text-dim);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .streak-dot.done .dot { background: var(--accent); border-color: var(--accent); color: #fff; }
 .streak-dot.today .dot { border-color: var(--accent); color: var(--accent); }
@@ -182,6 +215,7 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   user-select: none;
   -webkit-user-select: none;
+  transition: background 0.15s;
 }
 .ex-header:active { background: var(--surface-raised); }
 .ex-num {
@@ -198,10 +232,33 @@ a { color: inherit; text-decoration: none; }
 .ex-name { font-size: 0.95rem; font-weight: 700; color: #fff; }
 .ex-muscles { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; }
 .ex-meta { font-size: 0.78rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
-.ex-chevron { font-size: 0.7rem; color: var(--text-dim); transition: transform 0.2s; flex-shrink: 0; }
+.ex-chevron {
+  font-size: 0.7rem; color: var(--text-dim);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
-.ex-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
-.exercise-card.open .ex-body { display: block; }
+
+/* Accordion — max-height instead of display:none so it can animate */
+.ex-body {
+  display: block;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 18px;
+  border-top: 1px solid transparent;
+  transition:
+    max-height 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity    0.25s ease,
+    padding    0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease;
+}
+.exercise-card.open .ex-body {
+  max-height: 900px;
+  opacity: 1;
+  padding: 0 18px 18px;
+  border-top-color: var(--border);
+}
 
 /* ── Exercise detail grid (plan screen) ─────────────────── */
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
@@ -213,8 +270,15 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Set rows (workout screen) ──────────────────────────── */
 .sets-header { display: grid; grid-template-columns: 28px 80px 80px 32px; gap: 6px; align-items: center; padding: 10px 0 6px; font-size: 0.63rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
-.set-row { display: grid; grid-template-columns: 28px 80px 80px 32px; gap: 6px; align-items: center; padding: 5px 0; }
+.set-row { display: grid; grid-template-columns: 28px 80px 80px 32px; gap: 6px; align-items: center; padding: 5px 0; transition: opacity 0.25s ease; }
 .set-num { font-size: 0.75rem; color: var(--text-dim); text-align: center; }
+
+@keyframes check-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); }
+  70%  { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
 .set-check {
   width: 28px; height: 28px;
   border-radius: 50%;
@@ -226,7 +290,12 @@ a { color: inherit; text-decoration: none; }
   padding: 0;
   flex-shrink: 0;
 }
-.set-check.checked { background: var(--accent); border-color: var(--accent); color: #fff; }
+.set-check.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  animation: check-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .set-row input[type="number"] { text-align: center; padding: 6px 4px; font-size: 0.82rem; }
 .cardio-note { padding: 12px 0 4px; }
 .cardio-input { margin-top: 8px; }
@@ -242,12 +311,21 @@ a { color: inherit; text-decoration: none; }
 }
 .workout-header-left h2 { font-size: 1.3rem; font-weight: 800; color: #fff; }
 .workout-header-left p { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; }
-.timer { font-size: 1.5rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+.timer {
+  font-size: 1.5rem; font-weight: 800; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  animation: timer-pulse 1s ease-in-out infinite;
+}
 
 /* ── History calendar ───────────────────────────────────── */
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .cal-nav h3 { font-size: 0.95rem; font-weight: 700; }
-.cal-nav button { font-size: 1.1rem; color: var(--text-muted); padding: 4px 10px; }
+.cal-nav button { font-size: 1.1rem; color: var(--text-muted); padding: 4px 10px; transition: color 0.15s, transform 0.12s ease; }
+.cal-nav button:active { color: var(--accent); transform: scale(0.88); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .cal-day-hdr { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); text-align: center; padding: 4px 0; }
 .cal-day {
@@ -256,12 +334,14 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: 0.78rem;
   color: var(--text-dim);
+  transition: transform 0.12s ease;
 }
 .cal-day.has-session { background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; }
+.cal-day.has-session:active { transform: scale(0.88); }
 .cal-day.today { border: 1.5px solid var(--accent); color: var(--accent); }
 .cal-day.selected { outline: 2px solid var(--accent); outline-offset: 2px; }
-.session-detail { margin-top: 16px; animation: fadeIn 0.2s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.session-detail { margin-top: 16px; animation: fadeIn 0.25s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .session-ex-row { padding: 8px 0; border-top: 1px solid var(--border); }
 .session-ex-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .session-set-pill {
@@ -273,6 +353,8 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted);
   margin: 4px 4px 0 0;
 }
+.session-row { transition: background 0.15s, transform 0.12s ease; }
+.session-row:active { transform: scale(0.99); background: var(--surface-raised) !important; }
 
 /* ── Plan tabs ──────────────────────────────────────────── */
 .plan-tabs { display: flex; gap: 8px; padding: 16px 20px 0; }
@@ -285,8 +367,9 @@ a { color: inherit; text-decoration: none; }
   background: var(--surface-raised);
   border: 1px solid var(--border);
   color: var(--text-muted);
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.12s ease;
 }
+.plan-tab:active { transform: scale(0.95); }
 .plan-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* ── Next workout card ──────────────────────────────────── */
@@ -350,13 +433,18 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--text-dim);
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.12s ease;
   text-align: left;
   width: 100%;
 }
 .sidebar-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 .sidebar-btn:hover { background: var(--surface); color: var(--text-muted); }
-.sidebar-btn.active { background: rgba(233,69,96,0.12); color: var(--accent); }
+.sidebar-btn:active { transform: scale(0.97); }
+.sidebar-btn.active {
+  background: rgba(233,69,96,0.12);
+  color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
 .sidebar-user {
   display: flex;
   align-items: center;
@@ -376,6 +464,10 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   z-index: 100;
 }
+@keyframes signin-pop {
+  from { opacity: 0; transform: scale(0.93) translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
 .signin-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -384,6 +476,7 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
   max-width: 340px;
   width: 90%;
+  animation: signin-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .signin-icon { font-size: 3rem; margin-bottom: 16px; }
 .signin-card h1 { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
@@ -400,10 +493,11 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
   font-size: 0.9rem;
   border-radius: var(--radius-sm);
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s, transform 0.12s ease;
   margin-bottom: 16px;
 }
 .google-btn:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+.google-btn:active { transform: scale(0.97); }
 .signin-note { font-size: 0.72rem; color: var(--text-dim); margin: 0; }
 
 /* ── Desktop layout ─────────────────────────────────────── */
