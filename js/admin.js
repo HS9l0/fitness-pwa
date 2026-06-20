@@ -10,13 +10,9 @@ const ADMIN_EMAILS = ['lusi.genova@gmail.com', 'ranov.insta@gmail.com'];
 const DAY_LABELS   = { 1: 'Cardio', 2: 'Legs', 3: 'Arms' };
 
 const authEl  = document.getElementById('auth-screen');
-const denyEl  = document.getElementById('deny-screen');
 const adminEl = document.getElementById('admin-screen');
 const mainEl  = document.getElementById('main-content');
 const loadEl  = document.getElementById('loading');
-
-function show(el) { el.style.display = 'flex'; }
-function hide(el) { el.style.display = 'none'; }
 
 document.getElementById('google-btn').addEventListener('click', () =>
   signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message))
@@ -24,14 +20,17 @@ document.getElementById('google-btn').addEventListener('click', () =>
 document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
 
 onAuthStateChanged(auth, async user => {
-  if (!user) { show(authEl); hide(denyEl); hide(adminEl); return; }
-  hide(authEl);
+  if (!user) {
+    authEl.style.display = 'flex';
+    adminEl.style.display = 'none';
+    return;
+  }
+  authEl.style.display = 'none';
   if (!ADMIN_EMAILS.includes(user.email)) {
-    // Regular user — redirect to the main app (already authenticated via Firebase)
     window.location.href = './index.html';
     return;
   }
-  hide(denyEl); show(adminEl);
+  adminEl.style.display = 'flex';
   document.getElementById('admin-user').textContent = user.displayName ?? user.email;
   loadAndRender();
 });
