@@ -162,6 +162,7 @@ function renderActiveWorkout(container, workout, navigate) {
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
         showRestTimer(container, 90, nextCard ? () => {
+          exCard?.classList.remove('open');
           nextCard.classList.add('open');
           nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } : null);
@@ -188,6 +189,7 @@ function renderActiveWorkout(container, workout, navigate) {
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
         showRestTimer(container, 90, nextCard ? () => {
+          exCard?.classList.remove('open');
           nextCard.classList.add('open');
           nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } : null);
