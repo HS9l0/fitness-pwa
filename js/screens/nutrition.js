@@ -286,15 +286,10 @@ async function lookupBarcode(container, resultEl, code, date) {
 // ── AI scan ──────────────────────────────────────────────
 async function handleScan(container, file, date) {
   const resultEl = container.querySelector('#ai-result');
-  resultEl.innerHTML = `
-    <div class="ai-loading card">
-      <div class="ai-spinner"></div>
-      <span class="ai-loading-txt">Analyzing your meal…</span>
-    </div>
-  `;
+  resultEl.innerHTML = `<div class="ai-loading card"><div class="ai-spinner"></div><span class="ai-loading-txt">Analyzing your meal…</span></div>`;
   try {
     const { base64, mimeType } = await compress(file);
-    const analysis = await queryGemini(base64, mimeType, getKey());
+    const analysis = await queryGeminiWithRetry(base64, mimeType, getKey(), resultEl);
     showAnalysis(container, resultEl, analysis, date);
   } catch (err) {
     resultEl.innerHTML = `
@@ -302,10 +297,50 @@ async function handleScan(container, file, date) {
         <div class="ai-error-title">⚠️ Could not analyze</div>
         <div class="ai-error-msg">${err.message}</div>
         <button class="btn-ghost" style="margin-top:12px" id="ai-dismiss">Dismiss</button>
-      </div>
-    `;
+      </div>`;
     container.querySelector('#ai-dismiss').addEventListener('click', () => { resultEl.innerHTML = ''; });
   }
+}
+
+async function queryGeminiWithRetry(base64, mimeType, key, resultEl, attempt = 0) {
+  try {
+    return await queryGemini(base64, mimeType, key);
+  } catch (err) {
+    if (err.retryAfter && attempt < 2) {
+      await countdown(resultEl, err.retryAfter);
+      resultEl.innerHTML = `<div class="ai-loading card"><div class="ai-spinner"></div><span class="ai-loading-txt">Retrying…</span></div>`;
+      return queryGeminiWithRetry(base64, mimeType, key, resultEl, attempt + 1);
+    }
+    throw err;
+  }
+}
+
+function countdown(resultEl, seconds) {
+  return new Promise(resolve => {
+    let remaining = seconds;
+    const render = () => {
+      resultEl.innerHTML = `
+        <div class="ai-loading card">
+          <div class="ai-retry-ring">
+            <svg viewBox="0 0 36 36" width="40" height="40">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--surface-raised)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--accent)" stroke-width="3"
+                stroke-dasharray="${(2*Math.PI*14).toFixed(1)}"
+                stroke-dashoffset="${(2*Math.PI*14*(1-remaining/seconds)).toFixed(1)}"
+                transform="rotate(-90 18 18)" stroke-linecap="round"/>
+            </svg>
+            <span class="ai-retry-count">${remaining}</span>
+          </div>
+          <span class="ai-loading-txt">Rate limit — retrying in ${remaining}s</span>
+        </div>`;
+    };
+    render();
+    const iv = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) { clearInterval(iv); resolve(); return; }
+      render();
+    }, 1000);
+  });
 }
 
 function showAnalysis(container, resultEl, analysis, date) {
@@ -410,8 +445,13 @@ Respond with ONLY valid JSON (no markdown, no explanation):
     const msg  = body.error?.message ?? `HTTP ${res.status}`;
     if (res.status === 401 || msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('api_key'))
       throw new Error('Invalid API key — check your key in the admin dashboard');
-    if (res.status === 429)
-      throw new Error('Rate limit hit — wait a moment and try again');
+    if (res.status === 429) {
+      const retryDelay = body.error?.details?.find(d => d.retryDelay)?.retryDelay;
+      const seconds = retryDelay ? Math.ceil(parseInt(retryDelay)) : 30;
+      const err = new Error(`Rate limit — retrying in ${seconds}s`);
+      err.retryAfter = seconds;
+      throw err;
+    }
     throw new Error(msg);
   }
 
