@@ -372,8 +372,8 @@ function renderSettingsPanel() {
           </div>
         </div>
         <div class="ctrl-group" style="grid-column:1/-1">
-          <label class="ctrl-label">Gemini API key <span class="muted">(food AI scanner)</span></label>
-          <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
+          <label class="ctrl-label">OpenRouter API key <span class="muted">(food AI scanner)</span></label>
+          <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from openrouter.ai/keys…"/>
         </div>
         <div class="ctrl-group" style="grid-column:1/-1">
           <label class="ctrl-label">Nutrition tab</label>

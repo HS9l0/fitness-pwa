@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v13';
+const CACHE = 'fitplan-v14';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',
@@ -40,6 +40,7 @@ self.addEventListener('fetch', e => {
       e.request.url.includes('identitytoolkit.googleapis.com') ||
       e.request.url.includes('securetoken.googleapis.com') ||
       e.request.url.includes('gstatic.com/firebasejs') ||
+      e.request.url.includes('openrouter.ai') ||
       e.request.url.includes('generativelanguage.googleapis.com') ||
       e.request.url.includes('world.openfoodfacts.org') ||
       e.request.url.includes('youtube.com') ||
