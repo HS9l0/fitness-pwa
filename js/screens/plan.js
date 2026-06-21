@@ -131,10 +131,13 @@ function renderSetRowsWithVideo(ex, lastWeights) {
 }
 
 function renderSetRows(ex, lastWeights) {
+  const lastW    = lastWeights?.weight ?? null;
+  const lastR    = lastWeights?.reps   ?? null;
+  const lastNote = lastWeights?.note   ?? null;
   const lastHint = lastWeights
     ? (ex.isCardio
-        ? (lastWeights.note ? `Last time: ${lastWeights.note}` : 'Done before ✓')
-        : `Last: ${lastWeights.weight ?? '?'} kg × ${lastWeights.reps ?? '?'} reps`)
+        ? (lastNote ? `Last: ${lastNote}` : 'Done before ✓')
+        : `Last: ${lastW ?? '?'} kg × ${lastR ?? '?'} reps`)
     : 'First time — start light';
 
   const exId = ex.name.replace(/[^a-z0-9]/gi, '-');
@@ -159,22 +162,28 @@ function renderSetRows(ex, lastWeights) {
 
   const rows = Array.from({ length: ex.defaultSets }, (_, i) => `
     <div class="set-card" data-set="${i}" data-ex="${ex.name}">
-      <div class="set-card-badge">${i + 1}</div>
-      <div class="set-card-inputs">
-        <div class="set-inp-group">
-          <input type="number" class="set-weight set-inp" min="0" max="999" step="2.5"
-            placeholder="${lastWeights?.weight ?? '—'}" data-ex="${ex.name}" data-set="${i}"/>
-          <span class="set-inp-lbl">kg</span>
+      <div class="set-card-row">
+        <div class="set-card-badge">${i + 1}</div>
+        <div class="set-card-inputs">
+          <div class="set-inp-group">
+            <input type="number" inputmode="decimal" class="set-weight set-inp" min="0" max="999" step="2.5"
+              placeholder="${lastW ?? '0'}" value="${lastW ?? ''}"
+              data-ex="${ex.name}" data-set="${i}"/>
+            <span class="set-inp-lbl">kg</span>
+          </div>
+          <span class="set-inp-x">×</span>
+          <div class="set-inp-group">
+            <input type="number" inputmode="numeric" class="set-reps set-inp" min="0" max="99"
+              placeholder="${lastR ?? '0'}" value="${lastR ?? ''}"
+              data-ex="${ex.name}" data-set="${i}"/>
+            <span class="set-inp-lbl">reps</span>
+          </div>
         </div>
-        <span class="set-inp-x">×</span>
-        <div class="set-inp-group">
-          <input type="number" class="set-reps set-inp" min="0" max="99"
-            placeholder="${lastWeights?.reps ?? '—'}" data-ex="${ex.name}" data-set="${i}"/>
-          <span class="set-inp-lbl">reps</span>
-        </div>
+        <div class="set-done-summary"></div>
       </div>
       <button class="set-done-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
+        Log Set ${i + 1}
       </button>
     </div>
   `).join('');

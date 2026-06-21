@@ -70,14 +70,21 @@ function beginWorkout(day) {
 
 function renderActiveWorkout(container, workout, navigate) {
   const session = activeSession;
+  const totalWorkoutSets = workout.exercises
+    .filter(e => !e.isCardio)
+    .reduce((sum, e) => sum + e.defaultSets, 0);
+  let doneWorkoutSets = 0;
 
   container.innerHTML = `
     <div class="workout-header">
       <div class="workout-header-left">
         <h2>${workout.label}</h2>
-        <p>${workout.weekday} · ${workout.exercises.length} exercises</p>
+        <p id="wkt-progress">${workout.weekday} · 0 / ${totalWorkoutSets} sets</p>
       </div>
-      <div class="timer" id="workout-timer">0:00</div>
+      <div class="wkt-timer-wrap">
+        <div class="timer" id="workout-timer">0:00</div>
+        <div class="timer-lbl">elapsed</div>
+      </div>
     </div>
     <div class="section">
       ${workout.exercises.map((ex, i) => {
@@ -116,25 +123,26 @@ function renderActiveWorkout(container, workout, navigate) {
       const exName = btn.dataset.ex;
       const setIdx = parseInt(btn.dataset.set);
       const exId   = exName.replace(/[^a-z0-9]/gi, '-');
-      const weightInput = container.querySelector(`.set-weight[data-ex="${exName}"][data-set="${setIdx}"]`);
-      const repsInput   = container.querySelector(`.set-reps[data-ex="${exName}"][data-set="${setIdx}"]`);
+      const card   = btn.closest('.set-card');
+      const weightInput = card.querySelector(`.set-weight`);
+      const repsInput   = card.querySelector(`.set-reps`);
       const exSession   = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
-      exSession.sets[setIdx] = {
-        done: true,
-        weight: parseFloat(weightInput?.value) || null,
-        reps:   parseInt(repsInput?.value)     || null,
-        note: ''
-      };
+      const w = parseFloat(weightInput?.value) || null;
+      const r = parseInt(repsInput?.value)     || null;
 
-      // Visual: mark card done + lock inputs
-      const card = btn.closest('.set-card');
+      exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
+
+      // Collapse card to summary
       card.classList.add('done');
-      if (weightInput) weightInput.readOnly = true;
-      if (repsInput)   repsInput.readOnly   = true;
+      const summary = card.querySelector('.set-done-summary');
+      if (summary) summary.textContent = `${w ?? '—'} kg × ${r ?? '—'} reps`;
 
-      // Progress bar
+      // Haptic
+      if ('vibrate' in navigator) navigator.vibrate(40);
+
+      // Per-exercise progress bar
       const doneSets  = exSession.sets.filter(s => s.done).length;
       const totalSets = exSession.sets.length;
       const progressFill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
@@ -142,9 +150,24 @@ function renderActiveWorkout(container, workout, navigate) {
       if (progressFill) progressFill.style.width = `${(doneSets / totalSets) * 100}%`;
       if (progressTxt)  progressTxt.textContent  = `${doneSets} / ${totalSets}`;
 
-      // Mark exercise complete when all sets done
+      // Overall header progress
+      doneWorkoutSets++;
+      const wktProgress = container.querySelector('#wkt-progress');
+      if (wktProgress) wktProgress.textContent = `${workout.weekday} · ${doneWorkoutSets} / ${totalWorkoutSets} sets`;
+
+      // Exercise complete
       if (doneSets === totalSets) {
-        container.querySelector(`.exercise-card[data-ex-name="${exName}"]`)?.classList.add('ex-complete');
+        const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+        exCard?.classList.add('ex-complete');
+        // Auto-open next exercise after a beat
+        const allCards = [...container.querySelectorAll('.exercise-card')];
+        const nextCard = allCards[allCards.indexOf(exCard) + 1];
+        if (nextCard) {
+          setTimeout(() => {
+            nextCard.classList.add('open');
+            nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 700);
+        }
       }
 
       showRestTimer(container, 90);
@@ -160,6 +183,7 @@ function renderActiveWorkout(container, workout, navigate) {
       if (!exSession) return;
       const isDone = btn.classList.toggle('done');
       exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
+      if ('vibrate' in navigator) navigator.vibrate(isDone ? 40 : 20);
       container.querySelector(`.exercise-card[data-ex-name="${exName}"]`)
         ?.classList.toggle('ex-complete', isDone);
     });

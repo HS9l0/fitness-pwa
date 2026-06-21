@@ -248,23 +248,24 @@ a { color: inherit; text-decoration: none; }
 .tip-box strong { color: var(--accent); }
 
 /* ── Set cards (workout mode) ───────────────────────────── */
-.set-last-hint { font-size: 0.7rem; color: var(--text-dim); padding: 6px 0 10px; }
+.set-last-hint { font-size: 0.7rem; color: var(--text-dim); padding: 4px 0 10px; }
 
-.sets-progress       { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.sets-progress-bar   { flex: 1; height: 3px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
+.sets-progress       { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sets-progress-bar   { flex: 1; height: 4px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
 .sets-progress-fill  { height: 100%; background: var(--accent-2); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); }
 .sets-progress-txt   { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-.sets-list   { display: flex; flex-direction: column; gap: 8px; }
+.sets-list { display: flex; flex-direction: column; gap: 10px; }
 
 .set-card {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
   background: var(--surface-raised);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 14px;
-  transition: border-color 0.35s, background 0.35s;
+  padding: 14px;
+  transition: border-color 0.35s, background 0.35s, gap 0.3s, padding 0.3s;
 }
+
 @keyframes set-done-flash {
   0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.85); }
   30%  { box-shadow: 0 0 0 16px rgba(34,197,94,0.4); }
@@ -272,16 +273,28 @@ a { color: inherit; text-decoration: none; }
   100% { box-shadow: none; }
 }
 .set-card.done {
-  border-color: rgba(34,197,94,0.35);
-  background: rgba(34,197,94,0.05);
-  animation: set-done-flash 0.6s ease forwards;
+  border-color: rgba(34,197,94,0.4);
+  background: rgba(34,197,94,0.06);
+  gap: 0; padding: 12px 14px;
+  animation: set-done-flash 0.7s ease forwards;
 }
 
+/* Row inside card: badge + inputs or summary */
+.set-card-row { display: flex; align-items: center; gap: 12px; }
+
+/* Done summary — shown instead of inputs when set is logged */
+.set-done-summary {
+  display: none; flex: 1;
+  font-size: 0.92rem; font-weight: 700; color: var(--accent-2);
+}
+.set-card.done .set-done-summary { display: block; }
+.set-card.done .set-card-inputs  { display: none; }
+
 .set-card-badge {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
   background: var(--surface); border: 1.5px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.72rem; font-weight: 700; color: var(--text-dim);
+  font-size: 0.78rem; font-weight: 700; color: var(--text-dim);
   transition: background 0.35s, border-color 0.35s, color 0.35s;
 }
 .set-card.done .set-card-badge {
@@ -290,27 +303,16 @@ a { color: inherit; text-decoration: none; }
   color: var(--accent-2);
 }
 
-.set-card-inputs {
-  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;
-}
-.set-inp-group {
-  display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
-}
+.set-card-inputs { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.set-inp-group   { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
 .set-inp {
-  flex: 1; min-width: 0; padding: 8px 6px;
-  font-size: 0.88rem; font-weight: 600; text-align: center;
-  border-radius: var(--radius-sm); transition: background 0.3s, border-color 0.3s, color 0.3s;
+  width: 100%; padding: 13px 6px;
+  font-size: 1.15rem; font-weight: 700; text-align: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
-.set-card.done .set-inp {
-  background: transparent; border-color: transparent;
-  color: var(--accent-2); pointer-events: none;
-}
-.set-inp-lbl {
-  font-size: 0.6rem; color: var(--text-dim); flex-shrink: 0;
-  transition: color 0.3s;
-}
-.set-card.done .set-inp-lbl { color: rgba(34,197,94,0.6); }
-.set-inp-x { font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0; }
+.set-inp-lbl { font-size: 0.6rem; color: var(--text-dim); flex-shrink: 0; transition: color 0.3s; }
+.set-inp-x   { font-size: 0.9rem; color: var(--text-dim); flex-shrink: 0; padding-bottom: 18px; }
 
 @keyframes done-btn-pop {
   0%   { transform: scale(1) rotate(0deg); box-shadow: 0 0 0 rgba(34,197,94,0); }
@@ -321,17 +323,18 @@ a { color: inherit; text-decoration: none; }
   100% { transform: scale(1) rotate(0deg); box-shadow: none; }
 }
 .set-done-btn {
-  width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%;
-  border: 2px solid var(--border); color: var(--text-dim);
-  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 15px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: var(--radius-sm); border: 2px solid var(--border);
+  color: var(--text-muted); font-size: 0.95rem; font-weight: 700;
   transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.12s;
 }
-.set-done-btn:active { transform: scale(0.9); }
-.set-card.done .set-done-btn {
-  background: var(--accent-2); border-color: var(--accent-2); color: #fff;
-  animation: done-btn-pop 0.4s cubic-bezier(0.16,1,0.3,1);
-  pointer-events: none;
+.set-done-btn:active {
+  transform: scale(0.97);
+  border-color: var(--accent-2); color: var(--accent-2);
+  animation: done-btn-pop 0.45s cubic-bezier(0.16,1,0.3,1);
 }
+.set-card.done .set-done-btn { display: none; }
 
 /* Exercise complete state */
 @keyframes ex-num-pop {
@@ -390,14 +393,17 @@ a { color: inherit; text-decoration: none; }
   padding: max(38px, calc(var(--safe-top) + 10px)) 20px 14px;
   border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: flex-end;
+  position: sticky; top: 0; z-index: 50;
 }
 .workout-header-left h2 { font-size: 1.25rem; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
-.workout-header-left p  { font-size: 0.82rem; color: var(--text-muted); margin-top: 3px; }
+.workout-header-left p  { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+.wkt-timer-wrap { text-align: right; }
+.timer-lbl { font-size: 0.52rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-top: 1px; }
 @keyframes timer-pulse {
   0%, 100% { opacity: 1; text-shadow: 0 0 0 rgba(59,130,246,0); transform: scale(1); }
   50%       { opacity: 0.7; text-shadow: 0 0 24px rgba(59,130,246,0.9), 0 0 48px rgba(59,130,246,0.4); transform: scale(1.06); }
 }
-.timer { font-size: 1.5rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; animation: timer-pulse 1.3s ease-in-out infinite; }
+.timer { font-size: 1.8rem; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -1px; animation: timer-pulse 1.3s ease-in-out infinite; }
 
 
 /* ── Plan tabs ──────────────────────────────────────────── */
