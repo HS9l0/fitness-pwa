@@ -352,8 +352,9 @@ function showAnalysis(container, resultEl, analysis, date) {
 
 // ── Compress image before sending ───────────────────────
 function compress(file) {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
+    img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('Could not load image')); };
     img.onload = () => {
       const MAX = 1024;
       let [w, h] = [img.width, img.height];
@@ -365,7 +366,9 @@ function compress(file) {
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('Image compression failed')); return; }
         const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Could not read image'));
         reader.onloadend = () => {
           URL.revokeObjectURL(img.src);
           resolve({ base64: reader.result.split(',')[1], mimeType: 'image/jpeg' });
@@ -405,8 +408,8 @@ Respond with ONLY valid JSON (no markdown, no explanation):
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const msg  = body.error?.message ?? `HTTP ${res.status}`;
-    if (res.status === 400 || msg.toLowerCase().includes('api_key'))
-      throw new Error('Invalid API key — check your key in Settings');
+    if (res.status === 401 || msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('api_key'))
+      throw new Error('Invalid API key — check your key in the admin dashboard');
     if (res.status === 429)
       throw new Error('Rate limit hit — wait a moment and try again');
     throw new Error(msg);
@@ -414,8 +417,10 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No food detected in image');
+  // Strip markdown code fences if present
+  const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  const match = clean.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No food detected in image — try a clearer photo');
   try { return JSON.parse(match[0]); }
   catch { throw new Error('Could not parse AI response'); }
 }
