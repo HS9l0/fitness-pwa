@@ -10,8 +10,8 @@
   --text:           #ede9e3;
   --text-muted:     #9a8d83;
   --text-dim:       #534a43;
-  --radius:         10px;
-  --radius-sm:      6px;
+  --radius:         14px;
+  --radius-sm:      8px;
   --nav-h:          54px;
   --safe-bottom:    env(safe-area-inset-bottom, 0px);
   --safe-top:       env(safe-area-inset-top, 0px);
@@ -59,11 +59,19 @@ a { color: inherit; text-decoration: none; }
   gap: 2px; color: var(--text-dim);
   transition: color 0.15s, transform 0.12s ease;
   padding: 6px 2px 0;
-  min-width: 0;
+  min-width: 0; position: relative;
 }
-.nav-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-.nav-btn span { font-size: 0.58rem; letter-spacing: 0.1px; white-space: nowrap; }
+.nav-btn svg { width: 20px; height: 20px; flex-shrink: 0; position: relative; z-index: 1; }
+.nav-btn span { font-size: 0.58rem; letter-spacing: 0.1px; white-space: nowrap; position: relative; z-index: 1; }
 .nav-btn.active { color: var(--accent); }
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 4px; left: 50%; transform: translateX(-50%);
+  width: 52px; height: 36px;
+  background: rgba(249,115,22,0.12);
+  border-radius: 10px;
+}
 .nav-btn:active { transform: scale(0.87); }
 
 /* ── Cards ──────────────────────────────────────────────── */
@@ -72,6 +80,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.28);
 }
 .card + .card { margin-top: 8px; }
 
@@ -110,27 +119,28 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Screen header ──────────────────────────────────────── */
 .screen-header {
-  padding: max(40px, calc(var(--safe-top) + 10px)) 16px 14px;
-  background: var(--surface);
+  padding: max(40px, calc(var(--safe-top) + 10px)) 16px 16px;
+  background: linear-gradient(170deg, #211e1b 0%, var(--surface) 100%);
   border-bottom: 1px solid var(--border);
 }
-.screen-header h1 { font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
-.screen-header p  { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+.screen-header h1 { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.4px; }
+.screen-header p  { color: var(--text-muted); font-size: 0.8rem; margin-top: 3px; }
 .badge {
   display: inline-block;
-  background: var(--accent); color: #fff;
+  background: rgba(249,115,22,0.18); color: var(--accent);
   font-size: 0.6rem; font-weight: 700;
   letter-spacing: 1.2px; text-transform: uppercase;
-  padding: 2px 8px; border-radius: 20px; margin-bottom: 8px;
+  padding: 3px 9px; border-radius: 20px; margin-bottom: 8px;
+  border: 1px solid rgba(249,115,22,0.3);
 }
 
 /* ── Section padding ────────────────────────────────────── */
 .section { padding: 14px 16px; }
 .section + .section { padding-top: 0; }
 .section-title {
-  font-size: 0.62rem; font-weight: 700;
-  letter-spacing: 1.1px; text-transform: uppercase;
-  color: var(--text-dim); margin-bottom: 10px;
+  font-size: 0.64rem; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 10px;
 }
 
 /* ── Water tracker ──────────────────────────────────────── */
@@ -178,6 +188,7 @@ a { color: inherit; text-decoration: none; }
 .exercise-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); overflow: hidden; margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.28);
 }
 .ex-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -196,7 +207,7 @@ a { color: inherit; text-decoration: none; }
 .ex-name    { font-size: 0.92rem; font-weight: 700; color: #fff; }
 .ex-muscles { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
 .ex-meta    { font-size: 0.78rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
-.ex-chevron { font-size: 0.65rem; color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
+.ex-chevron { color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
 
 .ex-body {
@@ -330,7 +341,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Workout header ─────────────────────────────────────── */
 .workout-header {
-  background: var(--surface);
+  background: linear-gradient(170deg, #211e1b 0%, var(--surface) 100%);
   padding: max(38px, calc(var(--safe-top) + 10px)) 20px 14px;
   border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: flex-end;
@@ -481,7 +492,7 @@ body { overscroll-behavior: none; }
 }
 .home-stat { flex: 1; text-align: center; padding: 14px 8px; border-right: 1px solid var(--border); }
 .home-stat:last-child { border-right: none; }
-.home-stat-num { font-size: 1.35rem; font-weight: 800; color: #fff; line-height: 1; }
+.home-stat-num { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -0.5px; }
 .home-stat-lbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-top: 4px; }
 
 /* ── Last workout card ──────────────────────────────────── */
