@@ -75,24 +75,18 @@ function renderPlanTab(container, tabIndex) {
 }
 
 export function embedVideo(thumb) {
-  const vid = thumb.dataset.vid;
-  const iframe = document.createElement('iframe');
-  iframe.className = 'video-frame';
-  iframe.src = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
-  iframe.setAttribute('allowfullscreen', '');
-  iframe.setAttribute('allow', 'autoplay; encrypted-media');
-  iframe.setAttribute('frameborder', '0');
-  thumb.replaceWith(iframe);
+  const query = encodeURIComponent(thumb.dataset.name + ' exercise tutorial');
+  window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank', 'noopener');
 }
 
 export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
   const videoHtml = ex.videoId ? `
     <div class="video-wrap">
-      <div class="video-thumb" data-vid="${ex.videoId}">
+      <div class="video-thumb" data-name="${ex.name}">
         <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
         <div class="play-overlay">
           <div class="play-circle">▶</div>
-          <span class="play-label">Watch tutorial</span>
+          <span class="play-label">Search on YouTube</span>
         </div>
       </div>
     </div>` : '';
@@ -141,11 +135,11 @@ function renderSetRowsWithVideo(ex, lastWeights) {
   const setHtml = renderSetRows(ex, lastWeights);
   const videoHtml = ex.videoId ? `
     <div class="video-wrap" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
-      <div class="video-thumb" data-vid="${ex.videoId}">
+      <div class="video-thumb" data-name="${ex.name}">
         <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
         <div class="play-overlay">
           <div class="play-circle">▶</div>
-          <span class="play-label">Watch tutorial</span>
+          <span class="play-label">Search on YouTube</span>
         </div>
       </div>
     </div>` : '';
