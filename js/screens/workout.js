@@ -120,6 +120,9 @@ function renderActiveWorkout(container, workout, navigate) {
   // Strength set done buttons
   container.querySelectorAll('.set-done-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      btn.classList.add('pop');
+      btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+
       const exName = btn.dataset.ex;
       const setIdx = parseInt(btn.dataset.set);
       const exId   = exName.replace(/[^a-z0-9]/gi, '-');
@@ -161,12 +164,14 @@ function renderActiveWorkout(container, workout, navigate) {
         exCard?.classList.add('ex-complete');
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
+        document.activeElement?.blur();
         showRestTimer(container, 90, nextCard ? () => {
           exCard?.classList.remove('open');
           nextCard.classList.add('open');
           nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } : null);
       } else {
+        document.activeElement?.blur();
         showRestTimer(container, 90);
       }
     });
@@ -186,6 +191,7 @@ function renderActiveWorkout(container, workout, navigate) {
       exCard?.classList.toggle('ex-complete', isDone);
 
       if (isDone) {
+        document.activeElement?.blur();
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
         showRestTimer(container, 90, nextCard ? () => {
