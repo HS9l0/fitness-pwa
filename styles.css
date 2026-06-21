@@ -519,15 +519,13 @@ body { overscroll-behavior: none; }
 .cooldown-list li { font-size: 0.8rem; color: var(--text-muted); padding: 2px 0; line-height: 1.5; }
 
 /* ── Video player ───────────────────────────────────────── */
-.video-wrap { border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px; background: #000; }
-.video-thumb { position: relative; cursor: pointer; aspect-ratio: 16/9; overflow: hidden; }
-.video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease; }
-.video-thumb:hover img { transform: scale(1.03); }
-.play-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.38); transition: background 0.2s; }
-.video-thumb:hover .play-overlay { background: rgba(0,0,0,0.52); }
-.play-circle { width: 46px; height: 46px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; padding-left: 3px; box-shadow: 0 4px 20px rgba(249,115,22,0.4); transition: transform 0.15s; }
-.video-thumb:hover .play-circle { transform: scale(1.08); }
-.play-label { font-size: 0.75rem; color: #fff; font-weight: 600; letter-spacing: 0.3px; }
+.yt-search-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 0.78rem; font-weight: 600; color: var(--accent);
+  text-decoration: none; padding: 6px 0;
+  transition: opacity 0.15s;
+}
+.yt-search-btn:hover { opacity: 0.75; }
 
 /* ── Nutrition screen ───────────────────────────────────── */
 

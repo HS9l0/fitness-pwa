@@ -1,6 +1,6 @@
 import { WORKOUTS, getNextWorkoutDay } from '../data.js';
 import { getSessions, saveSession, getLastWeights, today } from '../store.js';
-import { renderExerciseCard, embedVideo } from './plan.js';
+import { renderExerciseCard } from './plan.js';
 
 let timerInterval = null;
 let restInterval  = null;
@@ -108,11 +108,6 @@ function renderActiveWorkout(container, workout, navigate) {
     header.addEventListener('click', () => {
       header.closest('.exercise-card').classList.toggle('open');
     });
-  });
-
-  // Video thumbnails
-  container.querySelectorAll('.video-thumb').forEach(thumb => {
-    thumb.addEventListener('click', e => { e.stopPropagation(); embedVideo(thumb); });
   });
 
   // Strength set done buttons

@@ -69,27 +69,14 @@ function renderPlanTab(container, tabIndex) {
     header.addEventListener('click', () => header.closest('.exercise-card').classList.toggle('open'));
   });
 
-  content.querySelectorAll('.video-thumb').forEach(thumb => {
-    thumb.addEventListener('click', e => { e.stopPropagation(); embedVideo(thumb); });
-  });
-}
-
-export function embedVideo(thumb) {
-  const query = encodeURIComponent(thumb.dataset.name + ' exercise tutorial');
-  window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank', 'noopener');
 }
 
 export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
   const videoHtml = ex.videoId ? `
-    <div class="video-wrap">
-      <div class="video-thumb" data-name="${ex.name}">
-        <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
-        <div class="play-overlay">
-          <div class="play-circle">▶</div>
-          <span class="play-label">Search on YouTube</span>
-        </div>
-      </div>
-    </div>` : '';
+    <a class="yt-search-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise tutorial')}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+      Search on YouTube
+    </a>` : '';
 
   const detailsHtml = `
     ${videoHtml}
@@ -134,14 +121,11 @@ export function renderExerciseCard(ex, num, isWorkoutMode, lastWeights) {
 function renderSetRowsWithVideo(ex, lastWeights) {
   const setHtml = renderSetRows(ex, lastWeights);
   const videoHtml = ex.videoId ? `
-    <div class="video-wrap" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
-      <div class="video-thumb" data-name="${ex.name}">
-        <img src="https://img.youtube.com/vi/${ex.videoId}/mqdefault.jpg" alt="Tutorial" loading="lazy" />
-        <div class="play-overlay">
-          <div class="play-circle">▶</div>
-          <span class="play-label">Search on YouTube</span>
-        </div>
-      </div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+      <a class="yt-search-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise tutorial')}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+        Search on YouTube
+      </a>
     </div>` : '';
   return setHtml + videoHtml;
 }
