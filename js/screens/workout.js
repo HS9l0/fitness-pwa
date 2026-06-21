@@ -181,8 +181,17 @@ function renderActiveWorkout(container, workout, navigate) {
       const isDone = btn.classList.toggle('done');
       exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
       if ('vibrate' in navigator) navigator.vibrate(isDone ? 40 : 20);
-      container.querySelector(`.exercise-card[data-ex-name="${exName}"]`)
-        ?.classList.toggle('ex-complete', isDone);
+      const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+      exCard?.classList.toggle('ex-complete', isDone);
+
+      if (isDone) {
+        const allCards = [...container.querySelectorAll('.exercise-card')];
+        const nextCard = allCards[allCards.indexOf(exCard) + 1];
+        showRestTimer(container, 90, nextCard ? () => {
+          nextCard.classList.add('open');
+          nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } : null);
+      }
     });
   });
 
