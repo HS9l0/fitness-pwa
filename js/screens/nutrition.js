@@ -447,7 +447,8 @@ Respond with ONLY valid JSON (no markdown, no explanation):
       throw new Error('Invalid API key — check your key in the admin dashboard');
     if (res.status === 429) {
       const retryDelay = body.error?.details?.find(d => d.retryDelay)?.retryDelay;
-      const seconds = retryDelay ? Math.ceil(parseInt(retryDelay)) : 30;
+      const parsed  = retryDelay ? parseInt(retryDelay) : 0;
+      const seconds = parsed > 0 ? parsed : 30;
       const err = new Error(`Rate limit — retrying in ${seconds}s`);
       err.retryAfter = seconds;
       throw err;
