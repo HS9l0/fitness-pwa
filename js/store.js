@@ -60,6 +60,13 @@ export function removeFoodEntry(date, id) {
   write(KEYS.food, food);
 }
 
+export function getWeightLog() { return read('fit_weight', {}); }
+export function addWeightEntry(date, val) {
+  const log = read('fit_weight', {});
+  log[date] = val;
+  write('fit_weight', log);
+}
+
 export function getSessionsForMonth(year, month) {
   return getSessions().filter(s => {
     const d = new Date(s.date + 'T12:00:00');

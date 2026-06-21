@@ -3,7 +3,8 @@ import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { renderExerciseCard, embedVideo } from './plan.js';
 
 let timerInterval = null;
-let startTime = null;
+let restInterval  = null;
+let startTime     = null;
 let activeSession = null;
 
 export function renderWorkout(container, navigate) {
@@ -134,6 +135,7 @@ function renderActiveWorkout(container, workout, navigate) {
 
       btn.classList.add('checked');
       btn.closest('.set-row').style.opacity = '0.55';
+      if (!exSession.isCardio) showRestTimer(container, 90);
     });
   });
 
@@ -162,8 +164,9 @@ function renderActiveWorkout(container, workout, navigate) {
   });
 
   container.querySelector('#finish-btn').addEventListener('click', () => {
-    clearInterval(timerInterval);
-    timerInterval = null;
+    clearInterval(timerInterval);  timerInterval = null;
+    clearInterval(restInterval);   restInterval = null;
+    container.querySelector('.rest-overlay')?.remove();
     const durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
     session.durationMin = durationMin;
     saveSession(session);
@@ -176,4 +179,71 @@ function renderActiveWorkout(container, workout, navigate) {
       navigate('home');
     }, 600);
   });
+}
+
+// ── Rest Timer ────────────────────────────────────────────
+function showRestTimer(container, seconds) {
+  clearInterval(restInterval);
+  restInterval = null;
+  container.querySelector('.rest-overlay')?.remove();
+
+  const CIRC = 2 * Math.PI * 32;
+  let remaining = seconds;
+  const total = seconds;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'rest-overlay';
+  overlay.innerHTML = `
+    <div class="rest-card">
+      <div class="rest-lbl">Rest</div>
+      <div class="rest-arc-wrap">
+        <svg viewBox="0 0 72 72" class="rest-arc-svg">
+          <circle cx="36" cy="36" r="32" class="rest-arc-bg"/>
+          <circle cx="36" cy="36" r="32" class="rest-arc-fill" id="rest-fill"
+            stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="0"
+            transform="rotate(-90 36 36)"/>
+        </svg>
+        <div class="rest-arc-inner">
+          <span class="rest-count" id="rest-count">${fmtRest(remaining)}</span>
+        </div>
+      </div>
+      <div class="rest-btns">
+        <button class="rest-btn-add" id="rest-add">+30s</button>
+        <button class="rest-btn-skip" id="rest-skip">Skip</button>
+      </div>
+    </div>
+  `;
+  container.appendChild(overlay);
+
+  const countEl = overlay.querySelector('#rest-count');
+  const arcEl   = overlay.querySelector('#rest-fill');
+
+  function tick() {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(restInterval); restInterval = null;
+      if ('vibrate' in navigator) navigator.vibrate([180, 80, 180]);
+      overlay.querySelector('.rest-card')?.classList.add('rest-done');
+      setTimeout(() => overlay.remove(), 1100);
+      return;
+    }
+    countEl.textContent = fmtRest(remaining);
+    arcEl.style.strokeDashoffset = (CIRC * (1 - remaining / total)).toFixed(1);
+  }
+
+  restInterval = setInterval(tick, 1000);
+
+  overlay.querySelector('#rest-skip').addEventListener('click', () => {
+    clearInterval(restInterval); restInterval = null;
+    overlay.remove();
+  });
+  overlay.querySelector('#rest-add').addEventListener('click', () => {
+    remaining += 30;
+    countEl.textContent = fmtRest(remaining);
+  });
+}
+
+function fmtRest(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return m > 0 ? `${m}:${sec.toString().padStart(2, '0')}` : `${s}s`;
 }

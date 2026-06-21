@@ -3,6 +3,7 @@ import { renderPlan } from './screens/plan.js';
 import { renderWorkout } from './screens/workout.js';
 import { renderHistory } from './screens/history.js';
 import { renderNutrition } from './screens/nutrition.js';
+import { renderProgress  } from './screens/progress.js';
 import { auth } from './firebase.js';
 import { signInWithGoogle, signOutUser, pullFromFirestore, startListeners, stopListeners, saveUserProfile } from './sync.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -20,17 +21,19 @@ const screens = {
   workout:   document.getElementById('screen-workout'),
   history:   document.getElementById('screen-history'),
   plan:      document.getElementById('screen-plan'),
-  nutrition: document.getElementById('screen-nutrition')
+  nutrition: document.getElementById('screen-nutrition'),
+  progress:  document.getElementById('screen-progress')
 };
 
 const signinScreen = document.getElementById('signin-screen');
 const appEl = document.getElementById('app');
 
-const SCREEN_ORDER = ['home', 'workout', 'history', 'plan', 'nutrition'];
+const SCREEN_ORDER = ['home', 'workout', 'history', 'plan', 'nutrition', 'progress'];
 let currentScreen = null;
 
 export function navigateTo(name) {
   if (name === 'nutrition' && localStorage.getItem('fit_nutrition_enabled') !== 'true') return;
+  if (name === 'progress'  && localStorage.getItem('fit_progress_enabled')  === 'false') return;
   // Firestore-triggered re-render — no animation, just refresh content
   if (name === currentScreen) {
     if (name === 'home')      renderHome(screens.home, navigateTo);
@@ -67,6 +70,7 @@ export function navigateTo(name) {
   if (name === 'history')   renderHistory(screens.history);
   if (name === 'workout')   renderWorkout(screens.workout, navigateTo);
   if (name === 'nutrition') renderNutrition(screens.nutrition);
+  if (name === 'progress')  renderProgress(screens.progress);
 }
 
 // Wire nav buttons (bottom nav + sidebar)
@@ -143,9 +147,9 @@ function updateSidebarUser(user) {
 }
 
 function applyNutritionVisibility() {
-  const enabled = localStorage.getItem('fit_nutrition_enabled') === 'true';
+  const nutriOn = localStorage.getItem('fit_nutrition_enabled') === 'true';
   document.querySelectorAll('[data-screen="nutrition"]').forEach(el => {
-    el.style.display = enabled ? '' : 'none';
+    el.style.display = nutriOn ? '' : 'none';
   });
 }
 

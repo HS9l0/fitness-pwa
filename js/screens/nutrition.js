@@ -66,12 +66,19 @@ export function renderNutrition(container) {
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>
-          Scan Food
+          AI Scan
         </button>
-        <button class="nutri-manual-btn" id="manual-btn">✏️ Manual</button>
+        <button class="nutri-barcode-btn" id="barcode-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M3 5v14M7 5v14M11 5v14M15 5v8M19 5v8M15 17v2M19 17v2M3 3h4M17 3h4M3 21h4"/>
+          </svg>
+          Barcode
+        </button>
+        <button class="nutri-manual-btn" id="manual-btn">✏️</button>
       </div>
 
-      <input type="file" id="food-camera" accept="image/*" capture="environment" style="display:none"/>
+      <input type="file" id="food-camera"    accept="image/*" capture="environment" style="display:none"/>
+      <input type="file" id="barcode-camera" accept="image/*" capture="environment" style="display:none"/>
 
       <div id="ai-result"></div>
 
@@ -128,10 +135,12 @@ export function renderNutrition(container) {
   `;
 
   // ── Events ──────────────────────────────────────────────
-  const scanBtn    = container.querySelector('#scan-btn');
-  const cameraIn   = container.querySelector('#food-camera');
-  const manualBtn  = container.querySelector('#manual-btn');
-  const manualForm = container.querySelector('#manual-form');
+  const scanBtn     = container.querySelector('#scan-btn');
+  const cameraIn    = container.querySelector('#food-camera');
+  const barcodeBtn  = container.querySelector('#barcode-btn');
+  const barcodeIn   = container.querySelector('#barcode-camera');
+  const manualBtn   = container.querySelector('#manual-btn');
+  const manualForm  = container.querySelector('#manual-form');
 
   scanBtn.addEventListener('click', () => {
     if (!getKey()) {
@@ -147,6 +156,14 @@ export function renderNutrition(container) {
     if (!file) return;
     handleScan(container, file, date);
     cameraIn.value = '';
+  });
+
+  barcodeBtn.addEventListener('click', () => { barcodeIn.click(); });
+  barcodeIn.addEventListener('change', () => {
+    const file = barcodeIn.files[0];
+    if (!file) return;
+    handleBarcode(container, file, date);
+    barcodeIn.value = '';
   });
 
   manualBtn.addEventListener('click', () => {
@@ -173,6 +190,97 @@ export function renderNutrition(container) {
       renderNutrition(container);
     });
   });
+}
+
+// ── Barcode scan ─────────────────────────────────────────
+async function handleBarcode(container, file, date) {
+  const resultEl = container.querySelector('#ai-result');
+  resultEl.innerHTML = `<div class="ai-loading card"><div class="ai-spinner"></div><span class="ai-loading-txt">Reading barcode…</span></div>`;
+
+  try {
+    let code = null;
+
+    if ('BarcodeDetector' in window) {
+      const bitmap   = await createImageBitmap(file);
+      const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39'] });
+      const results  = await detector.detect(bitmap);
+      if (results.length) code = results[0].rawValue;
+    }
+
+    if (!code) {
+      resultEl.innerHTML = `
+        <div class="card">
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px">Enter barcode manually:</div>
+          <div style="display:flex;gap:8px">
+            <input type="number" id="manual-barcode" placeholder="e.g. 5000112548167" style="flex:1"/>
+            <button class="btn-primary" id="lookup-bc" style="width:auto;padding:10px 14px">Look up</button>
+          </div>
+        </div>`;
+      container.querySelector('#lookup-bc').addEventListener('click', async () => {
+        const val = container.querySelector('#manual-barcode').value.trim();
+        if (val.length < 6) return;
+        await lookupBarcode(container, resultEl, val, date);
+      });
+      return;
+    }
+
+    await lookupBarcode(container, resultEl, code, date);
+  } catch (err) {
+    resultEl.innerHTML = `<div class="card ai-error-card"><div class="ai-error-title">⚠️ Error</div><div class="ai-error-msg">${err.message}</div><button class="btn-ghost" style="margin-top:10px" id="ai-dismiss">Dismiss</button></div>`;
+    container.querySelector('#ai-dismiss').addEventListener('click', () => { resultEl.innerHTML = ''; });
+  }
+}
+
+async function lookupBarcode(container, resultEl, code, date) {
+  resultEl.innerHTML = `<div class="ai-loading card"><div class="ai-spinner"></div><span class="ai-loading-txt">Looking up ${code}…</span></div>`;
+  const res  = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
+  const data = await res.json();
+
+  if (data.status === 0 || !data.product) {
+    resultEl.innerHTML = `<div class="card ai-error-card"><div class="ai-error-title">⚠️ Not found</div><div class="ai-error-msg">Barcode ${code} not found. Try manual entry.</div><button class="btn-ghost" style="margin-top:10px" id="ai-dismiss">Dismiss</button></div>`;
+    container.querySelector('#ai-dismiss').addEventListener('click', () => { resultEl.innerHTML = ''; });
+    return;
+  }
+
+  const p          = data.product;
+  const name       = p.product_name || p.abbreviated_product_name || 'Unknown product';
+  const cal100     = p.nutriments?.['energy-kcal_100g'];
+  const calServing = p.nutriments?.['energy-kcal_serving'];
+  const servingQty = parseFloat(p.serving_quantity) || 100;
+  const serving    = p.serving_size || '100 g';
+  const calories   = calServing != null ? Math.round(calServing)
+                   : cal100     != null ? Math.round(cal100 * servingQty / 100)
+                   : 0;
+
+  resultEl.innerHTML = `
+    <div class="card ai-result-card">
+      <div class="ai-result-hdr">🔍 Product found</div>
+      <div class="ai-foods-list">
+        <div class="ai-food-row">
+          <div class="ai-food-left">
+            <input class="ai-food-name-inp" id="bc-name" value="${escHtml(name)}"/>
+            <div class="ai-food-portion">${escHtml(serving)}</div>
+          </div>
+          <div class="ai-food-cal-wrap">
+            <input class="ai-food-cal-inp" id="bc-cal" type="number" value="${calories}" min="0" max="9999"/>
+            <span class="ai-food-unit">kcal</span>
+          </div>
+        </div>
+      </div>
+      <div class="ai-result-actions">
+        <button class="btn-primary" id="bc-confirm" style="flex:1">Add to Log</button>
+        <button id="bc-dismiss" style="padding:0 14px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted)">Dismiss</button>
+      </div>
+    </div>`;
+
+  container.querySelector('#bc-confirm').addEventListener('click', () => {
+    const n = container.querySelector('#bc-name').value.trim();
+    const c = parseInt(container.querySelector('#bc-cal').value) || 0;
+    if (!n) return;
+    addFoodEntry(date, { id: uid(), name: n, calories: c, portion: serving, time: nowTime(), source: 'barcode' });
+    renderNutrition(container);
+  });
+  container.querySelector('#bc-dismiss').addEventListener('click', () => { resultEl.innerHTML = ''; });
 }
 
 // ── AI scan ──────────────────────────────────────────────
