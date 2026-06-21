@@ -488,27 +488,27 @@ body { overscroll-behavior: none; }
 }
 
 /* ── Nutrition screen ───────────────────────────────────── */
-.cal-ring-wrap  { position: relative; width: 164px; height: 164px; margin: 0 auto 18px; }
-.cal-ring-svg   { width: 100%; height: 100%; }
-.cal-ring-bg    { fill: none; stroke: var(--surface-raised); stroke-width: 10; }
-.cal-ring-fill  { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 314.16; transition: stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1); }
-.cal-ring-text  { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-.cal-ring-num   { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1; }
-.cal-ring-sub   { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
-.cal-ring-lbl   { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); margin-top: 3px; }
+
+/* Three-ring row */
+.rings-row      { display: flex; align-items: center; justify-content: space-around; gap: 6px; margin-bottom: 16px; }
+.ring-wrap      { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+.ring-main      { width: 124px; height: 124px; }
+.ring-svg       { width: 100%; height: 100%; }
+.ring-track     { fill: none; stroke: var(--surface-raised); stroke-width: 7; }
+.ring-track-lg  { stroke-width: 10; }
+.ring-fill      { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1); }
+.ring-fill-lg   { stroke-width: 10; }
+.ring-inner     { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; gap: 1px; }
+.ring-num       { font-size: 1.1rem; font-weight: 800; color: #fff; line-height: 1; }
+.ring-num-lg    { font-size: 1.5rem; }
+.ring-unit      { font-size: 0.52rem; color: var(--text-muted); }
+.ring-lbl       { font-size: 0.48rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
 
 .cal-meta-row   { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 20px; }
 .cal-meta-item  { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
-.cal-meta-num   { font-size: 1.05rem; font-weight: 700; color: #fff; }
-.cal-meta-lbl   { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
+.cal-meta-num   { font-size: 1.0rem; font-weight: 700; color: #fff; }
+.cal-meta-lbl   { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
 .cal-meta-sep   { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
-
-/* Macro bar (protein + fat totals) */
-.macro-bar      { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 20px; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 0; background: var(--surface-raised); }
-.macro-item     { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
-.macro-num      { font-size: 1.05rem; font-weight: 700; }
-.macro-lbl      { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
-.macro-sep      { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
 
 /* Macro inputs inside AI result rows */
 .ai-macro-row   { display: flex; align-items: center; gap: 4px; margin-top: 4px; }

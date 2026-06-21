@@ -1,7 +1,8 @@
 import { today, getFoodLog, addFoodEntry, removeFoodEntry, getSettings } from '../store.js';
 
-const CIRC  = 314.16;
-const MODEL = 'gemini-2.5-flash';
+const CIRC    = 314.16; // 2π × 50 (kcal ring r=50)
+const CIRC_SM = 263.89; // 2π × 42 (macro rings r=42)
+const MODEL   = 'gemini-2.5-flash';
 
 function getKey() { return localStorage.getItem('fit_gemini_key') ?? ''; }
 function nowTime() {
@@ -16,11 +17,19 @@ export function renderNutrition(container) {
   const consumed = log.reduce((s, e) => s + (e.calories ?? 0), 0);
   const protein  = log.reduce((s, e) => s + (e.protein  ?? 0), 0);
   const fat      = log.reduce((s, e) => s + (e.fat      ?? 0), 0);
-  const pct      = Math.min(1, consumed / goal);
-  const offset   = CIRC * (1 - pct);
-  const hasKey   = !!getKey();
-  const over     = consumed > goal;
-  const ringClr  = over ? '#e06040' : 'var(--accent)';
+  const protGoal  = getSettings().proteinGoalG ?? 150;
+  const fatGoal   = getSettings().fatGoalG     ?? 70;
+  const pct       = Math.min(1, consumed / goal);
+  const protPct   = Math.min(1, protein / protGoal);
+  const fatPct    = Math.min(1, fat / fatGoal);
+  const offset    = CIRC    * (1 - pct);
+  const protOff   = CIRC_SM * (1 - protPct);
+  const fatOff    = CIRC_SM * (1 - fatPct);
+  const hasKey    = !!getKey();
+  const over      = consumed > goal;
+  const ringClr   = over ? '#e06040' : 'var(--accent)';
+  const protClr   = protein > protGoal ? '#e06040' : 'var(--accent-blue)';
+  const fatClr    = fat > fatGoal ? '#e06040' : '#facc15';
 
   container.innerHTML = `
     <div class="screen-header">
@@ -31,46 +40,67 @@ export function renderNutrition(container) {
 
     <div class="section">
 
-      <div class="cal-ring-wrap">
-        <svg class="cal-ring-svg" viewBox="0 0 120 120" aria-hidden="true">
-          <circle class="cal-ring-bg" cx="60" cy="60" r="50"/>
-          <circle class="cal-ring-fill" cx="60" cy="60" r="50"
-            stroke-dasharray="${CIRC}" stroke-dashoffset="${offset}"
-            style="stroke:${ringClr}" transform="rotate(-90 60 60)"/>
-        </svg>
-        <div class="cal-ring-text">
-          <div class="cal-ring-num">${consumed.toLocaleString()}</div>
-          <div class="cal-ring-sub">/ ${goal.toLocaleString()} kcal</div>
-          <div class="cal-ring-lbl">${over ? 'over goal' : 'today'}</div>
+      <div class="rings-row">
+        <!-- Protein -->
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="ring-track" cx="50" cy="50" r="42"/>
+            <circle class="ring-fill" cx="50" cy="50" r="42"
+              stroke="${protClr}" stroke-dasharray="${CIRC_SM}" stroke-dashoffset="${protOff}"
+              transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-num" style="color:${protClr}">${protein}</div>
+            <div class="ring-unit">/ ${protGoal}g</div>
+            <div class="ring-lbl">protein</div>
+          </div>
+        </div>
+
+        <!-- Calories (main) -->
+        <div class="ring-wrap ring-main">
+          <svg class="ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-track ring-track-lg" cx="60" cy="60" r="50"/>
+            <circle class="ring-fill ring-fill-lg" cx="60" cy="60" r="50"
+              stroke="${ringClr}" stroke-dasharray="${CIRC}" stroke-dashoffset="${offset}"
+              transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-num ring-num-lg" style="color:${ringClr}">${consumed.toLocaleString()}</div>
+            <div class="ring-unit">/ ${goal.toLocaleString()} kcal</div>
+            <div class="ring-lbl">${over ? 'over goal' : 'today'}</div>
+          </div>
+        </div>
+
+        <!-- Fat -->
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="ring-track" cx="50" cy="50" r="42"/>
+            <circle class="ring-fill" cx="50" cy="50" r="42"
+              stroke="${fatClr}" stroke-dasharray="${CIRC_SM}" stroke-dashoffset="${fatOff}"
+              transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-num" style="color:${fatClr}">${fat}</div>
+            <div class="ring-unit">/ ${fatGoal}g</div>
+            <div class="ring-lbl">fat</div>
+          </div>
         </div>
       </div>
 
       <div class="cal-meta-row">
         <div class="cal-meta-item">
           <span class="cal-meta-num" style="color:var(--accent-2)">${Math.max(0, goal - consumed).toLocaleString()}</span>
-          <span class="cal-meta-lbl">remaining</span>
+          <span class="cal-meta-lbl">kcal left</span>
         </div>
         <div class="cal-meta-sep"></div>
         <div class="cal-meta-item">
-          <span class="cal-meta-num">${log.length}</span>
-          <span class="cal-meta-lbl">${log.length === 1 ? 'entry' : 'entries'}</span>
+          <span class="cal-meta-num" style="color:var(--accent-blue)">${Math.max(0, protGoal - protein)}</span>
+          <span class="cal-meta-lbl">protein left</span>
         </div>
         <div class="cal-meta-sep"></div>
         <div class="cal-meta-item">
-          <span class="cal-meta-num" style="color:var(--text-muted)">${goal.toLocaleString()}</span>
-          <span class="cal-meta-lbl">goal</span>
-        </div>
-      </div>
-
-      <div class="macro-bar">
-        <div class="macro-item">
-          <span class="macro-num" style="color:var(--accent-blue)">${protein}g</span>
-          <span class="macro-lbl">protein</span>
-        </div>
-        <div class="macro-sep"></div>
-        <div class="macro-item">
-          <span class="macro-num" style="color:#facc15">${fat}g</span>
-          <span class="macro-lbl">fat</span>
+          <span class="cal-meta-num" style="color:#facc15">${Math.max(0, fatGoal - fat)}</span>
+          <span class="cal-meta-lbl">fat left</span>
         </div>
       </div>
 
