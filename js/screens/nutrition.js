@@ -14,6 +14,8 @@ export function renderNutrition(container) {
   const log      = getFoodLog(date);
   const goal     = getSettings().calorieGoalKcal ?? 2000;
   const consumed = log.reduce((s, e) => s + (e.calories ?? 0), 0);
+  const protein  = log.reduce((s, e) => s + (e.protein  ?? 0), 0);
+  const fat      = log.reduce((s, e) => s + (e.fat      ?? 0), 0);
   const pct      = Math.min(1, consumed / goal);
   const offset   = CIRC * (1 - pct);
   const hasKey   = !!getKey();
@@ -60,6 +62,18 @@ export function renderNutrition(container) {
         </div>
       </div>
 
+      <div class="macro-bar">
+        <div class="macro-item">
+          <span class="macro-num" style="color:var(--accent-blue)">${protein}g</span>
+          <span class="macro-lbl">protein</span>
+        </div>
+        <div class="macro-sep"></div>
+        <div class="macro-item">
+          <span class="macro-num" style="color:#facc15">${fat}g</span>
+          <span class="macro-lbl">fat</span>
+        </div>
+      </div>
+
       <div class="nutri-actions">
         <button class="nutri-scan-btn" id="scan-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -84,8 +98,12 @@ export function renderNutrition(container) {
 
       <div id="manual-form" class="card" style="display:none;margin-top:8px">
         <div class="section-title" style="margin-bottom:10px">Manual Entry</div>
-        <input type="text" id="manual-name" placeholder="Food name (e.g. Chicken breast)" style="margin-bottom:8px"/>
-        <input type="number" id="manual-cal" placeholder="Calories (kcal)" min="1" max="9999" style="margin-bottom:12px"/>
+        <input type="text"   id="manual-name"    placeholder="Food name (e.g. Chicken breast)" style="margin-bottom:8px"/>
+        <input type="number" id="manual-cal"     placeholder="Calories (kcal)" min="1" max="9999" style="margin-bottom:8px"/>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="number" id="manual-protein" placeholder="Protein (g)" min="0" max="999"/>
+          <input type="number" id="manual-fat"     placeholder="Fat (g)"     min="0" max="999"/>
+        </div>
         <div style="display:flex;gap:8px">
           <button class="btn-primary" id="manual-submit" style="flex:1">Add to Log</button>
           <button id="manual-cancel" style="padding:0 16px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted)">Cancel</button>
@@ -98,10 +116,13 @@ export function renderNutrition(container) {
           ${log.map(e => `
             <div class="food-entry-card card">
               <div class="food-entry-main">
-                <div class="food-entry-icon">${e.source === 'ai' ? '📸' : '✏️'}</div>
+                <div class="food-entry-icon">${e.source === 'ai' ? '📸' : e.source === 'barcode' ? '🔍' : '✏️'}</div>
                 <div class="food-entry-info">
                   <div class="food-entry-name">${e.name}</div>
-                  <div class="food-entry-meta">${[e.portion, e.time].filter(Boolean).join(' · ')}</div>
+                  <div class="food-entry-meta">
+                    ${[e.portion, e.time].filter(Boolean).join(' · ')}
+                    ${(e.protein || e.fat) ? `<span class="food-macros"><span style="color:var(--accent-blue)">P:${e.protein ?? 0}g</span> <span style="color:#facc15">F:${e.fat ?? 0}g</span></span>` : ''}
+                  </div>
                 </div>
               </div>
               <div class="food-entry-right">
@@ -179,8 +200,10 @@ export function renderNutrition(container) {
   container.querySelector('#manual-submit').addEventListener('click', () => {
     const name = container.querySelector('#manual-name').value.trim();
     const cal  = parseInt(container.querySelector('#manual-cal').value);
+    const prot = parseInt(container.querySelector('#manual-protein').value) || 0;
+    const fatV = parseInt(container.querySelector('#manual-fat').value) || 0;
     if (!name || !(cal > 0)) return;
-    addFoodEntry(date, { id: uid(), name, calories: cal, portion: '', time: nowTime(), source: 'manual' });
+    addFoodEntry(date, { id: uid(), name, calories: cal, protein: prot, fat: fatV, portion: '', time: nowTime(), source: 'manual' });
     renderNutrition(container);
   });
 
@@ -244,12 +267,26 @@ async function lookupBarcode(container, resultEl, code, date) {
 
   const p          = data.product;
   const name       = p.product_name || p.abbreviated_product_name || 'Unknown product';
-  const cal100     = p.nutriments?.['energy-kcal_100g'];
-  const calServing = p.nutriments?.['energy-kcal_serving'];
+  const n          = p.nutriments ?? {};
   const servingQty = parseFloat(p.serving_quantity) || 100;
   const serving    = p.serving_size || '100 g';
+
+  const cal100     = n['energy-kcal_100g'];
+  const calServing = n['energy-kcal_serving'];
   const calories   = calServing != null ? Math.round(calServing)
-                   : cal100     != null ? Math.round(cal100 * servingQty / 100)
+                   : cal100    != null  ? Math.round(cal100 * servingQty / 100)
+                   : 0;
+
+  const prot100    = n['proteins_100g'];
+  const protServ   = n['proteins_serving'];
+  const protein    = protServ != null ? Math.round(protServ)
+                   : prot100  != null ? Math.round(prot100 * servingQty / 100)
+                   : 0;
+
+  const fat100     = n['fat_100g'];
+  const fatServ    = n['fat_serving'];
+  const fat        = fatServ != null ? Math.round(fatServ)
+                   : fat100  != null ? Math.round(fat100 * servingQty / 100)
                    : 0;
 
   resultEl.innerHTML = `
@@ -260,6 +297,12 @@ async function lookupBarcode(container, resultEl, code, date) {
           <div class="ai-food-left">
             <input class="ai-food-name-inp" id="bc-name" value="${escHtml(name)}"/>
             <div class="ai-food-portion">${escHtml(serving)}</div>
+            <div class="ai-macro-row">
+              <input class="ai-food-cal-inp" id="bc-protein" type="number" value="${protein}" min="0" max="999"/>
+              <span class="ai-food-unit" style="color:var(--accent-blue)">P(g)</span>
+              <input class="ai-food-cal-inp" id="bc-fat" type="number" value="${fat}" min="0" max="999"/>
+              <span class="ai-food-unit" style="color:#facc15">F(g)</span>
+            </div>
           </div>
           <div class="ai-food-cal-wrap">
             <input class="ai-food-cal-inp" id="bc-cal" type="number" value="${calories}" min="0" max="9999"/>
@@ -274,10 +317,12 @@ async function lookupBarcode(container, resultEl, code, date) {
     </div>`;
 
   container.querySelector('#bc-confirm').addEventListener('click', () => {
-    const n = container.querySelector('#bc-name').value.trim();
-    const c = parseInt(container.querySelector('#bc-cal').value) || 0;
+    const n    = container.querySelector('#bc-name').value.trim();
+    const c    = parseInt(container.querySelector('#bc-cal').value) || 0;
+    const prot = parseInt(container.querySelector('#bc-protein').value) || 0;
+    const fatV = parseInt(container.querySelector('#bc-fat').value) || 0;
     if (!n) return;
-    addFoodEntry(date, { id: uid(), name: n, calories: c, portion: serving, time: nowTime(), source: 'barcode' });
+    addFoodEntry(date, { id: uid(), name: n, calories: c, protein: prot, fat: fatV, portion: serving, time: nowTime(), source: 'barcode' });
     renderNutrition(container);
   });
   container.querySelector('#bc-dismiss').addEventListener('click', () => { resultEl.innerHTML = ''; });
@@ -353,6 +398,12 @@ function showAnalysis(container, resultEl, analysis, date) {
             <div class="ai-food-left">
               <input class="ai-food-name-inp" id="ai-name-${i}" value="${escHtml(f.name)}"/>
               <div class="ai-food-portion">${escHtml(f.portion)}</div>
+              <div class="ai-macro-row">
+                <input class="ai-food-cal-inp" id="ai-protein-${i}" type="number" value="${f.protein ?? 0}" min="0" max="999"/>
+                <span class="ai-food-unit" style="color:var(--accent-blue)">P(g)</span>
+                <input class="ai-food-cal-inp" id="ai-fat-${i}" type="number" value="${f.fat ?? 0}" min="0" max="999"/>
+                <span class="ai-food-unit" style="color:#facc15">F(g)</span>
+              </div>
             </div>
             <div class="ai-food-cal-wrap">
               <input class="ai-food-cal-inp" id="ai-cal-${i}" type="number" value="${f.calories}" min="0" max="9999"/>
@@ -362,7 +413,9 @@ function showAnalysis(container, resultEl, analysis, date) {
         `).join('')}
       </div>
       <div class="ai-result-total">
-        Total estimate: <strong>${analysis.totalCalories}</strong> kcal
+        Total: <strong>${analysis.totalCalories}</strong> kcal
+        <span style="color:var(--accent-blue);font-size:0.78rem">P:${analysis.totalProtein ?? 0}g</span>
+        <span style="color:#facc15;font-size:0.78rem">F:${analysis.totalFat ?? 0}g</span>
         <span class="ai-conf ai-conf-${analysis.confidence}">${analysis.confidence}</span>
       </div>
       <div class="ai-result-actions">
@@ -376,8 +429,10 @@ function showAnalysis(container, resultEl, analysis, date) {
     analysis.foods.forEach((f, i) => {
       const name = container.querySelector(`#ai-name-${i}`)?.value.trim() ?? f.name;
       const cal  = parseInt(container.querySelector(`#ai-cal-${i}`)?.value) || f.calories;
+      const prot = parseInt(container.querySelector(`#ai-protein-${i}`)?.value) || 0;
+      const fatV = parseInt(container.querySelector(`#ai-fat-${i}`)?.value) || 0;
       if (!name || !(cal > 0)) return;
-      addFoodEntry(date, { id: uid(), name, calories: cal, portion: f.portion, time: nowTime(), source: 'ai' });
+      addFoodEntry(date, { id: uid(), name, calories: cal, protein: prot, fat: fatV, portion: f.portion, time: nowTime(), source: 'ai' });
     });
     renderNutrition(container);
   });
@@ -428,11 +483,11 @@ async function queryGemini(base64, mimeType, key) {
             { inline_data: { mime_type: mimeType, data: base64 } },
             { text: `You are a nutrition expert. Look at this food image and identify every food and drink item visible.
 
-For each item estimate: its name, approximate portion size, and calories (kcal).
+For each item estimate: its name, approximate portion size, calories (kcal), protein (g), and fat (g).
 Be realistic — a standard home-cooked meal is usually 400–800 kcal total.
 
 Respond with ONLY valid JSON (no markdown, no explanation):
-{"foods":[{"name":"string","portion":"e.g. 1 cup (200g)","calories":300}],"totalCalories":600,"confidence":"high"}` }
+{"foods":[{"name":"string","portion":"e.g. 1 cup (200g)","calories":300,"protein":25,"fat":12}],"totalCalories":600,"totalProtein":75,"totalFat":36,"confidence":"high"}` }
           ]
         }],
         generationConfig: { temperature: 0.1 }
