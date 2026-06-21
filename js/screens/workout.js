@@ -159,18 +159,15 @@ function renderActiveWorkout(container, workout, navigate) {
       if (doneSets === totalSets) {
         const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
         exCard?.classList.add('ex-complete');
-        // Auto-open next exercise after a beat
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        if (nextCard) {
-          setTimeout(() => {
-            nextCard.classList.add('open');
-            nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 700);
-        }
+        showRestTimer(container, 90, nextCard ? () => {
+          nextCard.classList.add('open');
+          nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } : null);
+      } else {
+        showRestTimer(container, 90);
       }
-
-      showRestTimer(container, 90);
     });
   });
 
@@ -208,7 +205,7 @@ function renderActiveWorkout(container, workout, navigate) {
 }
 
 // ── Rest Timer ────────────────────────────────────────────
-function showRestTimer(container, seconds) {
+function showRestTimer(container, seconds, onDone) {
   clearInterval(restInterval);
   restInterval = null;
   container.querySelector('.rest-overlay')?.remove();
@@ -221,7 +218,7 @@ function showRestTimer(container, seconds) {
   overlay.className = 'rest-overlay';
   overlay.innerHTML = `
     <div class="rest-card">
-      <div class="rest-lbl">Rest</div>
+      <div class="rest-lbl">${onDone ? 'Rest · Next exercise →' : 'Rest'}</div>
       <div class="rest-arc-wrap">
         <svg viewBox="0 0 72 72" class="rest-arc-svg">
           <circle cx="36" cy="36" r="32" class="rest-arc-bg"/>
@@ -235,7 +232,7 @@ function showRestTimer(container, seconds) {
       </div>
       <div class="rest-btns">
         <button class="rest-btn-add" id="rest-add">+30s</button>
-        <button class="rest-btn-skip" id="rest-skip">Skip</button>
+        <button class="rest-btn-skip" id="rest-skip">${onDone ? 'Skip →' : 'Skip'}</button>
       </div>
     </div>
   `;
@@ -244,15 +241,16 @@ function showRestTimer(container, seconds) {
   const countEl = overlay.querySelector('#rest-count');
   const arcEl   = overlay.querySelector('#rest-fill');
 
+  function finish() {
+    clearInterval(restInterval); restInterval = null;
+    if ('vibrate' in navigator) navigator.vibrate([180, 80, 180]);
+    overlay.querySelector('.rest-card')?.classList.add('rest-done');
+    setTimeout(() => { overlay.remove(); onDone?.(); }, 1100);
+  }
+
   function tick() {
     remaining--;
-    if (remaining <= 0) {
-      clearInterval(restInterval); restInterval = null;
-      if ('vibrate' in navigator) navigator.vibrate([180, 80, 180]);
-      overlay.querySelector('.rest-card')?.classList.add('rest-done');
-      setTimeout(() => overlay.remove(), 1100);
-      return;
-    }
+    if (remaining <= 0) { finish(); return; }
     countEl.textContent = fmtRest(remaining);
     arcEl.style.strokeDashoffset = (CIRC * (1 - remaining / total)).toFixed(1);
   }
@@ -262,6 +260,7 @@ function showRestTimer(container, seconds) {
   overlay.querySelector('#rest-skip').addEventListener('click', () => {
     clearInterval(restInterval); restInterval = null;
     overlay.remove();
+    onDone?.();
   });
   overlay.querySelector('#rest-add').addEventListener('click', () => {
     remaining += 30;
