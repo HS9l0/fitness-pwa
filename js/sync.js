@@ -32,6 +32,14 @@ export async function pullFromFirestore(uid) {
   if (profile?.nutritionEnabled !== undefined) {
     localStorage.setItem('fit_nutrition_enabled', profile.nutritionEnabled ? 'true' : 'false');
   }
+  // Sync goal settings from Firestore into fit_settings
+  const goalFields = ['calorieGoalKcal', 'proteinGoalG', 'fatGoalG', 'waterGoalMl', 'weightUnit'];
+  if (goalFields.some(f => profile?.[f] !== undefined)) {
+    let cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
+    goalFields.forEach(f => { if (profile[f] !== undefined) cfg[f] = profile[f]; });
+    localStorage.setItem('fit_settings', JSON.stringify(cfg));
+  }
 
   const sessions = [];
   sessionsSnap.forEach(d => sessions.push(d.data()));

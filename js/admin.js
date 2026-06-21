@@ -263,8 +263,10 @@ function renderUserList(users) {
   );
 
   document.getElementById('save-settings-btn').addEventListener('click', async () => {
-    const cal     = parseInt(document.getElementById('s-calorie-goal').value) || 2000;
-    const wat     = parseInt(document.getElementById('s-water-goal').value)   || 2000;
+    const cal     = parseInt(document.getElementById('s-calorie-goal').value)  || 2000;
+    const wat     = parseInt(document.getElementById('s-water-goal').value)    || 2000;
+    const prot    = parseInt(document.getElementById('s-protein-goal').value)  || 150;
+    const fat     = parseInt(document.getElementById('s-fat-goal').value)      || 70;
     const unit    = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
     const key     = document.getElementById('s-api-key').value.trim();
     const nutriOn = document.getElementById('s-nutrition-enabled').checked;
@@ -272,6 +274,8 @@ function renderUserList(users) {
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
     cfg.calorieGoalKcal = cal;
     cfg.waterGoalMl     = wat;
+    cfg.proteinGoalG    = prot;
+    cfg.fatGoalG        = fat;
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
     localStorage.setItem('fit_gemini_key', key);
@@ -279,7 +283,11 @@ function renderUserList(users) {
     try {
       const usersSnap = await getDocs(collection(db, 'users'));
       const batch = writeBatch(db);
-      usersSnap.docs.forEach(d => batch.set(d.ref, { geminiKey: key, nutritionEnabled: nutriOn }, { merge: true }));
+      usersSnap.docs.forEach(d => batch.set(d.ref, {
+        geminiKey: key, nutritionEnabled: nutriOn,
+        calorieGoalKcal: cal, proteinGoalG: prot, fatGoalG: fat,
+        waterGoalMl: wat, weightUnit: unit
+      }, { merge: true }));
       await batch.commit();
     } catch {}
     const savedEl = document.getElementById('settings-saved-msg');
@@ -347,8 +355,10 @@ function renderSettingsPanel() {
   let cfg    = {};
   try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
   const cal     = cfg.calorieGoalKcal ?? 2000;
+  const prot    = cfg.proteinGoalG    ?? 150;
+  const fat     = cfg.fatGoalG        ?? 70;
   const wat     = cfg.waterGoalMl     ?? 2000;
-  const unit    = cfg.weightUnit       ?? 'kg';
+  const unit    = cfg.weightUnit      ?? 'kg';
   const key     = localStorage.getItem('fit_gemini_key') ?? '';
   const nutriOn = localStorage.getItem('fit_nutrition_enabled') === 'true';
 
@@ -363,6 +373,14 @@ function renderSettingsPanel() {
         <div class="ctrl-group">
           <label class="ctrl-label">Daily water goal (ml)</label>
           <input id="s-water-goal" class="ctrl-input" type="number" value="${wat}" min="500" max="5000" step="100"/>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Protein goal (g)</label>
+          <input id="s-protein-goal" class="ctrl-input" type="number" value="${prot}" min="10" max="500" step="5"/>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label">Fat goal (g)</label>
+          <input id="s-fat-goal" class="ctrl-input" type="number" value="${fat}" min="10" max="300" step="5"/>
         </div>
         <div class="ctrl-group">
           <label class="ctrl-label">Weight unit</label>
