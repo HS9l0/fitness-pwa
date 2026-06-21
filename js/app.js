@@ -1,7 +1,6 @@
 import { renderHome } from './screens/home.js';
 import { renderPlan } from './screens/plan.js';
 import { renderWorkout } from './screens/workout.js';
-import { renderHistory } from './screens/history.js';
 import { renderNutrition } from './screens/nutrition.js';
 import { renderProgress  } from './screens/progress.js';
 import { auth } from './firebase.js';
@@ -19,7 +18,6 @@ function getAdminEmails() {
 const screens = {
   home:      document.getElementById('screen-home'),
   workout:   document.getElementById('screen-workout'),
-  history:   document.getElementById('screen-history'),
   plan:      document.getElementById('screen-plan'),
   nutrition: document.getElementById('screen-nutrition'),
   progress:  document.getElementById('screen-progress')
@@ -28,7 +26,7 @@ const screens = {
 const signinScreen = document.getElementById('signin-screen');
 const appEl = document.getElementById('app');
 
-const SCREEN_ORDER = ['home', 'workout', 'history', 'plan', 'nutrition', 'progress'];
+const SCREEN_ORDER = ['home', 'workout', 'plan', 'nutrition', 'progress'];
 let currentScreen = null;
 
 export function navigateTo(name) {
@@ -38,7 +36,6 @@ export function navigateTo(name) {
   if (name === currentScreen) {
     if (name === 'home')      renderHome(screens.home, navigateTo);
     if (name === 'plan')      renderPlan(screens.plan);
-    if (name === 'history')   renderHistory(screens.history);
     if (name === 'nutrition') renderNutrition(screens.nutrition);
     return;
   }
@@ -67,7 +64,6 @@ export function navigateTo(name) {
   });
   if (name === 'home')      renderHome(screens.home, navigateTo);
   if (name === 'plan')      renderPlan(screens.plan);
-  if (name === 'history')   renderHistory(screens.history);
   if (name === 'workout')   renderWorkout(screens.workout, navigateTo);
   if (name === 'nutrition') renderNutrition(screens.nutrition);
   if (name === 'progress')  renderProgress(screens.progress);

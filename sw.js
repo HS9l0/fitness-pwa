@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v24';
+const CACHE = 'fitplan-v25';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',
@@ -12,7 +12,6 @@ const ASSETS = [
   BASE + '/js/screens/home.js',
   BASE + '/js/screens/plan.js',
   BASE + '/js/screens/workout.js',
-  BASE + '/js/screens/history.js',
   BASE + '/js/screens/nutrition.js',
   BASE + '/js/screens/progress.js',
   BASE + '/manifest.json',
