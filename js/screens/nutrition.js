@@ -446,8 +446,6 @@ Respond with ONLY valid JSON (no markdown, no explanation):
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const msg  = body.error?.message ?? `HTTP ${res.status}`;
-    if (res.status === 401 || res.status === 403)
-      throw new Error('Invalid API key — check your OpenRouter key in the admin dashboard');
     if (res.status === 429) {
       const err = new Error('Rate limit');
       err.retryAfter = 30;
