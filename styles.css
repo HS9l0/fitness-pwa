@@ -503,6 +503,31 @@ body { overscroll-behavior: none; }
 .goals-form-inp-wrap{ display: flex; align-items: center; gap: 4px; }
 .goals-form-inp     { flex: 1; padding: 7px 8px; font-size: 0.84rem; text-align: center; min-width: 0; }
 .goals-form-unit    { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+.goals-form-sep     { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); text-align: center; margin: 14px 0 10px; position: relative; }
+.goals-form-sep::before, .goals-form-sep::after { content: ''; position: absolute; top: 50%; width: 28%; height: 1px; background: var(--border); }
+.goals-form-sep::before { left: 0; }
+.goals-form-sep::after  { right: 0; }
+
+/* Macro calculator */
+.calc-toggle-btn  { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--text-muted); padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); width: 100%; transition: border-color 0.15s, color 0.15s; }
+.calc-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+.calc-chev        { margin-left: auto; transition: transform 0.2s; flex-shrink: 0; }
+.calc-grid        { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.calc-field       { display: flex; flex-direction: column; gap: 5px; }
+.calc-field-full  { grid-column: 1 / -1; }
+.calc-inp-row     { display: flex; gap: 6px; align-items: center; }
+.calc-inp-row .goals-form-inp { flex: 1; }
+.unit-toggle-sm   { display: flex; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; flex-shrink: 0; }
+.unit-sm          { padding: 6px 9px; font-size: 0.72rem; color: var(--text-dim); transition: background 0.15s, color 0.15s; }
+.unit-sm.active   { background: var(--accent); color: #fff; }
+.calc-select      { width: 100%; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font: inherit; font-size: 0.8rem; padding: 8px 10px; }
+.calc-select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.gender-toggle    { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.gender-btn       { flex: 1; padding: 8px; font-size: 0.78rem; color: var(--text-dim); transition: background 0.15s, color 0.15s; }
+.gender-btn.active{ background: var(--accent); color: #fff; }
+.goal-toggle      { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.goal-btn         { flex: 1; padding: 9px 4px; font-size: 0.75rem; color: var(--text-dim); transition: background 0.15s, color 0.15s; text-align: center; }
+.goal-btn.active  { background: var(--accent); color: #fff; }
 
 /* Three-ring row */
 .rings-row      { display: flex; align-items: center; justify-content: space-around; gap: 6px; margin-bottom: 16px; }

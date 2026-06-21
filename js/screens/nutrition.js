@@ -52,6 +52,65 @@ export function renderNutrition(container) {
       </div>
 
       <div id="goals-form" class="goals-form card" style="display:none;margin-bottom:12px">
+
+        <!-- Calculator -->
+        <button class="calc-toggle-btn" id="calc-toggle-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          Auto-calculate from body stats
+          <svg class="calc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div id="calc-panel" style="display:none;margin-top:12px">
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label class="goals-form-lbl">Weight</label>
+              <div class="calc-inp-row">
+                <input type="number" id="calc-weight" class="goals-form-inp" placeholder="75" min="30" max="300"/>
+                <div class="unit-toggle-sm">
+                  <button class="unit-sm active" id="calc-kg-btn">kg</button>
+                  <button class="unit-sm" id="calc-lbs-btn">lbs</button>
+                </div>
+              </div>
+            </div>
+            <div class="calc-field">
+              <label class="goals-form-lbl">Height (cm)</label>
+              <input type="number" id="calc-height" class="goals-form-inp" placeholder="175" min="100" max="250"/>
+            </div>
+            <div class="calc-field">
+              <label class="goals-form-lbl">Age</label>
+              <input type="number" id="calc-age" class="goals-form-inp" placeholder="25" min="10" max="99"/>
+            </div>
+            <div class="calc-field">
+              <label class="goals-form-lbl">Gender</label>
+              <div class="gender-toggle">
+                <button class="gender-btn active" data-gender="male">Male</button>
+                <button class="gender-btn" data-gender="female">Female</button>
+              </div>
+            </div>
+            <div class="calc-field calc-field-full">
+              <label class="goals-form-lbl">Activity level</label>
+              <select id="calc-activity" class="calc-select">
+                <option value="1.2">Sedentary — desk job, no exercise</option>
+                <option value="1.375">Light — 1–3 workouts/week</option>
+                <option value="1.55" selected>Moderate — 3–5 workouts/week</option>
+                <option value="1.725">Very active — 6–7 workouts/week</option>
+                <option value="1.9">Athlete / physical job</option>
+              </select>
+            </div>
+            <div class="calc-field calc-field-full">
+              <label class="goals-form-lbl">Goal</label>
+              <div class="goal-toggle">
+                <button class="goal-btn" data-goal="cut">🔥 Cut</button>
+                <button class="goal-btn active" data-goal="maintain">⚖️ Maintain</button>
+                <button class="goal-btn" data-goal="bulk">💪 Bulk</button>
+              </div>
+            </div>
+          </div>
+          <button class="btn-primary" id="calc-run" style="margin-top:12px;padding:11px">Calculate →</button>
+        </div>
+
+        <div class="goals-form-sep">Daily targets</div>
+
         <div class="goals-form-row">
           <div class="goals-form-field">
             <label class="goals-form-lbl">Calories</label>
@@ -304,6 +363,89 @@ export function renderNutrition(container) {
     cfg.fatGoalG        = fat;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
     renderNutrition(container);
+  });
+
+  // ── Macro calculator ────────────────────────────────────
+  let calcWeightUnit = 'kg';
+  let calcGender     = 'male';
+  let calcGoalType   = 'maintain';
+
+  const calcToggleBtn = container.querySelector('#calc-toggle-btn');
+  const calcPanel     = container.querySelector('#calc-panel');
+  calcToggleBtn.addEventListener('click', () => {
+    const open = calcPanel.style.display !== 'none';
+    calcPanel.style.display = open ? 'none' : 'block';
+    calcToggleBtn.querySelector('.calc-chev').style.transform = open ? '' : 'rotate(180deg)';
+  });
+
+  container.querySelector('#calc-kg-btn').addEventListener('click', () => {
+    calcWeightUnit = 'kg';
+    container.querySelector('#calc-kg-btn').classList.add('active');
+    container.querySelector('#calc-lbs-btn').classList.remove('active');
+  });
+  container.querySelector('#calc-lbs-btn').addEventListener('click', () => {
+    calcWeightUnit = 'lbs';
+    container.querySelector('#calc-lbs-btn').classList.add('active');
+    container.querySelector('#calc-kg-btn').classList.remove('active');
+  });
+
+  container.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calcGender = btn.dataset.gender;
+      container.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  container.querySelectorAll('.goal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calcGoalType = btn.dataset.goal;
+      container.querySelectorAll('.goal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  container.querySelector('#calc-run').addEventListener('click', () => {
+    let weightRaw = parseFloat(container.querySelector('#calc-weight').value);
+    const heightCm = parseFloat(container.querySelector('#calc-height').value);
+    const age      = parseInt(container.querySelector('#calc-age').value);
+    const activity = parseFloat(container.querySelector('#calc-activity').value);
+
+    if (!weightRaw || !heightCm || !age) {
+      showToast(container, 'Fill in weight, height and age');
+      return;
+    }
+
+    const weightKg = calcWeightUnit === 'lbs' ? weightRaw / 2.2046 : weightRaw;
+
+    // Mifflin-St Jeor BMR
+    const bmr = calcGender === 'male'
+      ? (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5
+      : (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+    const tdee = bmr * activity;
+
+    let kcal, protG, fatG;
+    if (calcGoalType === 'cut') {
+      kcal  = Math.round(tdee - 400);
+      protG = Math.round(weightKg * 2.2); // high protein to preserve muscle
+      fatG  = Math.round((kcal * 0.25) / 9);
+    } else if (calcGoalType === 'bulk') {
+      kcal  = Math.round(tdee + 250);
+      protG = Math.round(weightKg * 2.0);
+      fatG  = Math.round((kcal * 0.28) / 9);
+    } else {
+      kcal  = Math.round(tdee);
+      protG = Math.round(weightKg * 1.8);
+      fatG  = Math.round((kcal * 0.27) / 9);
+    }
+
+    container.querySelector('#gf-cal').value  = kcal;
+    container.querySelector('#gf-prot').value = protG;
+    container.querySelector('#gf-fat').value  = fatG;
+
+    calcPanel.style.display = 'none';
+    calcToggleBtn.querySelector('.calc-chev').style.transform = '';
+    calcToggleBtn.innerHTML = calcToggleBtn.innerHTML.replace('Auto-calculate from body stats', 'Recalculate');
   });
 }
 
