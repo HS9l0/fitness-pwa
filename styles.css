@@ -489,6 +489,21 @@ body { overscroll-behavior: none; }
 
 /* ── Nutrition screen ───────────────────────────────────── */
 
+/* Goals edit bar */
+.goals-edit-bar  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.goals-edit-lbl  { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); font-weight: 700; }
+.goals-edit-btn  { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-muted); padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px; transition: color 0.15s, border-color 0.15s; }
+.goals-edit-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Goals inline form */
+.goals-form         { padding: 14px 16px; }
+.goals-form-row     { display: flex; gap: 10px; }
+.goals-form-field   { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.goals-form-lbl     { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
+.goals-form-inp-wrap{ display: flex; align-items: center; gap: 4px; }
+.goals-form-inp     { flex: 1; padding: 7px 8px; font-size: 0.84rem; text-align: center; min-width: 0; }
+.goals-form-unit    { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+
 /* Three-ring row */
 .rings-row      { display: flex; align-items: center; justify-content: space-around; gap: 6px; margin-bottom: 16px; }
 .ring-wrap      { position: relative; width: 88px; height: 88px; flex-shrink: 0; }

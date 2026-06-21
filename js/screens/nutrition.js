@@ -40,6 +40,47 @@ export function renderNutrition(container) {
 
     <div class="section">
 
+      <div class="goals-edit-bar">
+        <span class="goals-edit-lbl">Daily Goals</span>
+        <button class="goals-edit-btn" id="goals-edit-btn" title="Edit goals">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
+      </div>
+
+      <div id="goals-form" class="goals-form card" style="display:none;margin-bottom:12px">
+        <div class="goals-form-row">
+          <div class="goals-form-field">
+            <label class="goals-form-lbl">Calories</label>
+            <div class="goals-form-inp-wrap">
+              <input type="number" id="gf-cal" class="goals-form-inp" value="${goal}" min="500" max="10000" step="50"/>
+              <span class="goals-form-unit">kcal</span>
+            </div>
+          </div>
+          <div class="goals-form-field">
+            <label class="goals-form-lbl">Protein</label>
+            <div class="goals-form-inp-wrap">
+              <input type="number" id="gf-prot" class="goals-form-inp" value="${protGoal}" min="10" max="500" step="5"/>
+              <span class="goals-form-unit">g</span>
+            </div>
+          </div>
+          <div class="goals-form-field">
+            <label class="goals-form-lbl">Fat</label>
+            <div class="goals-form-inp-wrap">
+              <input type="number" id="gf-fat" class="goals-form-inp" value="${fatGoal}" min="10" max="300" step="5"/>
+              <span class="goals-form-unit">g</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-primary" id="gf-save" style="flex:1;padding:10px">Save</button>
+          <button id="gf-cancel" style="padding:10px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font:inherit">Cancel</button>
+        </div>
+      </div>
+
       <div class="rings-row">
         <!-- Protein -->
         <div class="ring-wrap">
@@ -242,6 +283,27 @@ export function renderNutrition(container) {
       removeFoodEntry(date, btn.dataset.id);
       renderNutrition(container);
     });
+  });
+
+  const goalsEditBtn = container.querySelector('#goals-edit-btn');
+  const goalsForm    = container.querySelector('#goals-form');
+  goalsEditBtn.addEventListener('click', () => {
+    goalsForm.style.display = goalsForm.style.display === 'none' ? 'block' : 'none';
+  });
+  container.querySelector('#gf-cancel').addEventListener('click', () => {
+    goalsForm.style.display = 'none';
+  });
+  container.querySelector('#gf-save').addEventListener('click', () => {
+    const cal  = parseInt(container.querySelector('#gf-cal').value)  || 2000;
+    const prot = parseInt(container.querySelector('#gf-prot').value) || 150;
+    const fat  = parseInt(container.querySelector('#gf-fat').value)  || 70;
+    let cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
+    cfg.calorieGoalKcal = cal;
+    cfg.proteinGoalG    = prot;
+    cfg.fatGoalG        = fat;
+    localStorage.setItem('fit_settings', JSON.stringify(cfg));
+    renderNutrition(container);
   });
 }
 
