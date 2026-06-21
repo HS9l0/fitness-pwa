@@ -189,7 +189,7 @@ function renderActiveWorkout(container, workout, navigate) {
   container.querySelector('#finish-btn').addEventListener('click', () => {
     clearInterval(timerInterval);  timerInterval = null;
     clearInterval(restInterval);   restInterval = null;
-    container.querySelector('.rest-overlay')?.remove();
+    document.querySelector('.rest-overlay')?.remove();
     const durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
     session.durationMin = durationMin;
     saveSession(session);
@@ -208,7 +208,7 @@ function renderActiveWorkout(container, workout, navigate) {
 function showRestTimer(container, seconds, onDone) {
   clearInterval(restInterval);
   restInterval = null;
-  container.querySelector('.rest-overlay')?.remove();
+  document.querySelector('.rest-overlay')?.remove();
 
   const CIRC = 2 * Math.PI * 32;
   let remaining = seconds;
@@ -236,7 +236,7 @@ function showRestTimer(container, seconds, onDone) {
       </div>
     </div>
   `;
-  container.appendChild(overlay);
+  document.body.appendChild(overlay);
 
   const countEl = overlay.querySelector('#rest-count');
   const arcEl   = overlay.querySelector('#rest-fill');
