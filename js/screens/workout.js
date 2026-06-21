@@ -115,51 +115,58 @@ function renderActiveWorkout(container, workout, navigate) {
     thumb.addEventListener('click', e => { e.stopPropagation(); embedVideo(thumb); });
   });
 
-  // Strength set check buttons
-  container.querySelectorAll('.set-check').forEach(btn => {
+  // Strength set done buttons
+  container.querySelectorAll('.set-done-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const exName = btn.dataset.ex;
       const setIdx = parseInt(btn.dataset.set);
+      const exId   = exName.replace(/[^a-z0-9]/gi, '-');
       const weightInput = container.querySelector(`.set-weight[data-ex="${exName}"][data-set="${setIdx}"]`);
-      const repsInput = container.querySelector(`.set-reps[data-ex="${exName}"][data-set="${setIdx}"]`);
-
-      const exSession = session.exercises.find(e => e.name === exName);
+      const repsInput   = container.querySelector(`.set-reps[data-ex="${exName}"][data-set="${setIdx}"]`);
+      const exSession   = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
       exSession.sets[setIdx] = {
         done: true,
         weight: parseFloat(weightInput?.value) || null,
-        reps: parseInt(repsInput?.value) || null,
+        reps:   parseInt(repsInput?.value)     || null,
         note: ''
       };
 
-      btn.classList.add('checked');
-      btn.closest('.set-row').style.opacity = '0.55';
-      if (!exSession.isCardio) showRestTimer(container, 90);
+      // Visual: mark card done + lock inputs
+      const card = btn.closest('.set-card');
+      card.classList.add('done');
+      if (weightInput) weightInput.readOnly = true;
+      if (repsInput)   repsInput.readOnly   = true;
+
+      // Progress bar
+      const doneSets  = exSession.sets.filter(s => s.done).length;
+      const totalSets = exSession.sets.length;
+      const progressFill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
+      const progressTxt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
+      if (progressFill) progressFill.style.width = `${(doneSets / totalSets) * 100}%`;
+      if (progressTxt)  progressTxt.textContent  = `${doneSets} / ${totalSets}`;
+
+      // Mark exercise complete when all sets done
+      if (doneSets === totalSets) {
+        container.querySelector(`.exercise-card[data-ex-name="${exName}"]`)?.classList.add('ex-complete');
+      }
+
+      showRestTimer(container, 90);
     });
   });
 
-  // Cardio done checkboxes
-  container.querySelectorAll('.cardio-done').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const exName = cb.dataset.ex;
+  // Cardio done buttons
+  container.querySelectorAll('.cardio-done-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const exName    = btn.dataset.ex;
       const noteInput = container.querySelector(`.set-note[data-ex="${exName}"]`);
       const exSession = session.exercises.find(e => e.name === exName);
-      if (exSession) {
-        exSession.sets[0] = { done: cb.checked, weight: null, reps: null, note: noteInput?.value || '' };
-      }
-    });
-  });
-
-  // Cardio note inputs sync
-  container.querySelectorAll('.set-note').forEach(input => {
-    input.addEventListener('input', () => {
-      const exName = input.dataset.ex;
-      const cb = container.querySelector(`.cardio-done[data-ex="${exName}"]`);
-      const exSession = session.exercises.find(e => e.name === exName);
-      if (exSession && cb?.checked) {
-        exSession.sets[0].note = input.value;
-      }
+      if (!exSession) return;
+      const isDone = btn.classList.toggle('done');
+      exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
+      container.querySelector(`.exercise-card[data-ex-name="${exName}"]`)
+        ?.classList.toggle('ex-complete', isDone);
     });
   });
 

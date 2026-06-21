@@ -155,42 +155,58 @@ function renderSetRowsWithVideo(ex, lastWeights) {
 function renderSetRows(ex, lastWeights) {
   const lastHint = lastWeights
     ? (ex.isCardio
-        ? (lastWeights.note ? `Last time: ${lastWeights.note}` : 'Done before')
+        ? (lastWeights.note ? `Last time: ${lastWeights.note}` : 'Done before ✓')
         : `Last: ${lastWeights.weight ?? '?'} kg × ${lastWeights.reps ?? '?'} reps`)
     : 'First time — start light';
 
+  const exId = ex.name.replace(/[^a-z0-9]/gi, '-');
+
   if (ex.isCardio) {
     return `
-      <div class="cardio-note">
-        <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5;margin-bottom:10px">${ex.howTo}</div>
-        <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:10px">${lastHint}</div>
-        <label style="font-size:0.72rem;color:var(--text-dim);display:block;margin-bottom:4px">Notes (optional)</label>
-        <input type="text" class="set-note" placeholder="e.g. 10 min, ran at 11 km/h" data-ex="${ex.name}" style="width:100%" />
-        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:0.85rem;color:var(--text-muted);cursor:pointer">
-          <input type="checkbox" class="cardio-done" data-ex="${ex.name}" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0" />
-          Mark as done
-        </label>
+      <div class="cardio-section">
+        <div class="set-last-hint">${lastHint}</div>
+        <div style="margin-bottom:12px">
+          <label class="set-last-hint" style="display:block;margin-bottom:5px">Notes (optional)</label>
+          <input type="text" class="set-note" placeholder="e.g. 10 min, 11 km/h" data-ex="${ex.name}"/>
+        </div>
+        <button class="cardio-done-btn" data-ex="${ex.name}">
+          <span class="cardio-done-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="cardio-done-label">Mark as Done</span>
+        </button>
       </div>
     `;
   }
 
   const rows = Array.from({ length: ex.defaultSets }, (_, i) => `
-    <div class="set-row" data-set="${i}" data-ex="${ex.name}">
-      <div class="set-num">${i + 1}</div>
-      <input type="number" class="set-weight" min="0" max="999" step="2.5"
-        placeholder="${lastWeights?.weight ?? 'kg'}" data-ex="${ex.name}" data-set="${i}" />
-      <input type="number" class="set-reps" min="0" max="99"
-        placeholder="${lastWeights?.reps ?? 'reps'}" data-ex="${ex.name}" data-set="${i}" />
-      <button class="set-check" data-ex="${ex.name}" data-set="${i}">✓</button>
+    <div class="set-card" data-set="${i}" data-ex="${ex.name}">
+      <div class="set-card-badge">${i + 1}</div>
+      <div class="set-card-inputs">
+        <div class="set-inp-group">
+          <input type="number" class="set-weight set-inp" min="0" max="999" step="2.5"
+            placeholder="${lastWeights?.weight ?? '—'}" data-ex="${ex.name}" data-set="${i}"/>
+          <span class="set-inp-lbl">kg</span>
+        </div>
+        <span class="set-inp-x">×</span>
+        <div class="set-inp-group">
+          <input type="number" class="set-reps set-inp" min="0" max="99"
+            placeholder="${lastWeights?.reps ?? '—'}" data-ex="${ex.name}" data-set="${i}"/>
+          <span class="set-inp-lbl">reps</span>
+        </div>
+      </div>
+      <button class="set-done-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
     </div>
   `).join('');
 
   return `
-    <div style="font-size:0.72rem;color:var(--text-dim);padding:8px 0 6px">${lastHint}</div>
-    <div class="sets-header">
-      <div></div><div>Weight</div><div>Reps</div><div></div>
+    <div class="set-last-hint">${lastHint}</div>
+    <div class="sets-progress" id="sets-progress-${exId}">
+      <div class="sets-progress-bar"><div class="sets-progress-fill" style="width:0%"></div></div>
+      <span class="sets-progress-txt">0 / ${ex.defaultSets}</span>
     </div>
-    ${rows}
-    <div style="font-size:0.7rem;color:var(--text-dim);padding:8px 0 0">Tap ✓ after each set</div>
+    <div class="sets-list">${rows}</div>
   `;
 }

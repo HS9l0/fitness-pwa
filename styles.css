@@ -218,30 +218,114 @@ a { color: inherit; text-decoration: none; }
 }
 .tip-box strong { color: var(--accent); }
 
-/* ── Set rows ───────────────────────────────────────────── */
-.sets-header { display: grid; grid-template-columns: 28px 80px 80px 32px; gap: 6px; align-items: center; padding: 10px 0 6px; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
-.set-row     { display: grid; grid-template-columns: 28px 80px 80px 32px; gap: 6px; align-items: center; padding: 5px 0; transition: opacity 0.25s; }
-.set-num     { font-size: 0.75rem; color: var(--text-dim); text-align: center; }
+/* ── Set cards (workout mode) ───────────────────────────── */
+.set-last-hint { font-size: 0.7rem; color: var(--text-dim); padding: 6px 0 10px; }
 
-@keyframes check-pop {
+.sets-progress       { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sets-progress-bar   { flex: 1; height: 3px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
+.sets-progress-fill  { height: 100%; background: var(--accent-2); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); }
+.sets-progress-txt   { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.sets-list   { display: flex; flex-direction: column; gap: 8px; }
+
+.set-card {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  transition: border-color 0.35s, background 0.35s;
+}
+@keyframes set-done-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+  60%  { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+  100% { box-shadow: none; }
+}
+.set-card.done {
+  border-color: rgba(34,197,94,0.35);
+  background: rgba(34,197,94,0.05);
+  animation: set-done-flash 0.6s ease forwards;
+}
+
+.set-card-badge {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700; color: var(--text-dim);
+  transition: background 0.35s, border-color 0.35s, color 0.35s;
+}
+.set-card.done .set-card-badge {
+  background: rgba(34,197,94,0.15);
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+}
+
+.set-card-inputs {
+  display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;
+}
+.set-inp-group {
+  display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0;
+}
+.set-inp {
+  flex: 1; min-width: 0; padding: 8px 6px;
+  font-size: 0.88rem; font-weight: 600; text-align: center;
+  border-radius: var(--radius-sm); transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.set-card.done .set-inp {
+  background: transparent; border-color: transparent;
+  color: var(--accent-2); pointer-events: none;
+}
+.set-inp-lbl {
+  font-size: 0.6rem; color: var(--text-dim); flex-shrink: 0;
+  transition: color 0.3s;
+}
+.set-card.done .set-inp-lbl { color: rgba(34,197,94,0.6); }
+.set-inp-x { font-size: 0.7rem; color: var(--text-dim); flex-shrink: 0; }
+
+@keyframes done-btn-pop {
   0%   { transform: scale(1); }
-  40%  { transform: scale(1.45); }
-  70%  { transform: scale(0.85); }
+  35%  { transform: scale(1.4); }
+  65%  { transform: scale(0.88); }
   100% { transform: scale(1); }
 }
-.set-check {
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 2px solid var(--border); background: none;
+.set-done-btn {
+  width: 42px; height: 42px; flex-shrink: 0; border-radius: 50%;
+  border: 2px solid var(--border); color: var(--text-dim);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; transition: background 0.15s, border-color 0.15s; padding: 0; flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.12s;
 }
-.set-check.checked {
-  background: var(--accent); border-color: var(--accent); color: #fff;
-  animation: check-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.set-done-btn:active { transform: scale(0.9); }
+.set-card.done .set-done-btn {
+  background: var(--accent-2); border-color: var(--accent-2); color: #fff;
+  animation: done-btn-pop 0.4s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
 }
-.set-row input[type="number"] { text-align: center; padding: 6px 4px; font-size: 0.82rem; }
-.cardio-note  { padding: 12px 0 4px; }
-.cardio-input { margin-top: 8px; }
+
+/* Exercise complete state */
+.exercise-card.ex-complete .ex-num { background: var(--accent-2); }
+.exercise-card.ex-complete .ex-header { border-left: 3px solid var(--accent-2); }
+
+/* Cardio section */
+.cardio-section { padding: 4px 0; }
+.cardio-done-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 14px; border-radius: var(--radius);
+  border: 2px solid var(--border); color: var(--text-muted);
+  font-size: 0.9rem; font-weight: 600;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.12s;
+  margin-top: 4px;
+}
+.cardio-done-btn:active { transform: scale(0.97); }
+.cardio-done-btn.done {
+  background: rgba(34,197,94,0.1); border-color: var(--accent-2); color: var(--accent-2);
+}
+.cardio-done-icon {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.cardio-done-btn.done .cardio-done-icon { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
 
 /* ── Workout header ─────────────────────────────────────── */
 .workout-header {
@@ -401,7 +485,6 @@ a { color: inherit; text-decoration: none; }
 /* ── Mobile ─────────────────────────────────────────────── */
 @media (max-width: 380px) {
   .detail-grid { grid-template-columns: 1fr; }
-  .sets-header, .set-row { grid-template-columns: 24px 70px 70px 28px; }
 }
 
 /* ── Number inputs ──────────────────────────────────────── */
