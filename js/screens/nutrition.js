@@ -1,7 +1,7 @@
 import { today, getFoodLog, addFoodEntry, removeFoodEntry, getSettings } from '../store.js';
 
 const CIRC  = 314.16;
-const MODEL = 'meta-llama/llama-4-maverick:free';
+const MODEL = 'gemini-2.0-flash';
 
 function getKey() { return localStorage.getItem('fit_gemini_key') ?? ''; }
 function nowTime() {
@@ -415,47 +415,45 @@ function compress(file) {
   });
 }
 
-// ── OpenRouter API call ───────────────────────────────────
+// ── Gemini API call ──────────────────────────────────────
 async function queryGemini(base64, mimeType, key) {
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://hs9l0.github.io/fitness-pwa/',
-      'X-Title': 'FitPlan'
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
-          { type: 'text', text: `You are a nutrition expert. Look at this food image and identify every food and drink item visible.
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${key}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: mimeType, data: base64 } },
+            { text: `You are a nutrition expert. Look at this food image and identify every food and drink item visible.
 
 For each item estimate: its name, approximate portion size, and calories (kcal).
 Be realistic — a standard home-cooked meal is usually 400–800 kcal total.
 
 Respond with ONLY valid JSON (no markdown, no explanation):
 {"foods":[{"name":"string","portion":"e.g. 1 cup (200g)","calories":300}],"totalCalories":600,"confidence":"high"}` }
-        ]
-      }]
-    })
-  });
+          ]
+        }],
+        generationConfig: { temperature: 0.1 }
+      })
+    }
+  );
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const msg  = body.error?.message ?? `HTTP ${res.status}`;
     if (res.status === 429) {
-      const err = new Error('Rate limit');
-      err.retryAfter = 30;
+      const parsed  = parseInt(body.error?.details?.find(d => d.retryDelay)?.retryDelay) || 0;
+      const err     = new Error('Rate limit');
+      err.retryAfter = parsed > 0 ? parsed : 30;
       throw err;
     }
     throw new Error(msg);
   }
 
   const data  = await res.json();
-  const text  = data.choices?.[0]?.message?.content ?? '';
+  const text  = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
   const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
   const match = clean.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('No food detected in image — try a clearer photo');
