@@ -1055,3 +1055,129 @@ body { overscroll-behavior: none; }
   );
 }
 
+/* ── Cogwheel button ─────────────────────────────────────── */
+#cogwheel-btn {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top, 0px));
+  right: 14px;
+  z-index: 200;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(12, 21, 32, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  display: none;
+  align-items: center; justify-content: center;
+  color: var(--text-dim);
+  transition: color 0.15s, border-color 0.15s;
+}
+#cogwheel-btn svg { width: 18px; height: 18px; }
+#cogwheel-btn:active { color: var(--accent); border-color: var(--accent); }
+@media (max-width: 767px) { #cogwheel-btn { display: flex; } }
+
+/* ── Settings sheet ─────────────────────────────────────── */
+.settings-sheet {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.settings-sheet.open { opacity: 1; pointer-events: auto; }
+.settings-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.settings-panel {
+  position: relative;
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+  border: 1px solid var(--border); border-bottom: none;
+  max-height: 82vh; overflow-y: auto;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+}
+.settings-sheet.open .settings-panel { transform: translateY(0); }
+.settings-panel-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.settings-panel-title { font-size: 1rem; font-weight: 700; }
+.settings-done-btn { color: var(--accent); font-weight: 700; font-size: 0.9rem; padding: 4px; }
+.settings-body { padding: 8px 20px 20px; }
+.settings-section-label {
+  font-size: 0.65rem; font-weight: 700; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin: 14px 0 4px;
+}
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(30,45,68,0.6);
+  cursor: pointer;
+}
+.settings-row:last-of-type { border-bottom: none; }
+.settings-row-label { font-size: 0.88rem; font-weight: 500; color: var(--text); }
+.ios-toggle { position: relative; display: inline-block; width: 51px; height: 31px; flex-shrink: 0; }
+.ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.ios-track {
+  position: absolute; inset: 0;
+  background: var(--border); border-radius: 15.5px;
+  cursor: pointer; transition: background 0.2s;
+}
+.ios-track::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 27px; height: 27px; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+  transition: left 0.2s;
+}
+.ios-toggle input:checked + .ios-track { background: var(--accent-2); }
+.ios-toggle input:checked + .ios-track::after { left: 22px; }
+.unit-seg { display: flex; background: var(--surface-raised); border-radius: 8px; padding: 2px; gap: 2px; }
+.unit-seg-btn { padding: 5px 14px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); transition: all 0.15s; }
+.unit-seg-btn.active { background: var(--border); color: var(--text); }
+.settings-admin-link {
+  display: block; margin-top: 18px; padding: 13px 16px;
+  background: var(--surface-raised); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 0.86rem; font-weight: 600;
+  color: var(--text-muted); text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+.settings-admin-link:active { background: var(--border); color: var(--text); }
+
+/* ── Home quick nav ──────────────────────────────────────── */
+.home-quicknav { display: flex; gap: 10px; padding: 0 16px 6px; }
+.home-qnav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 8px 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 0.7rem; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.4px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.home-qnav-btn svg { width: 20px; height: 20px; }
+.home-qnav-btn:active { background: var(--surface-raised); color: var(--text); border-color: var(--accent); }
+@media (min-width: 768px) { .home-quicknav { display: none; } }
+
+/* ── Workout back button ─────────────────────────────────── */
+.wkt-back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
+  padding: 0 0 10px; transition: color 0.15s;
+}
+.wkt-back-btn svg { width: 15px; height: 15px; }
+.wkt-back-btn:active { color: var(--text); }
+.pwkt-back {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0;
+  color: var(--text-muted); border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+.pwkt-back svg { width: 18px; height: 18px; }
+.pwkt-back:active { background: var(--surface-raised); color: var(--text); }
+

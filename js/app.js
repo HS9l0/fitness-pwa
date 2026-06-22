@@ -26,10 +26,6 @@ export function navigateTo(name) {
     return;
   }
 
-  const fromIdx = SCREEN_ORDER.indexOf(currentScreen ?? 'home');
-  const toIdx   = SCREEN_ORDER.indexOf(name);
-  const isForward = toIdx >= fromIdx;
-
   if (currentScreen) {
     screens[currentScreen].classList.remove('active', 'fade-in');
   }
@@ -42,7 +38,7 @@ export function navigateTo(name) {
 
   currentScreen = name;
 
-  document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
+  document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
   });
   if (name === 'home')      renderHome(screens.home, navigateTo);
@@ -52,17 +48,105 @@ export function navigateTo(name) {
   if (name === 'progress')  renderProgress(screens.progress);
 }
 
-document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
   btn.addEventListener('click', () => navigateTo(btn.dataset.screen));
 });
 
-const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-const planOn     = localStorage.getItem('fit_plan_enabled')      !== 'false';
-const progressOn = localStorage.getItem('fit_progress_enabled')  !== 'false';
+export function applyTabVisibility() {
+  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
+  const planOn     = localStorage.getItem('fit_plan_enabled')      !== 'false';
+  const progressOn = localStorage.getItem('fit_progress_enabled')  !== 'false';
+  document.querySelectorAll('[data-screen="nutrition"]').forEach(el => { el.style.display = nutriOn    ? '' : 'none'; });
+  document.querySelectorAll('[data-screen="plan"]').forEach(el =>      { el.style.display = planOn     ? '' : 'none'; });
+  document.querySelectorAll('[data-screen="progress"]').forEach(el =>  { el.style.display = progressOn ? '' : 'none'; });
+}
 
-document.querySelectorAll('[data-screen="nutrition"]').forEach(el => { el.style.display = nutriOn    ? '' : 'none'; });
-document.querySelectorAll('[data-screen="plan"]').forEach(el =>      { el.style.display = planOn     ? '' : 'none'; });
-document.querySelectorAll('[data-screen="progress"]').forEach(el =>  { el.style.display = progressOn ? '' : 'none'; });
+applyTabVisibility();
+
+// ── Settings sheet ────────────────────────────────────────
+function openSettings() {
+  if (document.getElementById('settings-sheet')) return;
+
+  const planOn     = localStorage.getItem('fit_plan_enabled')     !== 'false';
+  const progressOn = localStorage.getItem('fit_progress_enabled') !== 'false';
+  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
+  const unit = (() => {
+    try { return JSON.parse(localStorage.getItem('fit_settings') ?? '{}').weightUnit ?? 'kg'; } catch { return 'kg'; }
+  })();
+
+  const sheet = document.createElement('div');
+  sheet.id = 'settings-sheet';
+  sheet.className = 'settings-sheet';
+  sheet.innerHTML = `
+    <div class="settings-backdrop"></div>
+    <div class="settings-panel">
+      <div class="settings-panel-hdr">
+        <span class="settings-panel-title">Settings</span>
+        <button class="settings-done-btn">Done</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-section-label">Sections</div>
+        <label class="settings-row">
+          <span class="settings-row-label">Plan</span>
+          <div class="ios-toggle"><input type="checkbox" id="stg-plan" ${planOn ? 'checked' : ''}><span class="ios-track"></span></div>
+        </label>
+        <label class="settings-row">
+          <span class="settings-row-label">Progress</span>
+          <div class="ios-toggle"><input type="checkbox" id="stg-progress" ${progressOn ? 'checked' : ''}><span class="ios-track"></span></div>
+        </label>
+        <label class="settings-row">
+          <span class="settings-row-label">Nutrition</span>
+          <div class="ios-toggle"><input type="checkbox" id="stg-nutrition" ${nutriOn ? 'checked' : ''}><span class="ios-track"></span></div>
+        </label>
+        <div class="settings-section-label">Units</div>
+        <div class="settings-row">
+          <span class="settings-row-label">Weight</span>
+          <div class="unit-seg">
+            <button class="unit-seg-btn ${unit === 'kg' ? 'active' : ''}" data-unit="kg">kg</button>
+            <button class="unit-seg-btn ${unit === 'lbs' ? 'active' : ''}" data-unit="lbs">lbs</button>
+          </div>
+        </div>
+        <a href="./admin.html" class="settings-admin-link">Admin Dashboard →</a>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(sheet);
+  requestAnimationFrame(() => sheet.classList.add('open'));
+
+  sheet.querySelector('.settings-backdrop').addEventListener('click', closeSettings);
+  sheet.querySelector('.settings-done-btn').addEventListener('click', closeSettings);
+
+  ['plan', 'progress', 'nutrition'].forEach(name => {
+    const el = sheet.querySelector(`#stg-${name}`);
+    if (!el) return;
+    el.addEventListener('change', () => {
+      const key = name === 'nutrition' ? 'fit_nutrition_enabled' : `fit_${name}_enabled`;
+      localStorage.setItem(key, el.checked ? 'true' : 'false');
+      applyTabVisibility();
+      if (currentScreen === 'home') renderHome(screens.home, navigateTo);
+    });
+  });
+
+  sheet.querySelectorAll('.unit-seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sheet.querySelectorAll('.unit-seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      let cfg = {};
+      try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
+      cfg.weightUnit = btn.dataset.unit;
+      localStorage.setItem('fit_settings', JSON.stringify(cfg));
+    });
+  });
+}
+
+function closeSettings() {
+  const sheet = document.getElementById('settings-sheet');
+  if (!sheet) return;
+  sheet.classList.remove('open');
+  setTimeout(() => sheet?.remove(), 340);
+}
+
+document.getElementById('cogwheel-btn')?.addEventListener('click', openSettings);
 
 navigateTo('home');
 

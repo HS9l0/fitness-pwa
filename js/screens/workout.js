@@ -24,6 +24,10 @@ export function renderWorkout(container, navigate) {
 
   container.innerHTML = `
     <div class="screen-header">
+      <button class="wkt-back-btn" id="wkt-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Home
+      </button>
       <div class="badge">${workout.weekday}</div>
       <h1>${workout.label}</h1>
       <p>${workout.focus}</p>
@@ -54,6 +58,7 @@ export function renderWorkout(container, navigate) {
     </div>
   `;
 
+  container.querySelector('#wkt-back').addEventListener('click', () => navigate('home'));
   container.querySelector('#begin-btn').addEventListener('click', () => {
     beginWorkout(nextDay);
     renderActiveWorkout(container, workout, navigate);
@@ -142,6 +147,9 @@ function renderPhoneWorkout(container, workout, navigate) {
   container.innerHTML = `
     <div class="pwkt">
       <div class="pwkt-hdr">
+        <button class="pwkt-back" id="pwkt-back-home" aria-label="Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
         <div class="pwkt-hdr-left">
           <div class="pwkt-label">${workout.label}</div>
           <div class="pwkt-excount" id="pwkt-count">1 / ${total}</div>
@@ -199,6 +207,7 @@ function renderPhoneWorkout(container, workout, navigate) {
   allCards[0]?.classList.add('pwkt-active', 'open');
   updateNav();
 
+  container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
   container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
   container.querySelector('#pwkt-next').addEventListener('click', () => goToSlide(currentIdx + 1, 'next'));
 
