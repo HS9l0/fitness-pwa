@@ -29,9 +29,12 @@ export async function pullFromFirestore(uid) {
   if (profile?.geminiKey) {
     localStorage.setItem('fit_gemini_key', profile.geminiKey);
   }
-  if (profile?.nutritionEnabled !== undefined) {
+  if (profile?.nutritionEnabled !== undefined)
     localStorage.setItem('fit_nutrition_enabled', profile.nutritionEnabled ? 'true' : 'false');
-  }
+  if (profile?.planEnabled !== undefined)
+    localStorage.setItem('fit_plan_enabled',      profile.planEnabled      ? 'true' : 'false');
+  if (profile?.progressEnabled !== undefined)
+    localStorage.setItem('fit_progress_enabled',  profile.progressEnabled  ? 'true' : 'false');
   // Sync goal settings from Firestore into fit_settings
   const goalFields = ['calorieGoalKcal', 'proteinGoalG', 'fatGoalG', 'waterGoalMl', 'weightUnit'];
   if (goalFields.some(f => profile?.[f] !== undefined)) {

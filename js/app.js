@@ -17,6 +17,7 @@ let currentScreen = null;
 
 export function navigateTo(name) {
   if (name === 'nutrition' && localStorage.getItem('fit_nutrition_enabled') !== 'true') return;
+  if (name === 'plan'      && localStorage.getItem('fit_plan_enabled')      === 'false') return;
   if (name === 'progress'  && localStorage.getItem('fit_progress_enabled')  === 'false') return;
   if (name === currentScreen) {
     if (name === 'home')      renderHome(screens.home, navigateTo);
@@ -55,10 +56,13 @@ document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(btn => {
   btn.addEventListener('click', () => navigateTo(btn.dataset.screen));
 });
 
-const nutriOn = localStorage.getItem('fit_nutrition_enabled') === 'true';
-document.querySelectorAll('[data-screen="nutrition"]').forEach(el => {
-  el.style.display = nutriOn ? '' : 'none';
-});
+const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
+const planOn     = localStorage.getItem('fit_plan_enabled')      !== 'false';
+const progressOn = localStorage.getItem('fit_progress_enabled')  !== 'false';
+
+document.querySelectorAll('[data-screen="nutrition"]').forEach(el => { el.style.display = nutriOn    ? '' : 'none'; });
+document.querySelectorAll('[data-screen="plan"]').forEach(el =>      { el.style.display = planOn     ? '' : 'none'; });
+document.querySelectorAll('[data-screen="progress"]').forEach(el =>  { el.style.display = progressOn ? '' : 'none'; });
 
 navigateTo('home');
 
