@@ -199,12 +199,24 @@ a { color: inherit; text-decoration: none; }
 .ex-chevron { color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
 
-.ex-body {
-  display: block; overflow: hidden; max-height: 0; opacity: 0;
-  padding: 0 16px; border-top: 1px solid transparent;
-  transition: max-height 0.38s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease, padding 0.38s cubic-bezier(0.16,1,0.3,1), border-color 0.2s ease;
+.ex-body-outer {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.42s cubic-bezier(0.16,1,0.3,1),
+              opacity 0.3s ease;
 }
-.exercise-card.open .ex-body { max-height: 900px; opacity: 1; padding: 0 16px 16px; border-top-color: var(--border); }
+.exercise-card.open .ex-body-outer {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.ex-body {
+  overflow: hidden;
+  padding: 0 16px;
+  border-top: 1px solid transparent;
+  transition: padding 0.42s cubic-bezier(0.16,1,0.3,1), border-color 0.25s ease;
+}
+.exercise-card.open .ex-body { padding: 0 16px 16px; border-top-color: var(--border); }
 
 /* ── Exercise detail grid ───────────────────────────────── */
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
