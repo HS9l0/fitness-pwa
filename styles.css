@@ -130,7 +130,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Screen header ──────────────────────────────────────── */
 .screen-header {
-  padding: max(40px, calc(var(--safe-top) + 10px)) 16px 16px;
+  padding: 12px 16px 16px;
   background: linear-gradient(170deg, #0a1525 0%, var(--surface) 100%);
   border-bottom: 1px solid var(--border);
 }
@@ -413,7 +413,7 @@ a { color: inherit; text-decoration: none; }
 /* ── Workout header ─────────────────────────────────────── */
 .workout-header {
   background: linear-gradient(170deg, #0a1525 0%, var(--surface) 100%);
-  padding: max(38px, calc(var(--safe-top) + 10px)) 20px 14px;
+  padding: 12px 20px 14px;
   border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: flex-end;
   position: sticky; top: 0; z-index: 50;
@@ -1021,4 +1021,10 @@ body { overscroll-behavior: none; }
     rgba(15,24,37,0) 68%,
     #0f1825 100%
   );
+}
+
+/* ── Standalone PWA: restore status-bar clearance ───────── */
+@media (display-mode: standalone) {
+  .screen-header  { padding-top: calc(var(--safe-top) + 10px); }
+  .workout-header { padding-top: calc(var(--safe-top) + 10px); }
 }
