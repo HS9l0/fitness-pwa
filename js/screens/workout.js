@@ -165,13 +165,13 @@ function renderPhoneWorkout(container, workout, navigate) {
           <div class="pwkt-label">${workout.label}</div>
           <div class="pwkt-excount" id="pwkt-count">1 / ${total}</div>
         </div>
-        <div class="pwkt-timer-wrap">
-          <div class="pwkt-timer" id="workout-timer">0:00</div>
-          <div class="pwkt-timer-lbl">elapsed</div>
-        </div>
       </div>
       <div class="pwkt-prog-track">
         <div class="pwkt-prog-fill" id="pwkt-prog" style="width:${100/total}%"></div>
+      </div>
+      <div class="pwkt-timer-row">
+        <div class="pwkt-timer" id="workout-timer">0:00</div>
+        <div class="pwkt-timer-lbl">elapsed</div>
       </div>
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}

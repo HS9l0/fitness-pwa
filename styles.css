@@ -499,9 +499,8 @@ a { color: inherit; text-decoration: none; }
 .pwkt-label    { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
 .pwkt-excount  { font-size: 1.05rem; font-weight: 800; color: var(--text); }
 
-.pwkt-timer-wrap { text-align: right; }
-.pwkt-timer      { font-size: 1.7rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1; }
-.pwkt-timer-lbl  { font-size: 0.58rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+.pwkt-timer      { font-size: 0.95rem; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; line-height: 1; }
+.pwkt-timer-lbl  { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
 
 .pwkt-prog-track {
   height: 3px; background: var(--border); flex-shrink: 0;
@@ -509,6 +508,12 @@ a { color: inherit; text-decoration: none; }
 .pwkt-prog-fill {
   height: 100%; background: var(--accent);
   transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+.pwkt-timer-row {
+  display: flex; align-items: baseline; justify-content: center; gap: 5px;
+  padding: 5px 0 3px;
+  flex-shrink: 0;
 }
 
 .pwkt-stage {
