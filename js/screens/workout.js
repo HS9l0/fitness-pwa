@@ -31,7 +31,6 @@ export function renderWorkout(container, navigate) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Home
       </button>
-      <div class="badge">${workout.weekday}</div>
       <h1>${workout.label}</h1>
       <p>${workout.focus}</p>
     </div>
