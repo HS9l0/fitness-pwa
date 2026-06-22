@@ -36,11 +36,10 @@ a { color: inherit; text-decoration: none; }
 .screen.active { opacity: 1; pointer-events: auto; }
 
 /* ── Screen animations ──────────────────────────────────── */
-@keyframes screen-fade-in  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes screen-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes screen-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .screen.slide-right,
-.screen.slide-left  { animation: screen-fade-in  0.28s ease both; z-index: 2; }
-.screen.leaving     { animation: screen-fade-out 0.22s ease forwards; pointer-events: none; z-index: 1; }
+.screen.slide-left { animation: screen-fade-in 0.28s ease both; z-index: 2; }
+.screen.leaving    { opacity: 0; pointer-events: none; z-index: 1; }
 
 /* ── Bottom nav ─────────────────────────────────────────── */
 #bottom-nav {
