@@ -39,7 +39,6 @@ export function renderHome(container, navigate) {
       <div class="section-title">Next Up</div>
       ${todayWorkoutDay
         ? `<div class="card next-workout-card">
-            <div class="next-day-label">${workout.weekday}</div>
             <div class="next-day-title">${workout.label}</div>
             <div class="next-day-focus">${workout.focus}</div>
             <div class="next-day-meta">
