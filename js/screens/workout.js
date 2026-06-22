@@ -166,9 +166,13 @@ function renderPhoneWorkout(container, workout, navigate) {
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
       <div class="pwkt-foot">
-        <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">‹</button>
+        <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
         <button class="btn-primary pwkt-finish-btn" id="finish-btn" style="display:none">Finish ✓</button>
-        <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">›</button>
+        <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
     </div>
   `;
