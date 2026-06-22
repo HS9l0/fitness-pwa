@@ -30,14 +30,14 @@ export function navigateTo(name) {
   const isForward = toIdx >= fromIdx;
 
   if (currentScreen) {
-    const leaving = screens[currentScreen];
-    leaving.classList.remove('active', 'slide-right', 'slide-left');
+    screens[currentScreen].classList.remove('active', 'fade-in');
   }
 
   const entering = screens[name];
-  entering.classList.remove('slide-right', 'slide-left');
+  entering.classList.remove('fade-in');
+  entering.classList.add('active');
   void entering.offsetHeight;
-  entering.classList.add('active', isForward ? 'slide-right' : 'slide-left');
+  entering.classList.add('fade-in');
 
   currentScreen = name;
 

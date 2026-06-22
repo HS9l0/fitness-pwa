@@ -33,13 +33,17 @@ a { color: inherit; text-decoration: none; }
   overflow-y: auto; padding-bottom: 16px;
   display: none;
   background: var(--bg);
+  opacity: 1;
 }
-.screen.active { display: block; }
-
+.screen.active {
+  display: block;
+  z-index: 1;
+}
+.screen.fade-in {
+  animation: screen-fade-in 0.25s ease forwards;
+}
 /* ── Screen animations ──────────────────────────────────── */
 @keyframes screen-fade-in { from { opacity: 0; } to { opacity: 1; } }
-.screen.slide-right,
-.screen.slide-left { animation: screen-fade-in 0.28s ease both; }
 
 /* ── Bottom nav ─────────────────────────────────────────── */
 #bottom-nav {
