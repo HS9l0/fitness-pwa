@@ -31,6 +31,7 @@ export function navigateTo(name) {
 
   if (currentScreen) {
     const leaving = screens[currentScreen];
+    leaving.classList.remove('slide-right', 'slide-left');
     leaving.classList.add('leaving');
     setTimeout(() => leaving.classList.remove('active', 'leaving'), 260);
   }
