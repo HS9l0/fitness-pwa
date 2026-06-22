@@ -65,7 +65,7 @@ function openSettings() {
             <button class="unit-seg-btn ${unit === 'lbs' ? 'active' : ''}" data-unit="lbs">lbs</button>
           </div>
         </div>
-        <a href="./admin.html" class="settings-admin-link">Admin Dashboard →</a>
+        <a href="./admin.html" class="settings-admin-link">Admin Dashboard <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg></a>
       </div>
     </div>
   `;

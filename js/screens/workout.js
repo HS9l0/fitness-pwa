@@ -2,6 +2,10 @@ import { WORKOUTS, getNextWorkoutDay } from '../data.js';
 import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { showWeightPicker, showRepsPicker } from '../drum-picker.js';
 
+const ICO_CHEVRON_R = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
+const ICO_CHECK = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_FLAME = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2C10 6 7 9 7 13a5 5 0 0010 0c0-4-2.5-7-5-11z"/><path d="M12 13c-1.1.8-2 2-2 3a2 2 0 004 0c0-1-.9-2.2-2-3z" fill="#f0a500" stroke="none"/></svg>`;
+
 let timerInterval = null;
 let restInterval  = null;
 let startTime     = null;
@@ -34,14 +38,14 @@ export function renderWorkout(container, navigate) {
     <div class="section">
       <div class="card" style="background:rgba(255,165,0,0.06);border-color:rgba(255,165,0,0.2);margin-bottom:12px">
         <div style="display:flex;gap:10px;align-items:flex-start">
-          <span style="font-size:1.3rem;flex-shrink:0">🔥</span>
+          <span style="flex-shrink:0;display:flex">${ICO_FLAME}</span>
           <div>
             <div style="font-size:0.78rem;font-weight:700;color:#f0a500;margin-bottom:4px">Warm-Up First</div>
             <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5">${workout.warmup}</div>
           </div>
         </div>
       </div>
-      <button class="btn-primary" id="begin-btn">Begin Workout →</button>
+      <button class="btn-primary" id="begin-btn">Begin Workout ${ICO_CHEVRON_R}</button>
     </div>
     <div class="section" style="padding-top:0">
       <div class="section-title">Exercises Today</div>
@@ -109,7 +113,7 @@ function renderDesktopWorkout(container, workout, navigate) {
     </div>
     <div class="section">
       ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
-      <button class="btn-primary" id="finish-btn" style="margin-top:8px;display:none">Finish Workout ✓</button>
+      <button class="btn-primary" id="finish-btn" style="margin-top:8px;display:none">Finish Workout ${ICO_CHECK}</button>
     </div>
   `;
 
@@ -169,7 +173,7 @@ function renderPhoneWorkout(container, workout, navigate) {
         <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button class="btn-primary pwkt-finish-btn" id="finish-btn" style="display:none">Finish ✓</button>
+        <button class="btn-primary pwkt-finish-btn" id="finish-btn" style="display:none">Finish ${ICO_CHECK}</button>
         <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
@@ -507,7 +511,7 @@ function finishWorkout(container, session, navigate) {
   session.durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
   saveSession(session);
   const btn = container.querySelector('#finish-btn');
-  if (btn) { btn.classList.add('finishing'); btn.textContent = '🎉 Saved!'; }
+  if (btn) { btn.classList.add('finishing'); btn.innerHTML = `${ICO_CHECK} Saved`; }
   setTimeout(() => { activeSession = null; navigate('home'); }, 600);
 }
 
@@ -525,7 +529,8 @@ function showRestTimer(container, seconds, onDone) {
   overlay.className = 'rest-overlay';
   overlay.innerHTML = `
     <div class="rest-card">
-      <div class="rest-lbl">${onDone ? 'Rest · Next exercise →' : 'Rest'}</div>
+      <div class="rest-lbl">${onDone ? `Rest · Next ${ICO_CHEVRON_R}` : 'Rest'}</div>
+
       <div class="rest-arc-wrap">
         <svg viewBox="0 0 72 72" class="rest-arc-svg">
           <circle cx="36" cy="36" r="32" class="rest-arc-bg"/>
@@ -539,7 +544,7 @@ function showRestTimer(container, seconds, onDone) {
       </div>
       <div class="rest-btns">
         <button class="rest-btn-add" id="rest-add">+30s</button>
-        <button class="rest-btn-skip" id="rest-skip">${onDone ? 'Skip →' : 'Skip'}</button>
+        <button class="rest-btn-skip" id="rest-skip">${onDone ? `Skip ${ICO_CHEVRON_R}` : 'Skip'}</button>
       </div>
     </div>
   `;

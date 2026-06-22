@@ -6,13 +6,19 @@ function isInStandaloneMode() {
   return window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
 }
 
+const ICO_CHEVRON_R = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
+const ICO_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+const ICO_CHECK_SM = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
+const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_MOON = `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+const ICO_PHONE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>`;
 
 export function renderHome(container, navigate) {
   const sessions  = getSessions();
   const todayStr  = today();
   const nextDay   = getNextWorkoutDay(sessions);
   const workout   = WORKOUTS[nextDay - 1];
-
 
   const dow = new Date().getDay();
   const workoutDays = { 1: 1, 3: 2, 5: 3 };
@@ -37,19 +43,19 @@ export function renderHome(container, navigate) {
             <div class="next-day-title">${workout.label}</div>
             <div class="next-day-focus">${workout.focus}</div>
             <div class="next-day-meta">
-              <div class="next-meta-item">⏱ <span>~${workout.durationMin}</span> min</div>
-              <div class="next-meta-item">🏋️ <span>${workout.exercises.length}</span> exercises</div>
+              <div class="next-meta-item">${ICO_CLOCK} <span>~${workout.durationMin}</span> min</div>
+              <div class="next-meta-item">${ICO_DUMBBELL} <span>${workout.exercises.length}</span> exercises</div>
             </div>
-            <button class="btn-primary" id="start-workout-btn">Start Workout →</button>
+            <button class="btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
           </div>`
         : `<div class="card rest-day-card">
-            <div class="rest-icon">🧘</div>
+            <div class="rest-icon">${ICO_MOON}</div>
             <h3>Rest Day</h3>
             <p>Walk, stretch, or recover fully.<br/>Muscles grow during rest.</p>
             <div style="margin-top:16px">
               <button class="btn-primary" id="start-workout-btn"
                 style="background:var(--surface-raised);color:var(--text-muted);border:1px solid var(--border)">
-                Do ${workout.label} anyway →
+                Do ${workout.label} anyway ${ICO_CHEVRON_R}
               </button>
             </div>
           </div>`
@@ -63,7 +69,7 @@ export function renderHome(container, navigate) {
               <div class="last-workout-name">${lastWorkout.label}</div>
               <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
             </div>
-            <span class="last-workout-done">✓</span>
+            <span class="last-workout-done">${ICO_CHECK_CIRCLE}</span>
           </div>
           <div class="last-workout-exs">
             ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {
@@ -87,7 +93,7 @@ export function renderHome(container, navigate) {
             const done = sessionDates.has(dateStr);
             const isToday = dateStr === todayStr;
             return `<div class="streak-dot ${done ? 'done' : ''} ${isToday && !done ? 'today' : ''}">
-              <div class="dot">${done ? '✓' : d.getDate()}</div>
+              <div class="dot">${done ? ICO_CHECK_SM : d.getDate()}</div>
               <div class="day-lbl">${label}</div>
             </div>`;
           }).join('')}
@@ -96,7 +102,7 @@ export function renderHome(container, navigate) {
 
       ${isIos() && !isInStandaloneMode() ? `
         <div class="card install-card" style="margin-top:16px">
-          <div class="install-title">📱 Install on iPhone</div>
+          <div class="install-title">${ICO_PHONE} Install on iPhone</div>
           <div class="install-body">Tap <strong>Share</strong> then <strong>"Add to Home Screen"</strong> to use the app offline.</div>
         </div>
       ` : ''}
