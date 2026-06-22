@@ -103,7 +103,7 @@ function renderDesktopWorkout(container, workout, navigate) {
     <div class="workout-header">
       <div class="workout-header-left">
         <h2>${workout.label}</h2>
-        <p id="wkt-progress">${workout.weekday} · 0 / ${totalWorkoutSets} sets</p>
+        <p id="wkt-progress">0 / ${totalWorkoutSets} sets</p>
       </div>
       <div class="wkt-timer-wrap">
         <div class="timer" id="workout-timer">0:00</div>
@@ -452,7 +452,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
 
       incDone();
       const wktProg = container.querySelector('#wkt-progress');
-      if (wktProg) wktProg.textContent = `${workout.weekday} · ${getDoneSets()} / ${getTotalSets()} sets`;
+      if (wktProg) wktProg.textContent = `${getDoneSets()} / ${getTotalSets()} sets`;
 
       if (allExercisesDone(session)) revealFinish(container);
 
