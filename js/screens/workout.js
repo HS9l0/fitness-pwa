@@ -16,6 +16,7 @@ function isPhone() {
 }
 
 export function renderWorkout(container, navigate) {
+  document.body.classList.add('in-workout');
   const sessions = getSessions();
   const nextDay  = getNextWorkoutDay(sessions);
   const workout  = WORKOUTS[nextDay - 1];

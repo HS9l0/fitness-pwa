@@ -27,8 +27,7 @@ export function navigateTo(name) {
 
   currentScreen = name;
 
-  const cogwheel = document.getElementById('cogwheel-btn');
-  if (cogwheel) cogwheel.style.display = name === 'workout' ? 'none' : '';
+  document.body.classList.toggle('in-workout', name === 'workout');
 
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
