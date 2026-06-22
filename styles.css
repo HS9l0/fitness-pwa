@@ -266,7 +266,7 @@ a { color: inherit; text-decoration: none; }
 .set-field {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
-.set-field input {
+.set-val {
   width: 100%; padding: 10px 4px;
   background: rgba(255,255,255,0.04);
   border: 1.5px solid var(--border);
@@ -274,13 +274,15 @@ a { color: inherit; text-decoration: none; }
   font-size: 1.25rem; font-weight: 700; text-align: center;
   color: var(--text);
   transition: border-color 0.2s, background 0.2s, color 0.2s;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
 }
-.set-field input:focus {
+.set-val.empty { color: var(--text-dim); }
+.set-field-tap:active .set-val,
+.set-field-tap.pressed .set-val {
   border-color: var(--accent);
-  background: rgba(59,130,246,0.07);
-  outline: none;
+  background: rgba(59,130,246,0.12);
 }
-.set-row.done .set-field input {
+.set-row.done .set-val {
   border-color: transparent; background: none;
   color: var(--accent-2); pointer-events: none;
 }
@@ -782,3 +784,113 @@ body { overscroll-behavior: none; }
   100% { opacity: 0; transform: scale(0.82) translateY(14px); box-shadow: none; }
 }
 .rest-card.rest-done { animation: rest-done 1s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* ── Drum Picker ─────────────────────────────────────────── */
+.drum-sheet {
+  position: fixed; inset: 0; z-index: 700;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.drum-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  animation: drum-fade-in 0.28s ease forwards;
+}
+.drum-sheet.drum-leaving .drum-backdrop { animation: drum-fade-out 0.25s ease forwards; }
+@keyframes drum-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes drum-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+.drum-panel {
+  position: relative; z-index: 1;
+  background: #0f1825;
+  border-radius: 22px 22px 0 0;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  animation: drum-rise 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.drum-sheet.drum-leaving .drum-panel {
+  animation: drum-fall 0.28s cubic-bezier(0.4,0,1,1) forwards;
+}
+@keyframes drum-rise { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes drum-fall { from { transform: none; } to { transform: translateY(100%); } }
+
+.drum-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.drum-cancel-btn { color: var(--text-muted); font-size: 0.92rem; padding: 4px 2px; }
+.drum-done-btn   { color: var(--accent); font-size: 0.92rem; font-weight: 700; padding: 4px 2px; }
+.drum-hdr-title  { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.3px; }
+
+.drum-body {
+  position: relative; overflow: hidden;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 0 28px;
+  height: 220px;
+}
+
+.drum-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+}
+
+.drum-x {
+  width: 28px; flex-shrink: 0; text-align: center;
+  font-size: 1rem; color: var(--text-dim);
+  position: relative; top: calc(220px / 2 - 0.6rem);
+}
+
+.drum-lbl-row {
+  display: flex; justify-content: center;
+  gap: 28px; padding: 6px 28px 0;
+}
+.drum-col-lbl {
+  flex: 1; text-align: center;
+  font-size: 0.6rem; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-dim);
+  padding-bottom: 16px;
+}
+
+.drum-scroll {
+  width: 100%;
+  height: 220px;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 88px 0;
+}
+.drum-scroll::-webkit-scrollbar { display: none; }
+
+.drum-item {
+  height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  scroll-snap-align: center;
+  font-size: 1.8rem; font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Selection band in center */
+.drum-band {
+  position: absolute;
+  left: 20px; right: 20px;
+  top: calc(50% - 22px); height: 44px;
+  background: rgba(255,255,255,0.055);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  pointer-events: none; z-index: 2;
+}
+
+/* Top/bottom fade gradient */
+.drum-fade {
+  position: absolute;
+  left: 0; right: 0; top: 0; height: 220px;
+  pointer-events: none; z-index: 3;
+  background: linear-gradient(
+    to bottom,
+    #0f1825 0%,
+    rgba(15,24,37,0) 32%,
+    rgba(15,24,37,0) 68%,
+    #0f1825 100%
+  );
+}

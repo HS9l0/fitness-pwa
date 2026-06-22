@@ -1,6 +1,7 @@
 import { WORKOUTS, getNextWorkoutDay } from '../data.js';
 import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { renderExerciseCard } from './plan.js';
+import { showDrumPicker } from '../drum-picker.js';
 
 let timerInterval = null;
 let restInterval  = null;
@@ -117,6 +118,32 @@ function renderActiveWorkout(container, workout, navigate) {
     });
   });
 
+  // Drum picker — open on field tap
+  container.querySelectorAll('.set-field-tap').forEach(field => {
+    field.addEventListener('click', () => {
+      if (field.closest('.set-row').classList.contains('done')) return;
+      field.classList.add('pressed');
+      const row    = field.closest('.set-row');
+      const setIdx = parseInt(row.dataset.set);
+      const exName = row.dataset.ex;
+      const w = parseFloat(row.dataset.weight) || 0;
+      const r = parseInt(row.dataset.reps)     || 5;
+      showDrumPicker({
+        weight: w, reps: r,
+        label: `${exName} — Set ${setIdx + 1}`,
+        onConfirm(newW, newR) {
+          row.dataset.weight = newW;
+          row.dataset.reps   = newR;
+          const wVal = row.querySelector('.set-fields .set-field:first-child .set-val');
+          const rVal = row.querySelector('.set-fields .set-field:last-child .set-val');
+          if (wVal) { wVal.textContent = newW; wVal.classList.remove('empty'); }
+          if (rVal) { rVal.textContent = newR; rVal.classList.remove('empty'); }
+        }
+      });
+      setTimeout(() => field.classList.remove('pressed'), 200);
+    });
+  });
+
   // Strength set done buttons
   container.querySelectorAll('.set-check-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -127,13 +154,11 @@ function renderActiveWorkout(container, workout, navigate) {
       const setIdx = parseInt(btn.dataset.set);
       const exId   = exName.replace(/[^a-z0-9]/gi, '-');
       const row    = btn.closest('.set-row');
-      const weightInput = row.querySelector(`.set-weight`);
-      const repsInput   = row.querySelector(`.set-reps`);
-      const exSession   = session.exercises.find(e => e.name === exName);
+      const exSession = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
-      const w = parseFloat(weightInput?.value) || null;
-      const r = parseInt(repsInput?.value)     || null;
+      const w = parseFloat(row.dataset.weight) || null;
+      const r = parseInt(row.dataset.reps)     || null;
 
       exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
 

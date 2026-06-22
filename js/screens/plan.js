@@ -160,21 +160,20 @@ function renderSetRows(ex, lastWeights) {
     `;
   }
 
-  const rows = Array.from({ length: ex.defaultSets }, (_, i) => `
-    <div class="set-row" data-set="${i}" data-ex="${ex.name}">
+  const rows = Array.from({ length: ex.defaultSets }, (_, i) => {
+    const initW = lastW ?? 0;
+    const initR = lastR ?? 5;
+    return `
+    <div class="set-row" data-set="${i}" data-ex="${ex.name}" data-weight="${initW}" data-reps="${initR}">
       <span class="set-num">${i + 1}</span>
       <div class="set-fields">
-        <div class="set-field">
-          <input type="number" inputmode="decimal" class="set-weight" min="0" max="999" step="2.5"
-            placeholder="${lastW ?? '0'}" value="${lastW ?? ''}"
-            data-ex="${ex.name}" data-set="${i}"/>
+        <div class="set-field set-field-tap" data-type="weight">
+          <div class="set-val${!lastW ? ' empty' : ''}">${initW}</div>
           <span class="set-field-lbl">kg</span>
         </div>
         <span class="set-sep">×</span>
-        <div class="set-field">
-          <input type="number" inputmode="numeric" class="set-reps" min="0" max="99"
-            placeholder="${lastR ?? '0'}" value="${lastR ?? ''}"
-            data-ex="${ex.name}" data-set="${i}"/>
+        <div class="set-field set-field-tap" data-type="reps">
+          <div class="set-val${!lastR ? ' empty' : ''}">${initR}</div>
           <span class="set-field-lbl">reps</span>
         </div>
       </div>
@@ -182,7 +181,8 @@ function renderSetRows(ex, lastWeights) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
       </button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   return `
     <div class="set-last-hint">${lastHint}</div>
