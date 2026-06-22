@@ -19,6 +19,8 @@ function isPhone() {
 
 export function renderWorkout(container, navigate) {
   document.body.classList.add('in-workout');
+  container.style.paddingBottom = '';
+  container.style.overflow = '';
   const sessions = getSessions();
   const nextDay  = getNextWorkoutDay(sessions);
   const workout  = WORKOUTS[nextDay - 1];
@@ -225,7 +227,13 @@ function renderPhoneWorkout(container, workout, navigate) {
   allCards[0]?.classList.add('pwkt-active', 'open');
   updateNav();
 
-  container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
+  container.querySelector('#pwkt-back-home').addEventListener('click', () => {
+    clearInterval(timerInterval); timerInterval = null;
+    activeSession = null;
+    container.style.paddingBottom = '';
+    container.style.overflow = '';
+    navigate('home');
+  });
   container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
   container.querySelector('#pwkt-next').addEventListener('click', () => goToSlide(currentIdx + 1, 'next'));
 
