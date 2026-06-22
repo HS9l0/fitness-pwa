@@ -1,5 +1,4 @@
-const WEIGHTS = [];
-for (let w = 0; w <= 200; w = parseFloat((w + 2.5).toFixed(1))) WEIGHTS.push(w);
+const WEIGHTS = Array.from({ length: 201 }, (_, i) => i);
 const REPS = Array.from({ length: 200 }, (_, i) => i + 1);
 const ITEM_H = 44;
 
