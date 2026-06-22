@@ -32,6 +32,7 @@ a { color: inherit; text-decoration: none; }
   position: absolute; inset: 0;
   overflow-y: auto; padding-bottom: 16px;
   opacity: 0; pointer-events: none;
+  background: var(--bg);
 }
 .screen.active { opacity: 1; pointer-events: auto; }
 
