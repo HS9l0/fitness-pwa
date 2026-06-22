@@ -269,9 +269,6 @@ function renderUserList(users) {
     const fat     = parseInt(document.getElementById('s-fat-goal').value)      || 70;
     const unit    = document.querySelector('input[name="weight-unit"]:checked')?.value ?? 'kg';
     const key     = document.getElementById('s-api-key').value.trim();
-    const nutriOn    = document.getElementById('s-nutrition-enabled').checked;
-    const planOn     = document.getElementById('s-plan-enabled').checked;
-    const progressOn = document.getElementById('s-progress-enabled').checked;
     let cfg = {};
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
     cfg.calorieGoalKcal = cal;
@@ -280,16 +277,10 @@ function renderUserList(users) {
     cfg.fatGoalG        = fat;
     cfg.weightUnit      = unit;
     localStorage.setItem('fit_settings', JSON.stringify(cfg));
-    localStorage.setItem('fit_gemini_key',      key);
-    localStorage.setItem('fit_nutrition_enabled', nutriOn    ? 'true' : 'false');
-    localStorage.setItem('fit_plan_enabled',      planOn     ? 'true' : 'false');
-    localStorage.setItem('fit_progress_enabled',  progressOn ? 'true' : 'false');
     try {
       const usersSnap = await getDocs(collection(db, 'users'));
       const batch = writeBatch(db);
       usersSnap.docs.forEach(d => batch.set(d.ref, {
-        geminiKey: key, nutritionEnabled: nutriOn,
-        planEnabled: planOn, progressEnabled: progressOn,
         calorieGoalKcal: cal, proteinGoalG: prot, fatGoalG: fat,
         waterGoalMl: wat, weightUnit: unit
       }, { merge: true }));
@@ -364,10 +355,6 @@ function renderSettingsPanel() {
   const fat     = cfg.fatGoalG        ?? 70;
   const wat     = cfg.waterGoalMl     ?? 2000;
   const unit    = cfg.weightUnit      ?? 'kg';
-  const key     = localStorage.getItem('fit_gemini_key') ?? '';
-  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-  const planOn     = localStorage.getItem('fit_plan_enabled')     === 'true';
-  const progressOn = localStorage.getItem('fit_progress_enabled') === 'true';
 
   return `
     <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
@@ -395,31 +382,6 @@ function renderSettingsPanel() {
             <label class="unit-opt"><input type="radio" name="weight-unit" value="kg"  ${unit === 'kg'  ? 'checked' : ''}/> kg</label>
             <label class="unit-opt"><input type="radio" name="weight-unit" value="lbs" ${unit === 'lbs' ? 'checked' : ''}/> lbs</label>
           </div>
-        </div>
-        <div class="ctrl-group" style="grid-column:1/-1">
-          <label class="ctrl-label">Gemini API key <span class="muted">(food AI scanner)</span></label>
-          <input id="s-api-key" class="ctrl-input" type="password" value="${key}" placeholder="Paste key from aistudio.google.com…"/>
-        </div>
-        <div class="ctrl-group">
-          <label class="ctrl-label">Plan tab</label>
-          <label class="unit-opt" style="gap:8px;cursor:pointer">
-            <input type="checkbox" id="s-plan-enabled" ${planOn ? 'checked' : ''}/>
-            Visible
-          </label>
-        </div>
-        <div class="ctrl-group">
-          <label class="ctrl-label">Progress tab</label>
-          <label class="unit-opt" style="gap:8px;cursor:pointer">
-            <input type="checkbox" id="s-progress-enabled" ${progressOn ? 'checked' : ''}/>
-            Visible
-          </label>
-        </div>
-        <div class="ctrl-group" style="grid-column:1/-1">
-          <label class="ctrl-label">Nutrition tab</label>
-          <label class="unit-opt" style="gap:8px;cursor:pointer">
-            <input type="checkbox" id="s-nutrition-enabled" ${nutriOn ? 'checked' : ''}/>
-            Visible
-          </label>
         </div>
       </div>
       <div style="margin-top:18px;display:flex;align-items:center;gap:12px">

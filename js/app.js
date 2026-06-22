@@ -1,28 +1,17 @@
-import { renderHome } from './screens/home.js';
-import { renderPlan } from './screens/plan.js';
+import { renderHome }    from './screens/home.js';
 import { renderWorkout } from './screens/workout.js';
-import { renderNutrition } from './screens/nutrition.js';
-import { renderProgress  } from './screens/progress.js';
 
 const screens = {
-  home:      document.getElementById('screen-home'),
-  workout:   document.getElementById('screen-workout'),
-  plan:      document.getElementById('screen-plan'),
-  nutrition: document.getElementById('screen-nutrition'),
-  progress:  document.getElementById('screen-progress')
+  home:    document.getElementById('screen-home'),
+  workout: document.getElementById('screen-workout'),
 };
 
-const SCREEN_ORDER = ['home', 'workout', 'plan', 'nutrition', 'progress'];
+const SCREEN_ORDER = ['home', 'workout'];
 let currentScreen = null;
 
 export function navigateTo(name) {
-  if (name === 'nutrition' && localStorage.getItem('fit_nutrition_enabled') !== 'true') return;
-  if (name === 'plan'      && localStorage.getItem('fit_plan_enabled')      !== 'true') return;
-  if (name === 'progress'  && localStorage.getItem('fit_progress_enabled')  !== 'true') return;
   if (name === currentScreen) {
-    if (name === 'home')      renderHome(screens.home, navigateTo);
-    if (name === 'plan')      renderPlan(screens.plan);
-    if (name === 'nutrition') renderNutrition(screens.nutrition);
+    if (name === 'home') renderHome(screens.home, navigateTo);
     return;
   }
 
@@ -41,35 +30,18 @@ export function navigateTo(name) {
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
   });
-  if (name === 'home')      renderHome(screens.home, navigateTo);
-  if (name === 'plan')      renderPlan(screens.plan);
-  if (name === 'workout')   renderWorkout(screens.workout, navigateTo);
-  if (name === 'nutrition') renderNutrition(screens.nutrition);
-  if (name === 'progress')  renderProgress(screens.progress);
+  if (name === 'home')    renderHome(screens.home, navigateTo);
+  if (name === 'workout') renderWorkout(screens.workout, navigateTo);
 }
 
 document.querySelectorAll('.sidebar-btn').forEach(btn => {
   btn.addEventListener('click', () => navigateTo(btn.dataset.screen));
 });
 
-export function applyTabVisibility() {
-  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-  const planOn     = localStorage.getItem('fit_plan_enabled')      === 'true';
-  const progressOn = localStorage.getItem('fit_progress_enabled')  === 'true';
-  document.querySelectorAll('[data-screen="nutrition"]').forEach(el => { el.style.display = nutriOn    ? '' : 'none'; });
-  document.querySelectorAll('[data-screen="plan"]').forEach(el =>      { el.style.display = planOn     ? '' : 'none'; });
-  document.querySelectorAll('[data-screen="progress"]').forEach(el =>  { el.style.display = progressOn ? '' : 'none'; });
-}
-
-applyTabVisibility();
-
 // ── Settings sheet ────────────────────────────────────────
 function openSettings() {
   if (document.getElementById('settings-sheet')) return;
 
-  const planOn     = localStorage.getItem('fit_plan_enabled')     === 'true';
-  const progressOn = localStorage.getItem('fit_progress_enabled') === 'true';
-  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
   const unit = (() => {
     try { return JSON.parse(localStorage.getItem('fit_settings') ?? '{}').weightUnit ?? 'kg'; } catch { return 'kg'; }
   })();
@@ -85,19 +57,6 @@ function openSettings() {
         <button class="settings-done-btn">Done</button>
       </div>
       <div class="settings-body">
-        <div class="settings-section-label">Sections</div>
-        <label class="settings-row">
-          <span class="settings-row-label">Plan</span>
-          <div class="ios-toggle"><input type="checkbox" id="stg-plan" ${planOn ? 'checked' : ''}><span class="ios-track"></span></div>
-        </label>
-        <label class="settings-row">
-          <span class="settings-row-label">Progress</span>
-          <div class="ios-toggle"><input type="checkbox" id="stg-progress" ${progressOn ? 'checked' : ''}><span class="ios-track"></span></div>
-        </label>
-        <label class="settings-row">
-          <span class="settings-row-label">Nutrition</span>
-          <div class="ios-toggle"><input type="checkbox" id="stg-nutrition" ${nutriOn ? 'checked' : ''}><span class="ios-track"></span></div>
-        </label>
         <div class="settings-section-label">Units</div>
         <div class="settings-row">
           <span class="settings-row-label">Weight</span>
@@ -115,17 +74,6 @@ function openSettings() {
 
   sheet.querySelector('.settings-backdrop').addEventListener('click', closeSettings);
   sheet.querySelector('.settings-done-btn').addEventListener('click', closeSettings);
-
-  ['plan', 'progress', 'nutrition'].forEach(name => {
-    const el = sheet.querySelector(`#stg-${name}`);
-    if (!el) return;
-    el.addEventListener('change', () => {
-      const key = name === 'nutrition' ? 'fit_nutrition_enabled' : `fit_${name}_enabled`;
-      localStorage.setItem(key, el.checked ? 'true' : 'false');
-      applyTabVisibility();
-      if (currentScreen === 'home') renderHome(screens.home, navigateTo);
-    });
-  });
 
   sheet.querySelectorAll('.unit-seg-btn').forEach(btn => {
     btn.addEventListener('click', () => {

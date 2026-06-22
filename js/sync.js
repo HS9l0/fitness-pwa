@@ -7,7 +7,7 @@ import {
   collection, doc, setDoc, getDoc, getDocs, onSnapshot
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-const KEYS = { sessions: 'fit_sessions', water: 'fit_water' };
+const KEYS = { sessions: 'fit_sessions' };
 
 export async function signInWithGoogle(remember = true) {
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
@@ -19,24 +19,13 @@ export async function signOutUser() {
 }
 
 export async function pullFromFirestore(uid) {
-  const [profileSnap, sessionsSnap, waterSnap] = await Promise.all([
+  const [profileSnap, sessionsSnap] = await Promise.all([
     getDoc(doc(db, 'users', uid)),
     getDocs(collection(db, 'users', uid, 'sessions')),
-    getDocs(collection(db, 'users', uid, 'water'))
   ]);
 
   const profile = profileSnap.data();
-  if (profile?.geminiKey) {
-    localStorage.setItem('fit_gemini_key', profile.geminiKey);
-  }
-  if (profile?.nutritionEnabled !== undefined)
-    localStorage.setItem('fit_nutrition_enabled', profile.nutritionEnabled ? 'true' : 'false');
-  if (profile?.planEnabled !== undefined)
-    localStorage.setItem('fit_plan_enabled',      profile.planEnabled      ? 'true' : 'false');
-  if (profile?.progressEnabled !== undefined)
-    localStorage.setItem('fit_progress_enabled',  profile.progressEnabled  ? 'true' : 'false');
-  // Sync goal settings from Firestore into fit_settings
-  const goalFields = ['calorieGoalKcal', 'proteinGoalG', 'fatGoalG', 'waterGoalMl', 'weightUnit'];
+  const goalFields = ['weightUnit'];
   if (goalFields.some(f => profile?.[f] !== undefined)) {
     let cfg = {};
     try { cfg = JSON.parse(localStorage.getItem('fit_settings') ?? '{}'); } catch {}
@@ -48,10 +37,6 @@ export async function pullFromFirestore(uid) {
   sessionsSnap.forEach(d => sessions.push(d.data()));
   sessions.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
   localStorage.setItem(KEYS.sessions, JSON.stringify(sessions));
-
-  const water = {};
-  waterSnap.forEach(d => { water[d.id] = d.data().ml ?? 0; });
-  localStorage.setItem(KEYS.water, JSON.stringify(water));
 }
 
 export function pushSession(uid, session) {
@@ -59,16 +44,10 @@ export function pushSession(uid, session) {
   setDoc(doc(db, 'users', uid, 'sessions', id), session).catch(() => {});
 }
 
-export function pushWater(uid, date, ml) {
-  setDoc(doc(db, 'users', uid, 'water', date), { ml }).catch(() => {});
-}
-
 let unsubSessions = null;
-let unsubWater = null;
 
 export function startListeners(uid, onUpdate) {
   stopListeners();
-
   unsubSessions = onSnapshot(collection(db, 'users', uid, 'sessions'), snap => {
     const sessions = [];
     snap.forEach(d => sessions.push(d.data()));
@@ -76,18 +55,10 @@ export function startListeners(uid, onUpdate) {
     localStorage.setItem(KEYS.sessions, JSON.stringify(sessions));
     onUpdate();
   });
-
-  unsubWater = onSnapshot(collection(db, 'users', uid, 'water'), snap => {
-    const water = {};
-    snap.forEach(d => { water[d.id] = d.data().ml ?? 0; });
-    localStorage.setItem(KEYS.water, JSON.stringify(water));
-    onUpdate();
-  });
 }
 
 export function stopListeners() {
   if (unsubSessions) { unsubSessions(); unsubSessions = null; }
-  if (unsubWater) { unsubWater(); unsubWater = null; }
 }
 
 export function saveUserProfile(uid, user) {

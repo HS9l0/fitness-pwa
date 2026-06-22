@@ -32,14 +32,6 @@ export function renderHome(container, navigate) {
   const nextDay   = getNextWorkoutDay(sessions);
   const workout   = WORKOUTS[nextDay - 1];
 
-  const planOn     = localStorage.getItem('fit_plan_enabled')     === 'true';
-  const progressOn = localStorage.getItem('fit_progress_enabled') === 'true';
-  const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-  const quickLinks = [
-    planOn     && { screen: 'plan',      label: 'Plan',      svg: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>` },
-    progressOn && { screen: 'progress',  label: 'Progress',  svg: `<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>` },
-    nutriOn    && { screen: 'nutrition', label: 'Nutrition', svg: `<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>` },
-  ].filter(Boolean);
 
   const dow = new Date().getDay();
   const workoutDays = { 1: 1, 3: 2, 5: 3 };
@@ -65,15 +57,6 @@ export function renderHome(container, navigate) {
       <h1>Train Hard.<br/><span style="color:var(--accent)">Stay Consistent.</span></h1>
       <p>Age 15 · Split Training Program</p>
     </div>
-
-    ${quickLinks.length ? `
-    <div class="home-quicknav">
-      ${quickLinks.map(({ screen, label, svg }) => `
-        <button class="home-qnav-btn" data-nav="${screen}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>
-          ${label}
-        </button>`).join('')}
-    </div>` : ''}
 
     <div class="home-stats">
       <div class="home-stat">
@@ -165,8 +148,4 @@ export function renderHome(container, navigate) {
   `;
 
   container.querySelector('#start-workout-btn')?.addEventListener('click', () => navigate('workout'));
-
-  container.querySelectorAll('.home-qnav-btn').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.nav));
-  });
 }

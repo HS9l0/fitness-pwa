@@ -1,4 +1,4 @@
-const KEYS = { sessions: 'fit_sessions', settings: 'fit_settings', food: 'fit_food' };
+const KEYS = { sessions: 'fit_sessions', settings: 'fit_settings' };
 
 function read(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -13,7 +13,7 @@ export function saveSession(session) {
 }
 
 export function getSettings() {
-  return { waterGoalMl: 2000, weightUnit: 'kg', ...read(KEYS.settings, {}) };
+  return { weightUnit: 'kg', ...read(KEYS.settings, {}) };
 }
 export function saveSettings(patch) {
   write(KEYS.settings, { ...getSettings(), ...patch });
@@ -35,28 +35,3 @@ export function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function getFoodLog(date) { return (read(KEYS.food, {}))[date] ?? []; }
-export function addFoodEntry(date, entry) {
-  const food = read(KEYS.food, {});
-  food[date] = [entry, ...(food[date] ?? [])];
-  write(KEYS.food, food);
-}
-export function removeFoodEntry(date, id) {
-  const food = read(KEYS.food, {});
-  food[date] = (food[date] ?? []).filter(e => e.id !== id);
-  write(KEYS.food, food);
-}
-
-export function getWeightLog() { return read('fit_weight', {}); }
-export function addWeightEntry(date, val) {
-  const log = read('fit_weight', {});
-  log[date] = val;
-  write('fit_weight', log);
-}
-
-export function getSessionsForMonth(year, month) {
-  return getSessions().filter(s => {
-    const d = new Date(s.date + 'T12:00:00');
-    return d.getFullYear() === year && d.getMonth() === month;
-  });
-}
