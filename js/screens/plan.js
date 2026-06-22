@@ -161,29 +161,25 @@ function renderSetRows(ex, lastWeights) {
   }
 
   const rows = Array.from({ length: ex.defaultSets }, (_, i) => `
-    <div class="set-card" data-set="${i}" data-ex="${ex.name}">
-      <div class="set-card-row">
-        <div class="set-card-badge">${i + 1}</div>
-        <div class="set-card-inputs">
-          <div class="set-inp-group">
-            <input type="number" inputmode="decimal" class="set-weight set-inp" min="0" max="999" step="2.5"
-              placeholder="${lastW ?? '0'}" value="${lastW ?? ''}"
-              data-ex="${ex.name}" data-set="${i}"/>
-            <span class="set-inp-lbl">kg</span>
-          </div>
-          <span class="set-inp-x">×</span>
-          <div class="set-inp-group">
-            <input type="number" inputmode="numeric" class="set-reps set-inp" min="0" max="99"
-              placeholder="${lastR ?? '0'}" value="${lastR ?? ''}"
-              data-ex="${ex.name}" data-set="${i}"/>
-            <span class="set-inp-lbl">reps</span>
-          </div>
+    <div class="set-row" data-set="${i}" data-ex="${ex.name}">
+      <span class="set-num">${i + 1}</span>
+      <div class="set-fields">
+        <div class="set-field">
+          <input type="number" inputmode="decimal" class="set-weight" min="0" max="999" step="2.5"
+            placeholder="${lastW ?? '0'}" value="${lastW ?? ''}"
+            data-ex="${ex.name}" data-set="${i}"/>
+          <span class="set-field-lbl">kg</span>
         </div>
-        <div class="set-done-summary"></div>
+        <span class="set-sep">×</span>
+        <div class="set-field">
+          <input type="number" inputmode="numeric" class="set-reps" min="0" max="99"
+            placeholder="${lastR ?? '0'}" value="${lastR ?? ''}"
+            data-ex="${ex.name}" data-set="${i}"/>
+          <span class="set-field-lbl">reps</span>
+        </div>
       </div>
-      <button class="set-done-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
-        Log Set ${i + 1}
+      <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
       </button>
     </div>
   `).join('');

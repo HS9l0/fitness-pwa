@@ -118,7 +118,7 @@ function renderActiveWorkout(container, workout, navigate) {
   });
 
   // Strength set done buttons
-  container.querySelectorAll('.set-done-btn').forEach(btn => {
+  container.querySelectorAll('.set-check-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       btn.classList.add('pop');
       btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
@@ -126,9 +126,9 @@ function renderActiveWorkout(container, workout, navigate) {
       const exName = btn.dataset.ex;
       const setIdx = parseInt(btn.dataset.set);
       const exId   = exName.replace(/[^a-z0-9]/gi, '-');
-      const card   = btn.closest('.set-card');
-      const weightInput = card.querySelector(`.set-weight`);
-      const repsInput   = card.querySelector(`.set-reps`);
+      const row    = btn.closest('.set-row');
+      const weightInput = row.querySelector(`.set-weight`);
+      const repsInput   = row.querySelector(`.set-reps`);
       const exSession   = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
@@ -137,10 +137,7 @@ function renderActiveWorkout(container, workout, navigate) {
 
       exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
 
-      // Collapse card to summary
-      card.classList.add('done');
-      const summary = card.querySelector('.set-done-summary');
-      if (summary) summary.textContent = `${w ?? '—'} kg × ${r ?? '—'} reps`;
+      row.classList.add('done');
 
       // Haptic
       if ('vibrate' in navigator) navigator.vibrate(40);
