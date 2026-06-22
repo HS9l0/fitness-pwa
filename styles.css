@@ -158,34 +158,6 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted); margin-bottom: 10px;
 }
 
-/* ── Water tracker ──────────────────────────────────────── */
-.water-bar-wrap { margin: 10px 0 14px; }
-.water-bar-bg { height: 7px; background: var(--surface-raised); border-radius: 4px; overflow: hidden; }
-.water-bar-fill { height: 100%; background: var(--accent-blue); border-radius: 4px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-.water-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
-.water-btns { display: flex; gap: 8px; }
-.water-btn {
-  flex: 1; padding: 10px;
-  background: var(--surface-raised); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); font-size: 0.82rem;
-  color: var(--accent-blue); font-weight: 600;
-  transition: background 0.15s, transform 0.12s ease;
-}
-.water-btn:active { background: rgba(6,182,212,0.1); transform: scale(0.92); }
-
-@keyframes water-float-up {
-  0%   { opacity: 1; transform: translate(-50%, 0) scale(1.4); }
-  18%  { transform: translate(-52%, -20px) scale(1.6); }
-  45%  { opacity: 1; transform: translate(-48%, -44px) scale(1.1); }
-  75%  { opacity: 0.6; transform: translate(-50%, -66px) scale(0.85); }
-  100% { opacity: 0; transform: translate(-50%, -88px) scale(0.6); }
-}
-.water-float {
-  position: fixed; pointer-events: none; z-index: 999;
-  color: var(--accent-blue); font-weight: 800; font-size: 1.3rem;
-  white-space: nowrap;
-  animation: water-float-up 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
 
 /* ── Streak dots ────────────────────────────────────────── */
 .streak-row { display: flex; gap: 6px; justify-content: space-between; }
@@ -455,62 +427,6 @@ a { color: inherit; text-decoration: none; }
 .sidebar-btn.active { background: rgba(59,130,246,0.1); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 14px; border-top: 1px solid var(--border); min-height: 64px; }
 
-/* ── Sign-in screen ──────────────────────────────────────── */
-#signin-screen {
-  position: fixed; inset: 0; background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100;
-}
-@keyframes signin-rise {
-  0%   { opacity: 0; transform: translateY(48px) scale(0.9); }
-  70%  { opacity: 1; transform: translateY(-6px) scale(1.01); }
-  100% { opacity: 1; transform: none; }
-}
-.signin-wrap {
-  text-align: center; max-width: 300px; width: 90%;
-  animation: signin-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.signin-logo {
-  width: 54px; height: 54px; border-radius: 14px;
-  background: var(--accent); color: #fff;
-  font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-}
-.signin-wrap h1 {
-  font-size: 1.9rem; font-weight: 900; color: #fff;
-  letter-spacing: -0.5px; margin-bottom: 8px;
-}
-.signin-wrap > p {
-  font-size: 0.88rem; color: var(--text-muted);
-  line-height: 1.55; margin-bottom: 32px;
-}
-.google-btn {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; padding: 13px 20px;
-  background: #fff; color: #3c4043;
-  font-weight: 600; font-size: 0.9rem; border-radius: var(--radius-sm);
-  transition: box-shadow 0.15s, transform 0.12s;
-  margin-bottom: 20px;
-}
-.google-btn:hover  { box-shadow: 0 2px 14px rgba(0,0,0,0.3); }
-.google-btn:active { transform: scale(0.97); }
-.signin-footer { display: flex; flex-direction: column; gap: 8px; align-items: center; }
-.signin-note  { font-size: 0.7rem; color: var(--text-dim); }
-.staff-link {
-  font-size: 0.75rem; color: var(--text-dim);
-  padding: 4px 0; transition: color 0.15s;
-  border-bottom: 1px solid transparent;
-}
-.staff-link:hover { color: var(--text-muted); border-bottom-color: var(--text-dim); }
-.remember-label {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.76rem; color: var(--text-muted); cursor: pointer;
-  margin: 10px 0 4px; user-select: none;
-}
-.remember-label input[type="checkbox"] {
-  width: 15px; height: 15px; accent-color: var(--accent);
-  cursor: pointer; flex-shrink: 0;
-}
 
 /* ── Desktop layout ─────────────────────────────────────── */
 @media (min-width: 768px) {
@@ -521,8 +437,7 @@ a { color: inherit; text-decoration: none; }
   #screens { flex: 1; min-width: 0; }
   .screen-header  { padding-top: 30px; }
   .workout-header { padding-top: 30px; }
-  .home-grid      { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: start; }
-  .plan-exercise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plan-exercise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .plan-exercise-grid .exercise-card { margin-bottom: 0; }
 }
 
@@ -560,9 +475,6 @@ body { overscroll-behavior: none; }
 .last-ex-chip { display: flex; flex-direction: column; gap: 1px; background: var(--surface-raised); border-radius: 6px; padding: 5px 8px; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); }
 .last-ex-val { font-size: 0.62rem; color: var(--accent); font-weight: 500; }
 
-/* ── Quote card ─────────────────────────────────────────── */
-.quote-card { border-left: 2px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; }
-.quote-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; font-style: italic; }
 
 /* ── iOS install card ───────────────────────────────────── */
 .install-card  { border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.05); }
