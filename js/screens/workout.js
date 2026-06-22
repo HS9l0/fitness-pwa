@@ -105,7 +105,7 @@ function renderDesktopWorkout(container, workout, navigate) {
     </div>
     <div class="section">
       ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, true, getLastWeights(ex.name))).join('')}
-      <button class="btn-primary" id="finish-btn" style="margin-top:8px">Finish Workout ✓</button>
+      <button class="btn-primary" id="finish-btn" style="margin-top:8px;display:none">Finish Workout ✓</button>
     </div>
   `;
 
@@ -159,7 +159,7 @@ function renderPhoneWorkout(container, workout, navigate) {
       </div>
       <div class="pwkt-foot">
         <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">‹</button>
-        <button class="btn-primary pwkt-finish-btn" id="finish-btn">Finish ✓</button>
+        <button class="btn-primary pwkt-finish-btn" id="finish-btn" style="display:none">Finish ✓</button>
         <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">›</button>
       </div>
     </div>
@@ -219,6 +219,23 @@ function renderPhoneWorkout(container, workout, navigate) {
   });
 }
 
+// ── Helpers ───────────────────────────────────────────────
+function allExercisesDone(session) {
+  return session.exercises.every(ex =>
+    ex.isCardio
+      ? ex.sets.some(s => s.done)
+      : ex.sets.every(s => s.done)
+  );
+}
+
+function revealFinish(container) {
+  const btn = container.querySelector('#finish-btn');
+  if (btn && btn.style.display === 'none') {
+    btn.style.display = '';
+    btn.classList.add('finish-reveal');
+  }
+}
+
 // ── Shared event wiring ───────────────────────────────────
 function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete }) {
   // Drum picker
@@ -243,6 +260,34 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         }
       });
       setTimeout(() => field.classList.remove('pressed'), 200);
+    });
+  });
+
+  // Skip buttons
+  container.querySelectorAll('.set-skip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.add('pop');
+      btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
+
+      const exName    = btn.dataset.ex;
+      const setIdx    = parseInt(btn.dataset.set);
+      const exId      = exName.replace(/[^a-z0-9]/gi, '-');
+      const row       = btn.closest('.set-row');
+      const exSession = session.exercises.find(e => e.name === exName);
+      if (!exSession) return;
+
+      exSession.sets[setIdx] = { done: true, skipped: true, weight: null, reps: null, note: '' };
+      row.classList.add('skipped');
+      if ('vibrate' in navigator) navigator.vibrate(20);
+
+      const doneSets  = exSession.sets.filter(s => s.done).length;
+      const totalSets = exSession.sets.length;
+      const fill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
+      const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
+      if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
+      if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
+
+      if (allExercisesDone(session)) revealFinish(container);
     });
   });
 
@@ -279,6 +324,8 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const wktProg = container.querySelector('#wkt-progress');
       if (wktProg) wktProg.textContent = `${workout.weekday} · ${getDoneSets()} / ${getTotalSets()} sets`;
 
+      if (allExercisesDone(session)) revealFinish(container);
+
       if (doneSets === totalSets) {
         const exCard   = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
         exCard?.classList.add('ex-complete');
@@ -307,6 +354,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       exCard?.classList.toggle('ex-complete', isDone);
 
       if (isDone) {
+        if (allExercisesDone(session)) revealFinish(container);
         document.activeElement?.blur();
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];

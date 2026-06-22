@@ -181,9 +181,12 @@ function renderSetRows(ex, lastWeights) {
           </div>
         </div>
       </div>
-      <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
-      </button>
+      <div class="set-row-foot">
+        <button class="set-skip-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Skip set">Skip</button>
+        <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>
     </div>
   `;
   }).join('');
