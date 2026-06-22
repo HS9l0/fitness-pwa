@@ -474,6 +474,97 @@ a { color: inherit; text-decoration: none; }
   .detail-grid { grid-template-columns: 1fr; }
 }
 
+/* ── Phone UI — general polish (≤479px) ─────────────────── */
+@media (max-width: 479px) {
+  .screen-header h1   { font-size: 1.6rem; }
+  .home-stat-num      { font-size: 1.7rem; }
+  .card               { padding: 18px; }
+  .ex-name            { font-size: 1rem; }
+  .ex-muscles         { font-size: 0.76rem; }
+  .ex-header          { padding: 16px; }
+  .set-val            { font-size: 1.35rem; padding: 12px 4px; }
+  .set-check-btn      { height: 50px; border-radius: 12px; font-size: 1rem; }
+  .section-title      { font-size: 0.78rem; }
+  #bottom-nav         { height: calc(62px + var(--safe-bottom)); }
+  .nav-btn svg        { width: 22px; height: 22px; }
+  .nav-btn span       { font-size: 0.67rem; }
+}
+
+/* ── Phone Workout layout ────────────────────────────────── */
+.pwkt {
+  display: flex; flex-direction: column;
+  height: 100%; overflow: hidden;
+}
+
+.pwkt-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px 12px;
+  padding-top: calc(14px + var(--safe-top));
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pwkt-hdr-left { display: flex; flex-direction: column; gap: 2px; }
+.pwkt-label    { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.pwkt-excount  { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+
+.pwkt-timer-wrap { text-align: right; }
+.pwkt-timer      { font-size: 1.7rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1; }
+.pwkt-timer-lbl  { font-size: 0.58rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+
+.pwkt-prog-track {
+  height: 3px; background: var(--border); flex-shrink: 0;
+}
+.pwkt-prog-fill {
+  height: 100%; background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+.pwkt-stage {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* In phone stage: hide all cards, show only active */
+.pwkt-stage .exercise-card {
+  display: none;
+  border-radius: 0; border-left: none; border-right: none; border-top: none;
+  margin-bottom: 0; box-shadow: none;
+}
+.pwkt-stage .exercise-card.pwkt-active { display: block; }
+
+/* Slide animations between exercises */
+@keyframes pwkt-in-right  { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pwkt-in-left   { from { transform: translateX(-48px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pwkt-out-left  { from { transform: none; opacity: 1; } to { transform: translateX(-48px); opacity: 0; } }
+@keyframes pwkt-out-right { from { transform: none; opacity: 1; } to { transform: translateX(48px); opacity: 0; } }
+
+.pwkt-stage .exercise-card.pwkt-slide-in-right  { animation: pwkt-in-right  0.3s cubic-bezier(0.16,1,0.3,1) both; }
+.pwkt-stage .exercise-card.pwkt-slide-in-left   { animation: pwkt-in-left   0.3s cubic-bezier(0.16,1,0.3,1) both; }
+.pwkt-stage .exercise-card.pwkt-slide-out-left  { display: block !important; animation: pwkt-out-left  0.2s ease-in both; }
+.pwkt-stage .exercise-card.pwkt-slide-out-right { display: block !important; animation: pwkt-out-right 0.2s ease-in both; }
+
+.pwkt-foot {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  padding-bottom: calc(12px + var(--safe-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pwkt-arrow {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface-raised); border: 1.5px solid var(--border);
+  color: var(--text); font-size: 1.7rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s, transform 0.1s;
+  touch-action: manipulation;
+}
+.pwkt-arrow:active { transform: scale(0.88); }
+.pwkt-finish-btn { flex: 1; height: 52px; font-size: 1rem; border-radius: 14px; }
+
 /* ── Number inputs ──────────────────────────────────────── */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }

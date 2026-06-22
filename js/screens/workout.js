@@ -8,10 +8,14 @@ let restInterval  = null;
 let startTime     = null;
 let activeSession = null;
 
+function isPhone() {
+  return window.matchMedia('(max-width: 479px)').matches;
+}
+
 export function renderWorkout(container, navigate) {
   const sessions = getSessions();
-  const nextDay = getNextWorkoutDay(sessions);
-  const workout = WORKOUTS[nextDay - 1];
+  const nextDay  = getNextWorkoutDay(sessions);
+  const workout  = WORKOUTS[nextDay - 1];
 
   if (activeSession) {
     renderActiveWorkout(container, workout, navigate);
@@ -57,7 +61,7 @@ export function renderWorkout(container, navigate) {
 }
 
 function beginWorkout(day) {
-  startTime = Date.now();
+  startTime     = Date.now();
   activeSession = {
     day,
     date: today(),
@@ -70,11 +74,23 @@ function beginWorkout(day) {
 }
 
 function renderActiveWorkout(container, workout, navigate) {
+  if (isPhone()) {
+    renderPhoneWorkout(container, workout, navigate);
+  } else {
+    renderDesktopWorkout(container, workout, navigate);
+  }
+}
+
+// ── Desktop layout ────────────────────────────────────────
+function renderDesktopWorkout(container, workout, navigate) {
   const session = activeSession;
   const totalWorkoutSets = workout.exercises
     .filter(e => !e.isCardio)
     .reduce((sum, e) => sum + e.defaultSets, 0);
   let doneWorkoutSets = 0;
+
+  container.style.paddingBottom = '';
+  container.style.overflow = '';
 
   container.innerHTML = `
     <div class="workout-header">
@@ -88,37 +104,124 @@ function renderActiveWorkout(container, workout, navigate) {
       </div>
     </div>
     <div class="section">
-      ${workout.exercises.map((ex, i) => {
-        const lastWeights = getLastWeights(ex.name);
-        return renderExerciseCard(ex, i + 1, true, lastWeights);
-      }).join('')}
-      <button class="btn-primary" id="finish-btn" style="margin-top:8px">
-        Finish Workout ✓
-      </button>
+      ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, true, getLastWeights(ex.name))).join('')}
+      <button class="btn-primary" id="finish-btn" style="margin-top:8px">Finish Workout ✓</button>
     </div>
   `;
 
-  // Start/restart timer
-  const timerEl = container.querySelector('#workout-timer');
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    const m = Math.floor(elapsed / 60);
-    const s = elapsed % 60;
-    timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-  }, 1000);
+  startTimer(container.querySelector('#workout-timer'));
 
-  // Auto-open first card
   container.querySelector('.exercise-card')?.classList.add('open');
-
-  // Exercise card toggles
   container.querySelectorAll('.exercise-card .ex-header').forEach(header => {
-    header.addEventListener('click', () => {
-      header.closest('.exercise-card').classList.toggle('open');
-    });
+    header.addEventListener('click', () => header.closest('.exercise-card').classList.toggle('open'));
   });
 
-  // Drum picker — open on field tap
+  wireWorkoutEvents(container, session, workout, {
+    incDone() { doneWorkoutSets++; },
+    getTotalSets() { return totalWorkoutSets; },
+    getDoneSets()  { return doneWorkoutSets; },
+    onExComplete(_exCard, _allCards, nextCard) {
+      _exCard?.classList.remove('open');
+      nextCard?.classList.add('open');
+      nextCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  container.querySelector('#finish-btn').addEventListener('click', () => finishWorkout(container, session, navigate));
+}
+
+// ── Phone layout ──────────────────────────────────────────
+function renderPhoneWorkout(container, workout, navigate) {
+  const session = activeSession;
+  const total   = workout.exercises.length;
+  let currentIdx = 0;
+
+  container.style.paddingBottom = '0';
+  container.style.overflow = 'hidden';
+
+  container.innerHTML = `
+    <div class="pwkt">
+      <div class="pwkt-hdr">
+        <div class="pwkt-hdr-left">
+          <div class="pwkt-label">${workout.label}</div>
+          <div class="pwkt-excount" id="pwkt-count">1 / ${total}</div>
+        </div>
+        <div class="pwkt-timer-wrap">
+          <div class="pwkt-timer" id="workout-timer">0:00</div>
+          <div class="pwkt-timer-lbl">elapsed</div>
+        </div>
+      </div>
+      <div class="pwkt-prog-track">
+        <div class="pwkt-prog-fill" id="pwkt-prog" style="width:${100/total}%"></div>
+      </div>
+      <div class="pwkt-stage" id="pwkt-stage">
+        ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, true, getLastWeights(ex.name))).join('')}
+      </div>
+      <div class="pwkt-foot">
+        <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">‹</button>
+        <button class="btn-primary pwkt-finish-btn" id="finish-btn">Finish ✓</button>
+        <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">›</button>
+      </div>
+    </div>
+  `;
+
+  startTimer(container.querySelector('#workout-timer'));
+
+  const allCards = [...container.querySelectorAll('.exercise-card')];
+
+  function updateNav() {
+    container.querySelector('#pwkt-prev').style.opacity = currentIdx === 0 ? '0.3' : '1';
+    container.querySelector('#pwkt-next').style.opacity = currentIdx === allCards.length - 1 ? '0.3' : '1';
+    container.querySelector('#pwkt-count').textContent  = `${currentIdx + 1} / ${total}`;
+    container.querySelector('#pwkt-prog').style.width   = `${((currentIdx + 1) / total) * 100}%`;
+  }
+
+  function goToSlide(idx, dir = 'next') {
+    if (idx < 0 || idx >= allCards.length) return;
+    const leaving = allCards[currentIdx];
+    const entering = allCards[idx];
+    const outCls = dir === 'next' ? 'pwkt-slide-out-left'  : 'pwkt-slide-out-right';
+    const inCls  = dir === 'next' ? 'pwkt-slide-in-right'  : 'pwkt-slide-in-left';
+
+    leaving.classList.add(outCls);
+    leaving.addEventListener('animationend', () => leaving.classList.remove('pwkt-active', outCls), { once: true });
+
+    entering.classList.add('pwkt-active', inCls, 'open');
+    entering.addEventListener('animationend', () => entering.classList.remove(inCls), { once: true });
+
+    // Scroll stage to top when switching
+    container.querySelector('#pwkt-stage').scrollTop = 0;
+
+    currentIdx = idx;
+    updateNav();
+  }
+
+  allCards[0]?.classList.add('pwkt-active', 'open');
+  updateNav();
+
+  container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
+  container.querySelector('#pwkt-next').addEventListener('click', () => goToSlide(currentIdx + 1, 'next'));
+
+  wireWorkoutEvents(container, session, workout, {
+    incDone() {},
+    getTotalSets() { return 0; },
+    getDoneSets()  { return 0; },
+    onExComplete(_exCard, cards, nextCard) {
+      if (!nextCard) return;
+      goToSlide(cards.indexOf(nextCard), 'next');
+    }
+  });
+
+  container.querySelector('#finish-btn').addEventListener('click', () => {
+    container.style.paddingBottom = '';
+    container.style.overflow = '';
+    finishWorkout(container, session, navigate);
+  });
+}
+
+// ── Shared event wiring ───────────────────────────────────
+function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete }) {
+  // Drum picker
   container.querySelectorAll('.set-field-tap').forEach(field => {
     field.addEventListener('click', () => {
       if (field.closest('.set-row').classList.contains('done')) return;
@@ -126,11 +229,10 @@ function renderActiveWorkout(container, workout, navigate) {
       const row    = field.closest('.set-row');
       const setIdx = parseInt(row.dataset.set);
       const exName = row.dataset.ex;
-      const w = parseFloat(row.dataset.weight) || 0;
-      const r = parseInt(row.dataset.reps)     || 5;
       showDrumPicker({
-        weight: w, reps: r,
-        label: `${exName} — Set ${setIdx + 1}`,
+        weight: parseFloat(row.dataset.weight) || 0,
+        reps:   parseInt(row.dataset.reps)     || 5,
+        label:  `${exName} — Set ${setIdx + 1}`,
         onConfirm(newW, newR) {
           row.dataset.weight = newW;
           row.dataset.reps   = newR;
@@ -144,54 +246,46 @@ function renderActiveWorkout(container, workout, navigate) {
     });
   });
 
-  // Strength set done buttons
+  // Strength sets
   container.querySelectorAll('.set-check-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       btn.classList.add('pop');
       btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
 
-      const exName = btn.dataset.ex;
-      const setIdx = parseInt(btn.dataset.set);
-      const exId   = exName.replace(/[^a-z0-9]/gi, '-');
-      const row    = btn.closest('.set-row');
+      const exName    = btn.dataset.ex;
+      const setIdx    = parseInt(btn.dataset.set);
+      const exId      = exName.replace(/[^a-z0-9]/gi, '-');
+      const row       = btn.closest('.set-row');
       const exSession = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
-      const w = parseFloat(row.dataset.weight) || null;
-      const r = parseInt(row.dataset.reps)     || null;
-
-      exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
-
+      exSession.sets[setIdx] = {
+        done: true,
+        weight: parseFloat(row.dataset.weight) || null,
+        reps:   parseInt(row.dataset.reps)     || null,
+        note: ''
+      };
       row.classList.add('done');
-
-      // Haptic
       if ('vibrate' in navigator) navigator.vibrate(40);
 
-      // Per-exercise progress bar
       const doneSets  = exSession.sets.filter(s => s.done).length;
       const totalSets = exSession.sets.length;
-      const progressFill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
-      const progressTxt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
-      if (progressFill) progressFill.style.width = `${(doneSets / totalSets) * 100}%`;
-      if (progressTxt)  progressTxt.textContent  = `${doneSets} / ${totalSets}`;
+      const fill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
+      const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
+      if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
+      if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
 
-      // Overall header progress
-      doneWorkoutSets++;
-      const wktProgress = container.querySelector('#wkt-progress');
-      if (wktProgress) wktProgress.textContent = `${workout.weekday} · ${doneWorkoutSets} / ${totalWorkoutSets} sets`;
+      incDone();
+      const wktProg = container.querySelector('#wkt-progress');
+      if (wktProg) wktProg.textContent = `${workout.weekday} · ${getDoneSets()} / ${getTotalSets()} sets`;
 
-      // Exercise complete
       if (doneSets === totalSets) {
-        const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+        const exCard   = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
         exCard?.classList.add('ex-complete');
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
         document.activeElement?.blur();
-        showRestTimer(container, 90, nextCard ? () => {
-          exCard?.classList.remove('open');
-          nextCard.classList.add('open');
-          nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } : null);
+        showRestTimer(container, 90, nextCard ? () => onExComplete(exCard, allCards, nextCard) : null);
       } else {
         document.activeElement?.blur();
         showRestTimer(container, 90);
@@ -199,7 +293,7 @@ function renderActiveWorkout(container, workout, navigate) {
     });
   });
 
-  // Cardio done buttons
+  // Cardio
   container.querySelectorAll('.cardio-done-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const exName    = btn.dataset.ex;
@@ -209,38 +303,37 @@ function renderActiveWorkout(container, workout, navigate) {
       const isDone = btn.classList.toggle('done');
       exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
       if ('vibrate' in navigator) navigator.vibrate(isDone ? 40 : 20);
-      const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+      const exCard   = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
       exCard?.classList.toggle('ex-complete', isDone);
 
       if (isDone) {
         document.activeElement?.blur();
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        showRestTimer(container, 90, nextCard ? () => {
-          exCard?.classList.remove('open');
-          nextCard.classList.add('open');
-          nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } : null);
+        showRestTimer(container, 90, nextCard ? () => onExComplete(exCard, allCards, nextCard) : null);
       }
     });
   });
+}
 
-  container.querySelector('#finish-btn').addEventListener('click', () => {
-    clearInterval(timerInterval);  timerInterval = null;
-    clearInterval(restInterval);   restInterval = null;
-    document.querySelector('.rest-overlay')?.remove();
-    const durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
-    session.durationMin = durationMin;
-    saveSession(session);
+// ── Helpers ───────────────────────────────────────────────
+function startTimer(el) {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    el.textContent = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
+  }, 1000);
+}
 
-    const btn = container.querySelector('#finish-btn');
-    btn.classList.add('finishing');
-    btn.textContent = '🎉 Workout saved!';
-    setTimeout(() => {
-      activeSession = null;
-      navigate('home');
-    }, 600);
-  });
+function finishWorkout(container, session, navigate) {
+  clearInterval(timerInterval); timerInterval = null;
+  clearInterval(restInterval);  restInterval  = null;
+  document.querySelector('.rest-overlay')?.remove();
+  session.durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
+  saveSession(session);
+  const btn = container.querySelector('#finish-btn');
+  if (btn) { btn.classList.add('finishing'); btn.textContent = '🎉 Saved!'; }
+  setTimeout(() => { activeSession = null; navigate('home'); }, 600);
 }
 
 // ── Rest Timer ────────────────────────────────────────────
@@ -251,7 +344,7 @@ function showRestTimer(container, seconds, onDone) {
 
   const CIRC = 2 * Math.PI * 32;
   let remaining = seconds;
-  const total = seconds;
+  const total   = seconds;
 
   const overlay = document.createElement('div');
   overlay.className = 'rest-overlay';
