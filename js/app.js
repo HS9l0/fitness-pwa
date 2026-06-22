@@ -64,5 +64,8 @@ document.querySelectorAll('[data-screen="nutrition"]').forEach(el => {
 navigateTo('home');
 
 if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data?.type === 'SW_UPDATED') window.location.reload();
+  });
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }

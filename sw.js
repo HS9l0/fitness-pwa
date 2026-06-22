@@ -1,4 +1,4 @@
-const CACHE = 'fitplan-v42';
+const CACHE = 'fitplan-v43';
 const BASE = '/fitness-pwa';
 const ASSETS = [
   BASE + '/',
@@ -25,15 +25,15 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then(clients => clients.forEach(c => c.postMessage({ type: 'SW_UPDATED' })))
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
-  // Don't cache live API calls
   if (e.request.url.includes('firestore.googleapis.com') ||
       e.request.url.includes('identitytoolkit.googleapis.com') ||
       e.request.url.includes('securetoken.googleapis.com') ||
