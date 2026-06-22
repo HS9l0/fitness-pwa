@@ -3,10 +3,8 @@ import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { showWeightPicker, showRepsPicker } from '../drum-picker.js';
 
 const ICO_CHEVRON_R = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
-const ICO_CHECK     = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
-const ICO_FLAME     = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2C10 6 7 9 7 13a5 5 0 0010 0c0-4-2.5-7-5-11z"/><path d="M12 13c-1.1.8-2 2-2 3a2 2 0 004 0c0-1-.9-2.2-2-3z" fill="#f0a500" stroke="none"/></svg>`;
-const ICO_CLOCK     = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
-const ICO_DUMBBELL  = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_CHECK = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_FLAME = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2C10 6 7 9 7 13a5 5 0 0010 0c0-4-2.5-7-5-11z"/><path d="M12 13c-1.1.8-2 2-2 3a2 2 0 004 0c0-1-.9-2.2-2-3z" fill="#f0a500" stroke="none"/></svg>`;
 
 let timerInterval = null;
 let restInterval  = null;
@@ -18,9 +16,6 @@ function isPhone() {
 }
 
 export function renderWorkout(container, navigate) {
-  document.body.classList.add('in-workout');
-  container.style.paddingBottom = '';
-  container.style.overflow = '';
   const sessions = getSessions();
   const nextDay  = getNextWorkoutDay(sessions);
   const workout  = WORKOUTS[nextDay - 1];
@@ -227,13 +222,7 @@ function renderPhoneWorkout(container, workout, navigate) {
   allCards[0]?.classList.add('pwkt-active', 'open');
   updateNav();
 
-  container.querySelector('#pwkt-back-home').addEventListener('click', () => {
-    clearInterval(timerInterval); timerInterval = null;
-    activeSession = null;
-    container.style.paddingBottom = '';
-    container.style.overflow = '';
-    navigate('home');
-  });
+  container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
   container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
   container.querySelector('#pwkt-next').addEventListener('click', () => goToSlide(currentIdx + 1, 'next'));
 
@@ -541,7 +530,7 @@ function showRestTimer(container, seconds, onDone) {
 
   const CIRC = 2 * Math.PI * 32;
   let remaining = seconds;
-  let total     = seconds;
+  const total   = seconds;
 
   const overlay = document.createElement('div');
   overlay.className = 'rest-overlay';
@@ -594,9 +583,7 @@ function showRestTimer(container, seconds, onDone) {
   });
   overlay.querySelector('#rest-add').addEventListener('click', () => {
     remaining += 30;
-    if (remaining > total) total = remaining;
     countEl.textContent = fmtRest(remaining);
-    arcEl.style.strokeDashoffset = (CIRC * (1 - remaining / total)).toFixed(1);
   });
 }
 

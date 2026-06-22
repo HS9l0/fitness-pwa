@@ -788,7 +788,6 @@ body { overscroll-behavior: none; }
 #cogwheel-btn svg { width: 18px; height: 18px; }
 #cogwheel-btn:active { color: var(--accent); border-color: var(--accent); }
 @media (max-width: 767px) { #cogwheel-btn { display: flex; } }
-body.in-workout #cogwheel-btn { display: none !important; }
 
 /* ── Settings sheet ─────────────────────────────────────── */
 .settings-sheet {
