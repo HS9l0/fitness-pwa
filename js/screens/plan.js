@@ -165,20 +165,22 @@ function renderSetRows(ex, lastWeights) {
     const initR = lastR ?? 5;
     return `
     <div class="set-row" data-set="${i}" data-ex="${ex.name}" data-weight="${initW}" data-reps="${initR}">
-      <span class="set-num">${i + 1}</span>
-      <div class="set-fields">
-        <div class="set-field set-field-tap" data-type="weight">
-          <div class="set-val${!lastW ? ' empty' : ''}">${initW}</div>
-          <span class="set-field-lbl">kg</span>
-        </div>
-        <span class="set-sep">×</span>
-        <div class="set-field set-field-tap" data-type="reps">
-          <div class="set-val${!lastR ? ' empty' : ''}">${initR}</div>
-          <span class="set-field-lbl">reps</span>
+      <div class="set-row-top">
+        <span class="set-num">${i + 1}</span>
+        <div class="set-fields">
+          <div class="set-field set-field-tap" data-type="weight">
+            <div class="set-val${!lastW ? ' empty' : ''}">${initW}</div>
+            <span class="set-field-lbl">kg</span>
+          </div>
+          <span class="set-sep">×</span>
+          <div class="set-field set-field-tap" data-type="reps">
+            <div class="set-val${!lastR ? ' empty' : ''}">${initR}</div>
+            <span class="set-field-lbl">reps</span>
+          </div>
         </div>
       </div>
       <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
       </button>
     </div>
   `;
