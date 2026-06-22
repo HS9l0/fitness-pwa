@@ -17,8 +17,8 @@ let currentScreen = null;
 
 export function navigateTo(name) {
   if (name === 'nutrition' && localStorage.getItem('fit_nutrition_enabled') !== 'true') return;
-  if (name === 'plan'      && localStorage.getItem('fit_plan_enabled')      === 'false') return;
-  if (name === 'progress'  && localStorage.getItem('fit_progress_enabled')  === 'false') return;
+  if (name === 'plan'      && localStorage.getItem('fit_plan_enabled')      !== 'true') return;
+  if (name === 'progress'  && localStorage.getItem('fit_progress_enabled')  !== 'true') return;
   if (name === currentScreen) {
     if (name === 'home')      renderHome(screens.home, navigateTo);
     if (name === 'plan')      renderPlan(screens.plan);
@@ -54,8 +54,8 @@ document.querySelectorAll('.sidebar-btn').forEach(btn => {
 
 export function applyTabVisibility() {
   const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-  const planOn     = localStorage.getItem('fit_plan_enabled')      !== 'false';
-  const progressOn = localStorage.getItem('fit_progress_enabled')  !== 'false';
+  const planOn     = localStorage.getItem('fit_plan_enabled')      === 'true';
+  const progressOn = localStorage.getItem('fit_progress_enabled')  === 'true';
   document.querySelectorAll('[data-screen="nutrition"]').forEach(el => { el.style.display = nutriOn    ? '' : 'none'; });
   document.querySelectorAll('[data-screen="plan"]').forEach(el =>      { el.style.display = planOn     ? '' : 'none'; });
   document.querySelectorAll('[data-screen="progress"]').forEach(el =>  { el.style.display = progressOn ? '' : 'none'; });
@@ -67,8 +67,8 @@ applyTabVisibility();
 function openSettings() {
   if (document.getElementById('settings-sheet')) return;
 
-  const planOn     = localStorage.getItem('fit_plan_enabled')     !== 'false';
-  const progressOn = localStorage.getItem('fit_progress_enabled') !== 'false';
+  const planOn     = localStorage.getItem('fit_plan_enabled')     === 'true';
+  const progressOn = localStorage.getItem('fit_progress_enabled') === 'true';
   const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
   const unit = (() => {
     try { return JSON.parse(localStorage.getItem('fit_settings') ?? '{}').weightUnit ?? 'kg'; } catch { return 'kg'; }

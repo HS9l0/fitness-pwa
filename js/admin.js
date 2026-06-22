@@ -366,8 +366,8 @@ function renderSettingsPanel() {
   const unit    = cfg.weightUnit      ?? 'kg';
   const key     = localStorage.getItem('fit_gemini_key') ?? '';
   const nutriOn    = localStorage.getItem('fit_nutrition_enabled') === 'true';
-  const planOn     = localStorage.getItem('fit_plan_enabled')     !== 'false';
-  const progressOn = localStorage.getItem('fit_progress_enabled') !== 'false';
+  const planOn     = localStorage.getItem('fit_plan_enabled')     === 'true';
+  const progressOn = localStorage.getItem('fit_progress_enabled') === 'true';
 
   return `
     <h3 class="sec-title" style="margin-top:28px">App Settings</h3>
