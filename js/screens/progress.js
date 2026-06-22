@@ -22,7 +22,7 @@ export function renderProgress(container) {
     </div>
 
     <div class="section">
-      <div class="section-title">Personal Records</div>
+      <div class="section-title">Personal Records <span class="section-title-count">${Object.keys(prs).length || ''}</span></div>
       ${buildPRs(prs, unit)}
     </div>
 
@@ -125,11 +125,13 @@ function computePRs(sessions) {
     for (const ex of (s.exercises ?? [])) {
       if (ex.isCardio) continue;
       for (const set of (ex.sets ?? [])) {
-        if (!set.done || !set.weight) continue;
+        if (!set.done || set.skipped || !set.weight || !set.reps) continue;
         const w = parseFloat(set.weight);
-        if (!w) continue;
-        if (!prs[ex.name] || w > prs[ex.name].weight) {
-          prs[ex.name] = { weight: w, reps: set.reps, date: s.date };
+        const r = parseInt(set.reps);
+        if (!w || !r) continue;
+        const e1rm = w * (1 + r / 30); // Epley formula
+        if (!prs[ex.name] || e1rm > prs[ex.name].e1rm) {
+          prs[ex.name] = { weight: w, reps: r, e1rm, date: s.date };
         }
       }
     }
@@ -137,16 +139,35 @@ function computePRs(sessions) {
   return prs;
 }
 
+const RANK_COLORS = ['#f59e0b', '#94a3b8', '#b87333'];
+
+function fmtDate(ds) {
+  return new Date(ds + 'T12:00:00').toLocaleDateString('en', { month: 'short', day: 'numeric' });
+}
+
 function buildPRs(prs, unit) {
   const entries = Object.entries(prs);
-  if (!entries.length) return `<p class="chart-empty">Complete weighted exercises to unlock records.</p>`;
-  entries.sort(([a], [b]) => a.localeCompare(b));
-  return `<div class="pr-grid">${entries.map(([name, pr]) => `
-    <div class="pr-item">
-      <div class="pr-name">${escH(name)}</div>
-      <div class="pr-weight">${pr.weight}<span style="font-size:0.58rem;color:var(--text-dim);margin-left:3px">${unit}</span></div>
-      <div class="pr-detail">${pr.reps} reps · ${pr.date}</div>
-    </div>`).join('')}</div>`;
+  if (!entries.length) return `<p class="chart-empty">Complete weighted exercises to unlock personal records.</p>`;
+
+  // Sort by estimated 1RM descending
+  entries.sort(([, a], [, b]) => b.e1rm - a.e1rm);
+
+  return `<div class="pr-list">${entries.map(([name, pr], idx) => {
+    const color   = RANK_COLORS[idx] ?? 'var(--accent)';
+    const e1rmInt = Math.round(pr.e1rm);
+    const showE1  = pr.reps > 1;
+    const rankBadge = idx < 3
+      ? `<span class="pr-rank" style="background:${color}20;color:${color}">${idx + 1}</span>`
+      : '';
+    return `
+    <div class="pr-row">
+      <div class="pr-row-left">
+        <div class="pr-row-name">${rankBadge}${escH(name)}</div>
+        <div class="pr-row-meta">${pr.reps} reps · ${fmtDate(pr.date)}${showE1 ? ` · ≈&thinsp;${e1rmInt} kg 1RM` : ''}</div>
+      </div>
+      <div class="pr-row-weight" style="color:${color}">${pr.weight}<span class="pr-unit">${unit}</span></div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 // ── Exercise chart ────────────────────────────────────────
@@ -200,13 +221,13 @@ function drawSVGChart(pts) {
   return `
     <svg viewBox="0 0 ${VW} ${VH}" class="prog-chart-svg">
       ${yTicks.map(v => `
-        <line x1="${PL}" y1="${y(v).toFixed(1)}" x2="${VW-PR}" y2="${y(v).toFixed(1)}" stroke="#353029" stroke-width="0.7"/>
-        <text x="${PL-4}" y="${y(v).toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#534a43" font-size="8">${Math.round(v)}</text>
+        <line x1="${PL}" y1="${y(v).toFixed(1)}" x2="${VW-PR}" y2="${y(v).toFixed(1)}" stroke="#1e2d44" stroke-width="0.7"/>
+        <text x="${PL-4}" y="${y(v).toFixed(1)}" text-anchor="end" dominant-baseline="middle" fill="#3a5070" font-size="8">${Math.round(v)}</text>
       `).join('')}
-      ${xLabels.map(({ i, label }) => `<text x="${x(i).toFixed(1)}" y="${VH-3}" text-anchor="middle" fill="#534a43" font-size="8">${label}</text>`).join('')}
-      <path d="${area}" fill="rgba(249,115,22,0.1)"/>
-      <path d="${linePts}" fill="none" stroke="#f97316" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-      ${pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.w).toFixed(1)}" r="2.5" fill="#f97316" stroke="#0f0e0d" stroke-width="1.5"/>`).join('')}
+      ${xLabels.map(({ i, label }) => `<text x="${x(i).toFixed(1)}" y="${VH-3}" text-anchor="middle" fill="#3a5070" font-size="8">${label}</text>`).join('')}
+      <path d="${area}" fill="rgba(59,130,246,0.1)"/>
+      <path d="${linePts}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.w).toFixed(1)}" r="2.5" fill="#3b82f6" stroke="#0f1825" stroke-width="1.5"/>`).join('')}
     </svg>
   `;
 }

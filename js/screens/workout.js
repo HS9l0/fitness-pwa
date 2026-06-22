@@ -1,7 +1,7 @@
 import { WORKOUTS, getNextWorkoutDay } from '../data.js';
 import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { renderExerciseCard } from './plan.js';
-import { showDrumPicker } from '../drum-picker.js';
+import { showWeightPicker, showRepsPicker } from '../drum-picker.js';
 
 let timerInterval = null;
 let restInterval  = null;
@@ -238,28 +238,39 @@ function revealFinish(container) {
 
 // ── Shared event wiring ───────────────────────────────────
 function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete }) {
-  // Drum picker
+  // Drum pickers — separate picker for weight and for reps
   container.querySelectorAll('.set-field-tap').forEach(field => {
     field.addEventListener('click', () => {
       if (field.closest('.set-row').classList.contains('done')) return;
-      field.classList.add('pressed');
       const row    = field.closest('.set-row');
       const setIdx = parseInt(row.dataset.set);
       const exName = row.dataset.ex;
-      showDrumPicker({
-        weight: parseFloat(row.dataset.weight) || 0,
-        reps:   parseInt(row.dataset.reps)     || 5,
-        label:  `${exName} — Set ${setIdx + 1}`,
-        onConfirm(newW, newR) {
-          row.dataset.weight = newW;
-          row.dataset.reps   = newR;
-          const wVal = row.querySelector('.set-fields .set-field:first-child .set-val');
-          const rVal = row.querySelector('.set-fields .set-field:last-child .set-val');
-          if (wVal) { wVal.textContent = newW; wVal.classList.remove('empty'); }
-          if (rVal) { rVal.textContent = newR; rVal.classList.remove('empty'); }
-        }
-      });
+      const label  = `${exName} — Set ${setIdx + 1}`;
+
+      field.classList.add('pressed');
       setTimeout(() => field.classList.remove('pressed'), 200);
+
+      if (field.dataset.type === 'weight') {
+        showWeightPicker({
+          weight: parseFloat(row.dataset.weight) || 0,
+          label,
+          onConfirm(newW) {
+            row.dataset.weight = newW;
+            const wVal = row.querySelector('.set-field[data-type="weight"] .set-val');
+            if (wVal) { wVal.textContent = newW; wVal.classList.remove('empty'); }
+          }
+        });
+      } else {
+        showRepsPicker({
+          reps: parseInt(row.dataset.reps) || 5,
+          label,
+          onConfirm(newR) {
+            row.dataset.reps = newR;
+            const rVal = row.querySelector('.set-field[data-type="reps"] .set-val');
+            if (rVal) { rVal.textContent = newR; rVal.classList.remove('empty'); }
+          }
+        });
+      }
     });
   });
 

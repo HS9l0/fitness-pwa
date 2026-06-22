@@ -852,6 +852,36 @@ body { overscroll-behavior: none; }
   text-align: center; padding: 20px 0; line-height: 1.6;
 }
 
+/* ── Personal Records ───────────────────────────────────── */
+.section-title-count {
+  font-size: 0.65rem; font-weight: 500;
+  color: var(--text-dim); margin-left: 6px;
+}
+.pr-list { display: flex; flex-direction: column; gap: 6px; }
+.pr-row {
+  display: flex; align-items: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  gap: 12px;
+}
+.pr-row-left { flex: 1; min-width: 0; }
+.pr-row-name {
+  font-size: 0.88rem; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 7px;
+}
+.pr-rank {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 0.6rem; font-weight: 900; flex-shrink: 0;
+}
+.pr-row-meta { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4; }
+.pr-row-weight {
+  font-size: 2rem; font-weight: 900; line-height: 1; flex-shrink: 0; text-align: right;
+}
+.pr-unit { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+
 /* Weight log */
 .weight-recent { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
 .weight-row {
@@ -966,27 +996,18 @@ body { overscroll-behavior: none; }
   font-size: 1.5rem; letter-spacing: -1px;
 }
 
-.drum-x {
-  width: 28px; flex-shrink: 0; text-align: center;
-  font-size: 1rem; color: var(--text-dim);
-  position: relative; top: calc(220px / 2 - 0.6rem);
-}
-.drum-x-phantom {
-  top: 0; visibility: hidden; pointer-events: none;
-}
+.drum-body-single { justify-content: center; }
+.drum-body-single .drum-col { max-width: 200px; }
 
 .drum-lbl-row {
   display: flex; justify-content: center;
-  padding: 6px 28px 0; gap: 0;
+  padding: 6px 28px 0;
 }
 .drum-col-lbl {
   flex: 1; text-align: center;
   font-size: 0.6rem; text-transform: uppercase;
   letter-spacing: 0.8px; color: var(--text-dim);
   padding-bottom: 16px;
-}
-.drum-col-lbl-frac {
-  flex: 0 0 52px;
 }
 
 .drum-scroll {
