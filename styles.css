@@ -1167,11 +1167,14 @@ body { overscroll-behavior: none; }
 /* ── Workout back button ─────────────────────────────────── */
 .wkt-back-btn {
   display: inline-flex; align-items: center; gap: 4px;
-  font-size: 0.78rem; font-weight: 600; color: var(--text-dim);
-  padding: 0 0 10px; transition: color 0.15s;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+  padding: 6px 12px 6px 8px; margin-bottom: 10px;
+  background: var(--surface-raised); border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 .wkt-back-btn svg { width: 15px; height: 15px; }
-.wkt-back-btn:active { color: var(--text); }
+.wkt-back-btn:active { color: var(--text); background: var(--border); border-color: var(--accent); }
 .pwkt-back {
   display: flex; align-items: center; justify-content: center;
   width: 32px; height: 32px; flex-shrink: 0;
