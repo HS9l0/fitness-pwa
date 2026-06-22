@@ -1035,8 +1035,8 @@ body { overscroll-behavior: none; }
   );
 }
 
-/* ── Standalone PWA: restore status-bar clearance ───────── */
-@media (display-mode: standalone) {
-  .screen-header  { padding-top: calc(var(--safe-top) + 10px); }
-  .workout-header { padding-top: calc(var(--safe-top) + 10px); }
-}
+/* ── Standalone PWA: clear status bar (class set by JS) ──── */
+/* Uses max() so at least 20px even if env() returns 0 */
+.pwa .screen-header  { padding-top: max(env(safe-area-inset-top, 20px), 20px); }
+.pwa .workout-header { padding-top: max(env(safe-area-inset-top, 20px), 20px); }
+.pwa .pwkt-hdr       { padding-top: max(env(safe-area-inset-top, 20px), 20px); }
