@@ -6,25 +6,6 @@ function isInStandaloneMode() {
   return window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone;
 }
 
-function computeStreak(sessions) {
-  if (!sessions.length) return 0;
-  const dates = new Set(sessions.map(s => s.date));
-  let streak = 0;
-  const d = new Date();
-  if (!dates.has(d.toISOString().slice(0, 10))) d.setDate(d.getDate() - 1);
-  while (dates.has(d.toISOString().slice(0, 10))) {
-    streak++;
-    d.setDate(d.getDate() - 1);
-  }
-  return streak;
-}
-
-function fmtTime(totalMin) {
-  if (!totalMin) return '0m';
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return h ? `${h}h ${m}m` : `${m}m`;
-}
 
 export function renderHome(container, navigate) {
   const sessions  = getSessions();
@@ -44,35 +25,10 @@ export function renderHome(container, navigate) {
   });
   const sessionDates = new Set(sessions.map(s => s.date));
 
-  const totalWorkouts = sessions.length;
-  const streak        = computeStreak(sessions);
-  const totalMin      = sessions.reduce((s, x) => s + (x.durationMin ?? 0), 0);
-
   const lastSession = sessions[0];
   const lastWorkout = lastSession ? WORKOUTS[lastSession.day - 1] : null;
 
   container.innerHTML = `
-    <div class="screen-header">
-      <div class="badge">Beginner · 3×/week</div>
-      <h1>Train Hard.<br/><span style="color:var(--accent)">Stay Consistent.</span></h1>
-      <p>Age 15 · Split Training Program</p>
-    </div>
-
-    <div class="home-stats">
-      <div class="home-stat">
-        <div class="home-stat-num">${totalWorkouts}</div>
-        <div class="home-stat-lbl">Workouts</div>
-      </div>
-      <div class="home-stat">
-        <div class="home-stat-num">${streak}${streak > 0 ? ' 🔥' : ''}</div>
-        <div class="home-stat-lbl">Day Streak</div>
-      </div>
-      <div class="home-stat">
-        <div class="home-stat-num">${fmtTime(totalMin)}</div>
-        <div class="home-stat-lbl">Total Time</div>
-      </div>
-    </div>
-
     <div class="section">
       <div class="section-title">Next Up</div>
       ${todayWorkoutDay
