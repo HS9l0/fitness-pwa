@@ -35,6 +35,14 @@ export function renderWorkout(container, navigate) {
       <p>${workout.focus}</p>
     </div>
     <div class="section">
+      <div class="card wkt-summary-card" style="margin-bottom:12px">
+        <div class="next-day-title">${workout.label}</div>
+        <div class="next-day-focus">${workout.focus}</div>
+        <div class="next-day-meta" style="margin-top:12px;margin-bottom:0">
+          <div class="next-meta-item">${ICO_CLOCK} ~${workout.durationMin} min</div>
+          <div class="next-meta-item">${ICO_DUMBBELL} ${workout.exercises.length} exercises</div>
+        </div>
+      </div>
       <div class="card" style="background:rgba(255,165,0,0.06);border-color:rgba(255,165,0,0.2);margin-bottom:12px">
         <div style="display:flex;gap:10px;align-items:flex-start">
           <span style="flex-shrink:0;display:flex">${ICO_FLAME}</span>
