@@ -490,7 +490,7 @@ a { color: inherit; text-decoration: none; }
 
 .pwkt-hdr {
   display: flex; align-items: center; justify-content: space-between;
-  padding: max(8px, env(safe-area-inset-top, 0px)) 64px 12px 20px;
+  padding: max(8px, env(safe-area-inset-top, 0px)) 20px 12px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
