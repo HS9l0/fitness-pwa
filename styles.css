@@ -36,18 +36,11 @@ a { color: inherit; text-decoration: none; }
 .screen.active { opacity: 1; pointer-events: auto; }
 
 /* ── Screen animations ──────────────────────────────────── */
-@keyframes slide-from-right {
-  from { transform: translateX(56px) scale(0.94); opacity: 0; }
-  to   { transform: none; }
-}
-@keyframes slide-from-left {
-  from { transform: translateX(-56px) scale(0.94); opacity: 0; }
-  to   { transform: none; }
-}
-.screen.slide-right { animation: slide-from-right 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; z-index: 2; }
-.screen.slide-left  { animation: slide-from-left  0.34s cubic-bezier(0.16, 1, 0.3, 1) both; z-index: 2; }
-@keyframes fade-out { from { opacity: 1; transform: scale(1.02); } to { opacity: 0; transform: scale(0.96); } }
-.screen.leaving { animation: fade-out 0.26s cubic-bezier(0.4,0,1,1) forwards; pointer-events: none; z-index: 1; }
+@keyframes screen-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes screen-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.screen.slide-right,
+.screen.slide-left  { animation: screen-fade-in  0.28s ease both; z-index: 2; }
+.screen.leaving     { animation: screen-fade-out 0.22s ease forwards; pointer-events: none; z-index: 1; }
 
 /* ── Bottom nav ─────────────────────────────────────────── */
 #bottom-nav {
@@ -536,15 +529,13 @@ a { color: inherit; text-decoration: none; }
 .pwkt-stage .exercise-card.pwkt-active { display: block; }
 
 /* Slide animations between exercises */
-@keyframes pwkt-in-right  { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pwkt-in-left   { from { transform: translateX(-48px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes pwkt-out-left  { from { transform: none; opacity: 1; } to { transform: translateX(-48px); opacity: 0; } }
-@keyframes pwkt-out-right { from { transform: none; opacity: 1; } to { transform: translateX(48px); opacity: 0; } }
+@keyframes pwkt-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pwkt-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-.pwkt-stage .exercise-card.pwkt-slide-in-right  { animation: pwkt-in-right  0.3s cubic-bezier(0.16,1,0.3,1) both; }
-.pwkt-stage .exercise-card.pwkt-slide-in-left   { animation: pwkt-in-left   0.3s cubic-bezier(0.16,1,0.3,1) both; }
-.pwkt-stage .exercise-card.pwkt-slide-out-left  { display: block !important; animation: pwkt-out-left  0.2s ease-in both; }
-.pwkt-stage .exercise-card.pwkt-slide-out-right { display: block !important; animation: pwkt-out-right 0.2s ease-in both; }
+.pwkt-stage .exercise-card.pwkt-slide-in-right,
+.pwkt-stage .exercise-card.pwkt-slide-in-left  { animation: pwkt-fade-in  0.3s ease both; }
+.pwkt-stage .exercise-card.pwkt-slide-out-left,
+.pwkt-stage .exercise-card.pwkt-slide-out-right { display: block !important; animation: pwkt-fade-out 0.18s ease both; }
 
 .pwkt-foot {
   display: flex; align-items: center; gap: 12px;
