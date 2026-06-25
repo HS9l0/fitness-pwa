@@ -1,0 +1,56 @@
+<!-- @dsCard group="Controls" name="DrumPicker" viewport='{"width":400,"height":340}' -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="../../../styles.css" />
+  <style>html,body{margin:0;padding:0;background:var(--bg);height:340px;overflow:hidden;}</style>
+</head>
+<body>
+  <div class="drum-sheet" style="position:relative;inset:unset;display:flex;flex-direction:column;justify-content:flex-end;height:340px;">
+    <div class="drum-panel" style="border-radius:22px 22px 0 0;padding-bottom:16px;">
+      <div class="drum-hdr">
+        <button class="drum-cancel-btn">Cancel</button>
+        <span class="drum-hdr-title">Rest Duration</span>
+        <button class="drum-done-btn">Done</button>
+      </div>
+      <div class="drum-body">
+        <div class="drum-band"></div>
+        <div class="drum-fade"></div>
+        <div class="drum-col">
+          <div class="drum-scroll" style="padding:88px 0;">
+            <div class="drum-item" style="color:var(--text-dim)">1</div>
+            <div class="drum-item" style="color:var(--text-dim)">1</div>
+            <div class="drum-item" style="color:#fff;font-weight:600">2</div>
+            <div class="drum-item" style="color:var(--text-dim)">3</div>
+            <div class="drum-item" style="color:var(--text-dim)">4</div>
+          </div>
+        </div>
+        <div class="drum-col drum-col-frac">
+          <div class="drum-scroll" style="padding:88px 0;">
+            <div class="drum-item" style="color:var(--text-dim)">.0</div>
+            <div class="drum-item" style="color:var(--text-dim)">.0</div>
+            <div class="drum-item" style="color:#fff;font-weight:600">.5</div>
+            <div class="drum-item" style="color:var(--text-dim)">.0</div>
+            <div class="drum-item" style="color:var(--text-dim)">.0</div>
+          </div>
+        </div>
+        <div class="drum-col">
+          <div class="drum-scroll" style="padding:88px 0;">
+            <div class="drum-item" style="color:var(--text-dim)">min</div>
+            <div class="drum-item" style="color:var(--text-dim)">min</div>
+            <div class="drum-item" style="color:#fff;font-weight:600">min</div>
+            <div class="drum-item" style="color:var(--text-dim)">min</div>
+            <div class="drum-item" style="color:var(--text-dim)">min</div>
+          </div>
+        </div>
+      </div>
+      <div class="drum-lbl-row">
+        <div class="drum-col-lbl">min</div>
+        <div class="drum-col-lbl"></div>
+        <div class="drum-col-lbl">unit</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

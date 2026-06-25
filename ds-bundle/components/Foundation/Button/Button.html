@@ -1,0 +1,21 @@
+<!-- @dsCard group="Foundation" name="Button" viewport='{"width":400}' -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="../../../styles.css" />
+  <style>
+    html, body { margin: 0; padding: 0; background: var(--bg); }
+    .preview { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  </style>
+</head>
+<body>
+  <div class="preview">
+    <button class="btn-primary">▶  Begin Workout</button>
+    <button class="btn-primary" id="pulse">▶  Begin Workout (pulsing)</button>
+    <button class="btn-ghost">+ Add Exercise</button>
+    <button class="btn-ghost">← Back</button>
+  </div>
+  <script>document.getElementById('pulse').style.animation='btn-pulse 1.8s ease-in-out infinite'</script>
+</body>
+</html>

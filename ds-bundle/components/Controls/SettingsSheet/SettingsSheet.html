@@ -1,0 +1,39 @@
+<!-- @dsCard group="Controls" name="SettingsSheet" viewport='{"width":400,"height":420}' -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="../../../styles.css" />
+  <style>html,body{margin:0;padding:0;background:rgba(0,0,0,0.55);height:420px;overflow:hidden;}</style>
+</head>
+<body>
+  <div class="settings-sheet open" style="position:relative;inset:unset;display:flex;flex-direction:column;justify-content:flex-end;height:420px;opacity:1;pointer-events:auto;">
+    <div class="settings-panel" style="transform:none;max-height:380px;">
+      <div class="settings-panel-hdr">
+        <span class="settings-panel-title">Settings</span>
+        <button class="settings-done-btn">Done</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-section-label">Workout</div>
+        <div class="settings-row">
+          <span class="settings-row-label">Weight Unit</span>
+          <div class="unit-seg"><button class="unit-seg-btn active">kg</button><button class="unit-seg-btn">lbs</button></div>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Rest Timer</span>
+          <label class="ios-toggle"><input type="checkbox" checked/><span class="ios-track"></span></label>
+        </div>
+        <div class="settings-section-label">App</div>
+        <div class="settings-row">
+          <span class="settings-row-label">Sound Effects</span>
+          <label class="ios-toggle"><input type="checkbox"/><span class="ios-track"></span></label>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">Haptic Feedback</span>
+          <label class="ios-toggle"><input type="checkbox" checked/><span class="ios-track"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
