@@ -86,7 +86,9 @@ a { color: inherit; text-decoration: none; }
 }
 .card + .card { margin-top: 8px; }
 
-/* ── Buttons ────────────────────────────────────────────── */
+/* ── Buttons — Apple HIG prominence hierarchy ────────────── */
+
+/* PRIMARY — most important action per screen; one per view */
 .btn-primary {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 14px;
@@ -97,14 +99,44 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.15s, transform 0.12s ease;
 }
 .btn-primary:active { opacity: 0.88; transform: scale(0.98); }
+
+/* GRAY — neutral secondary action; no brand colour, just structure */
+.btn-gray {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 14px;
+  background: rgba(120,120,128,.16); color: var(--text);
+  border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 600;
+  transition: opacity 0.15s, transform 0.12s ease;
+}
+.btn-gray:active { opacity: 0.72; transform: scale(0.97); }
+
+/* TINTED — branded secondary; accent colour at low opacity */
+.btn-tinted {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255,90,60,.12); color: var(--accent);
+  border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 600;
+  transition: opacity 0.15s, transform 0.12s ease;
+}
+.btn-tinted:active { opacity: 0.72; transform: scale(0.97); }
+
+/* PLAIN — supplementary / navigation; no fill, tint colour text only */
+.btn-plain {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--accent); font-size: 0.88rem; font-weight: 600;
+  transition: opacity 0.15s;
+}
+.btn-plain:active { opacity: 0.55; }
+
+/* Legacy alias — maps ghost to gray so no HTML changes needed */
 .btn-ghost {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border: 1px solid var(--border);
-  border-radius: var(--radius-sm); font-size: 0.82rem;
-  color: var(--text-muted);
-  transition: border-color 0.15s, color 0.15s, transform 0.12s ease;
+  padding: 8px 14px;
+  background: rgba(120,120,128,.16); color: var(--text);
+  border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 600;
+  transition: opacity 0.15s, transform 0.12s ease;
 }
-.btn-ghost:active { border-color: var(--accent); color: var(--accent); transform: scale(0.97); }
+.btn-ghost:active { opacity: 0.72; transform: scale(0.97); }
 
 /* ── Begin button pulse ─────────────────────────────────── */
 @keyframes btn-pulse {
@@ -246,11 +278,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 @keyframes set-row-flash {
-  0%   { background: rgba(34,197,94,0.28); }
-  100% { background: rgba(34,197,94,0.06); }
+  0%   { background: rgba(52,199,89,0.22); }
+  100% { background: rgba(52,199,89,0.07); }
 }
 .set-row.done {
-  background: rgba(34,197,94,0.06);
+  background: rgba(52,199,89,0.07);
   animation: set-row-flash 0.5s ease forwards;
 }
 
@@ -336,16 +368,16 @@ a { color: inherit; text-decoration: none; }
 .set-check-btn {
   flex: 1; height: 44px;
   border-radius: 10px;
-  background: var(--surface-raised); border: 1.5px solid var(--border);
-  color: var(--text-muted);
+  /* Gray — secondary action that becomes tinted-green on completion */
+  background: rgba(120,120,128,.14); color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.1s;
+  transition: background 0.25s, color 0.25s, transform 0.1s;
 }
 .set-check-btn:active { transform: scale(0.97); }
 .set-check-btn.pop { animation: check-pop 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
 .set-row.done .set-check-btn {
-  background: rgba(34,197,94,0.15); border-color: var(--accent-2);
-  color: var(--accent-2); pointer-events: none;
+  /* Tinted green — completion state */
+  background: rgba(52,199,89,.16); color: var(--accent-2); pointer-events: none;
 }
 
 /* Exercise complete state */
@@ -374,30 +406,32 @@ a { color: inherit; text-decoration: none; }
 .cardio-done-btn {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; padding: 14px; border-radius: 14px;
-  border: 1.5px solid var(--border); color: var(--text-muted);
+  /* Gray — secondary action */
+  background: rgba(120,120,128,.14); color: var(--text-muted);
   font-size: 0.9rem; font-weight: 600; min-height: 50px;
-  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.12s;
+  transition: background 0.2s, color 0.2s, transform 0.12s;
   margin-top: 4px;
 }
 .cardio-done-btn:active { transform: scale(0.97); }
 @keyframes cardio-done-pop {
-  0%   { transform: scale(1); box-shadow: 0 0 0 rgba(34,197,94,0); }
-  30%  { transform: scale(1.05); box-shadow: 0 0 30px rgba(34,197,94,0.5); }
+  0%   { transform: scale(1); box-shadow: 0 0 0 rgba(52,199,89,0); }
+  30%  { transform: scale(1.05); box-shadow: 0 0 30px rgba(52,199,89,0.5); }
   55%  { transform: scale(0.97); }
   75%  { transform: scale(1.02); }
   100% { transform: scale(1); box-shadow: none; }
 }
 .cardio-done-btn.done {
-  background: rgba(34,197,94,0.1); border-color: var(--accent-2); color: var(--accent-2);
+  /* Tinted green — completion state */
+  background: rgba(52,199,89,.16); color: var(--accent-2);
   animation: cardio-done-pop 0.5s cubic-bezier(0.16,1,0.3,1);
 }
 .cardio-done-icon {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-  border: 2px solid currentColor;
+  background: rgba(120,120,128,.18);
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s;
 }
-.cardio-done-btn.done .cardio-done-icon { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
+.cardio-done-btn.done .cardio-done-icon { background: var(--accent-2); color: #fff; }
 
 /* ── Workout header ─────────────────────────────────────── */
 .workout-header {
@@ -550,8 +584,8 @@ a { color: inherit; text-decoration: none; }
 }
 .pwkt-arrow {
   width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-  background: var(--surface-raised); border: 1.5px solid var(--border);
-  color: var(--text-muted);
+  /* Gray — navigation secondary */
+  background: rgba(120,120,128,.14); color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
   transition: opacity 0.2s, transform 0.1s;
   touch-action: manipulation;
@@ -637,13 +671,16 @@ body { overscroll-behavior: none; }
 .rest-count { font-size: 1.35rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
 .rest-btns  { display: flex; gap: 8px; }
 .rest-btn-add {
-  padding: 10px 16px; border: 1px solid var(--border);
-  border-radius: 12px; font-size: 0.85rem; color: var(--text-muted);
+  /* Gray — secondary in rest timer context */
+  padding: 10px 16px;
+  background: rgba(120,120,128,.14); color: var(--text);
+  border-radius: 12px; font-size: 0.85rem; font-weight: 600;
   min-height: 44px;
-  transition: border-color 0.15s, color 0.15s;
+  transition: opacity 0.15s;
 }
-.rest-btn-add:hover { border-color: var(--accent); color: var(--accent); }
+.rest-btn-add:active { opacity: 0.72; }
 .rest-btn-skip {
+  /* Primary — most important action during rest (end rest early) */
   display: flex; align-items: center; gap: 4px;
   padding: 10px 18px; background: var(--accent);
   color: #fff; font-size: 0.85rem; font-weight: 600; border-radius: 12px;

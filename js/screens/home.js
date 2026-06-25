@@ -114,8 +114,7 @@ export function renderHome(container, navigate) {
             <h3>Rest Day</h3>
             <p>Walk, stretch, or recover fully.<br/>Muscles grow during rest.</p>
             <div style="margin-top:16px">
-              <button class="btn-primary" id="start-workout-btn"
-                style="background:var(--surface-raised);color:var(--text-muted);border:1px solid var(--border)">
+              <button class="btn-gray" id="start-workout-btn" style="width:100%;padding:14px;font-size:1rem;border-radius:14px;min-height:50px">
                 Do ${workout.label} anyway ${ICO_CHEVRON_R}
               </button>
             </div>
