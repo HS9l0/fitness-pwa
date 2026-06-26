@@ -58,68 +58,110 @@ export function renderHome(container, navigate) {
   const nextWhen = workout.when ?? WHEN_LABELS[nextDay - 1] ?? `Day ${nextDay}`;
   const dateLabel = `${DAY_NAMES[dow]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
 
+  const doneToday = sessions.some(s => s.date === todayStr);
+
+  // Streak dots cover the last 7 days ending today
+  const streakStart = new Date(now);
+  streakStart.setDate(now.getDate() - 6);
+  const streakDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(streakStart);
+    d.setDate(streakStart.getDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+
+  const dotsHtml = streakDays.map(dateStr => {
+    const d = new Date(dateStr + 'T12:00:00');
+    const label = ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
+    const done = sessionDates.has(dateStr);
+    const isToday = dateStr === todayStr;
+    return `<div class="streak-dot ${done ? 'done' : ''} ${isToday && !done ? 'today' : ''}">
+      <div class="dot">${done ? ICO_CHECK_SM : d.getDate()}</div>
+      <div class="day-lbl">${label}</div>
+    </div>`;
+  }).join('');
+
+  // Next-up / done-today card
+  let nextCardHtml;
+  if (doneToday) {
+    nextCardHtml = `
+      <div class="card done-today-card" style="margin-bottom:12px">
+        <div class="done-today-icon">${ICO_CHECK_CIRCLE}</div>
+        <div class="done-today-text">
+          <div class="done-today-title">Workout complete!</div>
+          <div class="done-today-sub">You're done for today. Rest up and come back tomorrow.</div>
+        </div>
+      </div>`;
+  } else if (todayWorkoutDay) {
+    nextCardHtml = `
+      <div class="card next-card" style="margin-bottom:12px">
+        <div class="next-gradient">
+          <div class="next-dumbbell-icon">${ICO_DUMBBELL_LG}</div>
+          <div class="next-when-lbl">Up next · ${nextWhen}</div>
+          <div class="next-workout-name">${workout.label}</div>
+        </div>
+        <div class="next-body">
+          <div class="next-focus-txt">${workout.focus}</div>
+          <div class="next-meta-row">
+            <div class="next-meta-item">${ICO_CLOCK} <span>~${workout.durationMin}</span> min</div>
+            <div class="next-meta-item">${ICO_DUMBBELL} <span>${workout.exercises.length}</span> exercises</div>
+          </div>
+          <button class="hig-btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
+        </div>
+      </div>`;
+  } else {
+    nextCardHtml = `
+      <div class="card rest-day-card" style="margin-bottom:12px">
+        <div class="rest-icon">${ICO_MOON}</div>
+        <h3>Rest Day</h3>
+        <p>Walk, stretch, or recover fully.<br/>Muscles grow during rest.</p>
+        <div style="margin-top:16px">
+          <button class="btn-gray" id="start-workout-btn" style="width:100%;padding:14px;font-size:1rem;border-radius:14px;min-height:50px">
+            Do ${workout.label} anyway ${ICO_CHEVRON_R}
+          </button>
+        </div>
+      </div>`;
+  }
+
   container.innerHTML = `
     <div class="hig-large-title">FitPlan</div>
     <div class="hig-date-label">${dateLabel}</div>
 
     <div class="section" style="padding-top:0">
 
-      <!-- Activity ring card -->
-      <div class="card ring-card" style="margin-bottom:12px">
-        <div class="ring-wrap">
-          <svg width="104" height="104" viewBox="0 0 104 104">
-            <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,90,60,.15)" stroke-width="13"/>
-            <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accent)" stroke-width="13"
-              stroke-linecap="round"
-              stroke-dasharray="${ringFill.toFixed(1)} ${ringC.toFixed(1)}"
-              transform="rotate(-90 52 52)"/>
-          </svg>
-          <div class="ring-inner">
-            <span class="ring-count">${weekDone}</span>
-            <span class="ring-of">of ${weekGoal}</span>
+      <!-- Merged "This Week" card: ring + streak dots -->
+      <div class="card week-card" style="margin-bottom:12px">
+        <div class="ring-card">
+          <div class="ring-wrap">
+            <svg width="104" height="104" viewBox="0 0 104 104">
+              <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,90,60,.15)" stroke-width="13"/>
+              <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accent)" stroke-width="13"
+                stroke-linecap="round"
+                stroke-dasharray="${ringFill.toFixed(1)} ${ringC.toFixed(1)}"
+                transform="rotate(-90 52 52)"/>
+            </svg>
+            <div class="ring-inner">
+              <span class="ring-count">${weekDone}</span>
+              <span class="ring-of">of ${weekGoal}</span>
+            </div>
+          </div>
+          <div class="ring-info">
+            <div class="ring-headline">This Week</div>
+            <div class="ring-sub">
+              ${weekDone === 0
+                ? 'No workouts yet — let\'s go!'
+                : weekDone >= weekGoal
+                  ? '<strong>Goal reached!</strong> Great week.'
+                  : `<strong>${weekGoal - weekDone} more</strong> to hit your goal`
+              }
+            </div>
           </div>
         </div>
-        <div class="ring-info">
-          <div class="ring-headline">This Week</div>
-          <div class="ring-sub">
-            ${weekDone === 0
-              ? 'No workouts yet — let\'s go!'
-              : weekDone >= weekGoal
-                ? '<strong>Goal reached!</strong> Great week.'
-                : `<strong>${weekGoal - weekDone} more</strong> to hit your goal`
-            }
-          </div>
+        <div class="week-dots-row">
+          ${dotsHtml}
         </div>
       </div>
 
-      <!-- Next Up card -->
-      ${todayWorkoutDay
-        ? `<div class="card next-card" style="margin-bottom:12px">
-            <div class="next-gradient">
-              <div class="next-dumbbell-icon">${ICO_DUMBBELL_LG}</div>
-              <div class="next-when-lbl">Up next · ${nextWhen}</div>
-              <div class="next-workout-name">${workout.label}</div>
-            </div>
-            <div class="next-body">
-              <div class="next-focus-txt">${workout.focus}</div>
-              <div class="next-meta-row">
-                <div class="next-meta-item">${ICO_CLOCK} <span>~${workout.durationMin}</span> min</div>
-                <div class="next-meta-item">${ICO_DUMBBELL} <span>${workout.exercises.length}</span> exercises</div>
-              </div>
-              <button class="hig-btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
-            </div>
-          </div>`
-        : `<div class="card rest-day-card" style="margin-bottom:12px">
-            <div class="rest-icon">${ICO_MOON}</div>
-            <h3>Rest Day</h3>
-            <p>Walk, stretch, or recover fully.<br/>Muscles grow during rest.</p>
-            <div style="margin-top:16px">
-              <button class="btn-gray" id="start-workout-btn" style="width:100%;padding:14px;font-size:1rem;border-radius:14px;min-height:50px">
-                Do ${workout.label} anyway ${ICO_CHEVRON_R}
-              </button>
-            </div>
-          </div>`
-      }
+      ${nextCardHtml}
 
       ${lastSession && lastWorkout ? `
         <div class="section-title" style="margin-top:8px">Last Workout</div>
@@ -143,22 +185,6 @@ export function renderHome(container, navigate) {
           </div>
         </div>
       ` : ''}
-
-      <div class="section-title" style="margin-top:20px">This Week</div>
-      <div class="card">
-        <div class="streak-row">
-          ${streakDays.map(dateStr => {
-            const d = new Date(dateStr + 'T12:00:00');
-            const label = ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
-            const done = sessionDates.has(dateStr);
-            const isToday = dateStr === todayStr;
-            return `<div class="streak-dot ${done ? 'done' : ''} ${isToday && !done ? 'today' : ''}">
-              <div class="dot">${done ? ICO_CHECK_SM : d.getDate()}</div>
-              <div class="day-lbl">${label}</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
 
       ${isIos() && !isInStandaloneMode() ? `
         <div class="card install-card" style="margin-top:12px">

@@ -920,7 +920,15 @@ body { overscroll-behavior: none; }
   padding: 0 20px 14px; font-weight: 500;
 }
 
-/* Activity ring card */
+/* Merged "This Week" card */
+.week-card { padding: 0; overflow: hidden; }
+.week-dots-row {
+  display: flex; gap: 6px; justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Activity ring row (inside week-card) */
 .ring-card {
   display: flex; align-items: center; gap: 18px;
   padding: 18px 20px;
@@ -945,6 +953,18 @@ body { overscroll-behavior: none; }
 .ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
+
+/* Done-today card */
+.done-today-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 20px;
+  background: rgba(52,199,89,.08);
+  border-color: rgba(52,199,89,.22);
+}
+.done-today-icon { color: var(--accent-2); flex-shrink: 0; display: flex; }
+.done-today-icon svg { width: 32px; height: 32px; }
+.done-today-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-2); margin-bottom: 3px; }
+.done-today-sub   { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 
 /* Gradient "Next Up" card */
 .next-card {
