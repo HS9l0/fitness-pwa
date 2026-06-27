@@ -103,24 +103,22 @@ function openSettings() {
               <button class="unit-seg-btn dev-day-btn ${testDay===0?'active':''}" data-day="0" style="padding:5px 10px;font-size:0.76rem">Rest</button>
             </div>
           </div>
-        </div>
-
-        <div class="settings-section-label" style="margin-top:18px">About</div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Version</span>
-          <span class="settings-info-val" id="sw-version-display">—</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Today</span>
-          <span class="settings-info-val">${realDayLabel}</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">This week</span>
-          <span class="settings-info-val">${weekCount} workout${weekCount !== 1 ? 's' : ''}</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Total logged</span>
-          <span class="settings-info-val">${sessions.length} workout${sessions.length !== 1 ? 's' : ''}</span>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Version</span>
+            <span class="settings-info-val" id="sw-version-display">—</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Today</span>
+            <span class="settings-info-val">${realDayLabel}</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">This week</span>
+            <span class="settings-info-val">${weekCount} workout${weekCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Total logged</span>
+            <span class="settings-info-val">${sessions.length} workout${sessions.length !== 1 ? 's' : ''}</span>
+          </div>
         </div>
 
         <a href="./admin.html" class="settings-admin-link" style="margin-top:8px">Admin Dashboard ${ICO_CHEVRON}</a>
