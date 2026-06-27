@@ -44,23 +44,16 @@ export function renderHome(container, navigate) {
   const ringC = 2 * Math.PI * 44;
   const ringFill = Math.min(weekDone / weekGoal, 1) * ringC;
 
-  const streakDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - 6 + i);
-    return d.toISOString().slice(0, 10);
-  });
   const sessionDates = new Set(sessions.map(s => s.date));
-
   const lastSession = sessions[0];
   const lastWorkout = lastSession ? WORKOUTS[lastSession.day - 1] : null;
 
   const WHEN_LABELS = ['Monday', 'Wednesday', 'Friday'];
   const nextWhen = workout.when ?? WHEN_LABELS[nextDay - 1] ?? `Day ${nextDay}`;
   const dateLabel = `${DAY_NAMES[dow]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
-
   const doneToday = sessions.some(s => s.date === todayStr);
 
-  // Streak dots cover the last 7 days ending today
+  // Streak dots: last 7 days ending today
   const streakStart = new Date(now);
   streakStart.setDate(now.getDate() - 6);
   const streakDays = Array.from({ length: 7 }, (_, i) => {
