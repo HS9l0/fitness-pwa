@@ -880,6 +880,7 @@ body { overscroll-behavior: none; }
 }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-row-label { font-size: 0.88rem; font-weight: 500; color: var(--text); }
+.settings-info-val  { font-size: 0.82rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .ios-toggle { position: relative; display: inline-block; width: 51px; height: 31px; flex-shrink: 0; }
 .ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
 .ios-track {

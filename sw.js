@@ -30,6 +30,12 @@ self.addEventListener('activate', e => {
   );
 });
 
+self.addEventListener('message', e => {
+  if (e.data?.type === 'GET_VERSION') {
+    e.source?.postMessage({ type: 'VERSION', version: CACHE });
+  }
+});
+
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('firestore.googleapis.com') ||
       e.request.url.includes('identitytoolkit.googleapis.com') ||

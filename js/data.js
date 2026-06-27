@@ -258,7 +258,15 @@ export const WORKOUTS = [
 export const DAYS_MAP = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 0: 'Sun' };
 
 // Returns 1, 2, or 3 on Mon/Wed/Fri; null on all other days.
+// Test mode (set via settings) can override the calendar.
 export function getTodayWorkoutDay() {
+  try {
+    const s = JSON.parse(localStorage.getItem('fit_settings') ?? '{}');
+    if (s.testMode) {
+      const d = s.testDay ?? 1;
+      return d === 0 ? null : d; // 0 = simulate rest day
+    }
+  } catch {}
   const dow = new Date().getDay(); // 0=Sun … 6=Sat
   return { 1: 1, 3: 2, 5: 3 }[dow] ?? null;
 }
