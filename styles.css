@@ -637,7 +637,7 @@ body { overscroll-behavior: none; }
   text-decoration: none;
   transition: opacity 0.15s;
 }
-.yt-search-btn .yt-icon { color: #ff0000; flex-shrink: 0; display: flex; }
+.yt-search-btn .yt-icon { color: var(--text-muted); flex-shrink: 0; display: flex; }
 .yt-search-btn .yt-label { flex: 1; }
 .yt-search-btn .yt-arrow { color: var(--text-dim); flex-shrink: 0; }
 .yt-search-btn:active { opacity: 0.5; }
