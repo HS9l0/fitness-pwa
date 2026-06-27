@@ -78,7 +78,7 @@ export function renderWorkout(container, navigate) {
 
   container.querySelector('#wkt-back').addEventListener('click', () => navigate('home'));
   container.querySelector('#begin-btn').addEventListener('click', () => {
-    beginWorkout(nextDay);
+    beginWorkout(todayDay);
     renderActiveWorkout(container, workout, navigate);
   });
 }
