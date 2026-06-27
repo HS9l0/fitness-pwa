@@ -1,4 +1,4 @@
-import { WORKOUTS, getNextWorkoutDay } from '../data.js';
+import { WORKOUTS, getTodayWorkoutDay } from '../data.js';
 import { getSessions, saveSession, getLastWeights, today } from '../store.js';
 import { showWeightPicker, showRepsPicker } from '../drum-picker.js';
 
@@ -18,9 +18,15 @@ function isPhone() {
 }
 
 export function renderWorkout(container, navigate) {
-  const sessions = getSessions();
-  const nextDay  = getNextWorkoutDay(sessions);
-  const workout  = WORKOUTS[nextDay - 1];
+  const todayDay = getTodayWorkoutDay(); // 1, 2, 3, or null
+
+  // Guard: if it's not a scheduled workout day, send back to home
+  if (!todayDay && !activeSession) {
+    navigate('home');
+    return;
+  }
+
+  const workout = WORKOUTS[(todayDay ?? activeSession?.day ?? 1) - 1];
 
   if (activeSession) {
     renderActiveWorkout(container, workout, navigate);

@@ -1,4 +1,4 @@
-import { WORKOUTS, getNextWorkoutDay } from '../data.js';
+import { WORKOUTS, getTodayWorkoutDay } from '../data.js';
 import { getSessions, today } from '../store.js';
 
 function isIos() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
@@ -19,15 +19,13 @@ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 export function renderHome(container, navigate) {
-  const sessions  = getSessions();
-  const todayStr  = today();
-  const nextDay   = getNextWorkoutDay(sessions);
-  const workout   = WORKOUTS[nextDay - 1];
+  const sessions     = getSessions();
+  const todayStr     = today();
+  const todayDay     = getTodayWorkoutDay(); // 1, 2, 3, or null
+  const workout      = todayDay ? WORKOUTS[todayDay - 1] : null;
 
   const now = new Date();
   const dow = now.getDay();
-  const workoutDays = { 1: 1, 3: 2, 5: 3 };
-  const todayWorkoutDay = workoutDays[dow];
 
   // Activity ring: workouts this Mon–Sun week
   const startOfWeek = new Date(now);
@@ -49,9 +47,14 @@ export function renderHome(container, navigate) {
   const lastWorkout = lastSession ? WORKOUTS[lastSession.day - 1] : null;
 
   const WHEN_LABELS = ['Monday', 'Wednesday', 'Friday'];
-  const nextWhen = workout.when ?? WHEN_LABELS[nextDay - 1] ?? `Day ${nextDay}`;
   const dateLabel = `${DAY_NAMES[dow]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
   const doneToday = sessions.some(s => s.date === todayStr);
+
+  // Next scheduled workout (for rest-day card)
+  const nextScheduledDay = [1, 3, 5].find(d => d > dow) ?? 1; // next Mon/Wed/Fri
+  const nextScheduledDayName = { 1: 'Monday', 3: 'Wednesday', 5: 'Friday' }[nextScheduledDay];
+  const nextScheduledWorkoutDay = { 1: 1, 3: 2, 5: 3 }[nextScheduledDay];
+  const nextWorkout = WORKOUTS[nextScheduledWorkoutDay - 1];
 
   // Streak dots: last 7 days ending today
   const streakStart = new Date(now);
@@ -73,7 +76,7 @@ export function renderHome(container, navigate) {
     </div>`;
   }).join('');
 
-  // Next-up / done-today card
+  // Next-up / done-today / rest-day card
   let nextCardHtml;
   if (doneToday) {
     nextCardHtml = `
@@ -81,15 +84,15 @@ export function renderHome(container, navigate) {
         <div class="done-today-icon">${ICO_CHECK_CIRCLE}</div>
         <div class="done-today-text">
           <div class="done-today-title">Workout complete!</div>
-          <div class="done-today-sub">You're done for today. Rest up and come back tomorrow.</div>
+          <div class="done-today-sub">You're done for today. Rest up and come back ${nextScheduledDayName}.</div>
         </div>
       </div>`;
-  } else if (todayWorkoutDay) {
+  } else if (todayDay) {
     nextCardHtml = `
       <div class="card next-card" style="margin-bottom:12px">
         <div class="next-gradient">
           <div class="next-dumbbell-icon">${ICO_DUMBBELL_LG}</div>
-          <div class="next-when-lbl">Up next · ${nextWhen}</div>
+          <div class="next-when-lbl">Today · ${WHEN_LABELS[todayDay - 1]}</div>
           <div class="next-workout-name">${workout.label}</div>
         </div>
         <div class="next-body">
@@ -106,12 +109,7 @@ export function renderHome(container, navigate) {
       <div class="card rest-day-card" style="margin-bottom:12px">
         <div class="rest-icon">${ICO_MOON}</div>
         <h3>Rest Day</h3>
-        <p>Walk, stretch, or recover fully.<br/>Muscles grow during rest.</p>
-        <div style="margin-top:16px">
-          <button class="btn-gray" id="start-workout-btn" style="width:100%;padding:14px;font-size:1rem;border-radius:14px;min-height:50px">
-            Do ${workout.label} anyway ${ICO_CHEVRON_R}
-          </button>
-        </div>
+        <p>Walk, stretch, or recover fully.<br/>Next up: <strong>${nextWorkout.label}</strong> on ${nextScheduledDayName}.</p>
       </div>`;
   }
 

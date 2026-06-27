@@ -257,8 +257,13 @@ export const WORKOUTS = [
 
 export const DAYS_MAP = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 0: 'Sun' };
 
-export function getNextWorkoutDay(sessions) {
-  if (!sessions.length) return 1;
-  const last = sessions[0];
-  return last.day === 3 ? 1 : last.day + 1;
+// Returns 1, 2, or 3 on Mon/Wed/Fri; null on all other days.
+export function getTodayWorkoutDay() {
+  const dow = new Date().getDay(); // 0=Sun … 6=Sat
+  return { 1: 1, 3: 2, 5: 3 }[dow] ?? null;
+}
+
+// Kept for any code that still imports it — delegates to calendar.
+export function getNextWorkoutDay() {
+  return getTodayWorkoutDay();
 }
