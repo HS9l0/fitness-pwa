@@ -138,18 +138,6 @@ a { color: inherit; text-decoration: none; }
 }
 .btn-ghost:active { opacity: 0.72; transform: scale(0.97); }
 
-/* ── Begin button pulse ─────────────────────────────────── */
-@keyframes btn-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255,90,60,0.65), 0 4px 20px rgba(255,90,60,0.25);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 18px rgba(255,90,60,0), 0 8px 40px rgba(255,90,60,0.55);
-    transform: scale(1.018);
-  }
-}
-#begin-btn { animation: btn-pulse 1.8s ease-in-out infinite; }
 
 /* ── Finish celebration ─────────────────────────────────── */
 @keyframes finish-flash {
