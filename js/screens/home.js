@@ -70,9 +70,23 @@ export function renderHome(container, navigate) {
     const label = ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
     const done = sessionDates.has(dateStr);
     const isToday = dateStr === todayStr;
-    return `<div class="streak-dot ${done ? 'done' : ''} ${isToday && !done ? 'today' : ''}">
-      <div class="dot">${done ? ICO_CHECK_SM : d.getDate()}</div>
-      <div class="day-lbl">${label}</div>
+    let dotStyle, lblStyle, dotContent;
+    if (done) {
+      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--accent);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--onAccent);"`;
+      lblStyle = `style="font-size:9px;color:var(--dim);text-transform:uppercase;"`;
+      dotContent = ICO_CHECK_SM;
+    } else if (isToday) {
+      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--accentSoft);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);"`;
+      lblStyle = `style="font-size:9px;color:var(--accent);text-transform:uppercase;"`;
+      dotContent = d.getDate();
+    } else {
+      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--dim);"`;
+      lblStyle = `style="font-size:9px;color:var(--dim);text-transform:uppercase;"`;
+      dotContent = d.getDate();
+    }
+    return `<div class="streak-dot">
+      <div ${dotStyle}>${dotContent}</div>
+      <div ${lblStyle}>${label}</div>
     </div>`;
   }).join('');
 
@@ -124,7 +138,7 @@ export function renderHome(container, navigate) {
         <div class="ring-card">
           <div class="ring-wrap">
             <svg width="104" height="104" viewBox="0 0 104 104">
-              <circle cx="52" cy="52" r="44" fill="none" stroke="rgba(255,90,60,.15)" stroke-width="13"/>
+              <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accentSoft)" stroke-width="13"/>
               <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accent)" stroke-width="13"
                 stroke-linecap="round"
                 stroke-dasharray="${ringFill.toFixed(1)} ${ringC.toFixed(1)}"
@@ -162,7 +176,7 @@ export function renderHome(container, navigate) {
               <div class="last-workout-name">${lastWorkout.label}</div>
               <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
             </div>
-            <span class="last-workout-done">${ICO_CHECK_CIRCLE}</span>
+            <span class="last-workout-done" style="color:var(--accent3)">${ICO_CHECK_CIRCLE}</span>
           </div>
           <div class="last-workout-exs">
             ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {

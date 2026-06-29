@@ -166,31 +166,31 @@ function renderPhoneWorkout(container, workout, navigate) {
     <div class="pwkt">
       <div class="pwkt-hdr">
         <button class="pwkt-back" id="pwkt-back-home">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
           Home
         </button>
-        <div class="pwkt-hdr-left">
+        <div class="pwkt-hdr-center">
           <div class="pwkt-label">${workout.label}</div>
-          <div class="pwkt-excount" id="pwkt-count">1 / ${total}</div>
+          <div class="pwkt-excount" id="pwkt-count">Exercise 1 of ${total}</div>
+        </div>
+        <div class="pwkt-hdr-timer">
+          <div class="pwkt-timer" id="workout-timer">0:00</div>
+          <div class="pwkt-timer-lbl">Elapsed</div>
         </div>
       </div>
       <div class="pwkt-prog-track">
         <div class="pwkt-prog-fill" id="pwkt-prog" style="width:${100/total}%"></div>
-      </div>
-      <div class="pwkt-timer-row">
-        <div class="pwkt-timer" id="workout-timer">0:00</div>
-        <div class="pwkt-timer-lbl">elapsed</div>
       </div>
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
       <div class="pwkt-foot">
         <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button class="btn-primary pwkt-finish-btn" id="finish-btn" style="display:none">Finish ${ICO_CHECK}</button>
+        <button class="btn-primary pwkt-center-btn" id="finish-btn">Next Exercise <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
     </div>
@@ -203,8 +203,16 @@ function renderPhoneWorkout(container, workout, navigate) {
   function updateNav() {
     container.querySelector('#pwkt-prev').style.opacity = currentIdx === 0 ? '0.3' : '1';
     container.querySelector('#pwkt-next').style.opacity = currentIdx === allCards.length - 1 ? '0.3' : '1';
-    container.querySelector('#pwkt-count').textContent  = `${currentIdx + 1} / ${total}`;
+    container.querySelector('#pwkt-count').textContent  = `Exercise ${currentIdx + 1} of ${total}`;
     container.querySelector('#pwkt-prog').style.width   = `${((currentIdx + 1) / total) * 100}%`;
+    const centerBtn = container.querySelector('#finish-btn');
+    if (centerBtn) {
+      if (currentIdx === allCards.length - 1) {
+        centerBtn.innerHTML = 'Finish Workout ' + ICO_CHECK;
+      } else {
+        centerBtn.innerHTML = 'Next Exercise <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+      }
+    }
   }
 
   function goToSlide(idx, dir = 'next') {
@@ -245,9 +253,13 @@ function renderPhoneWorkout(container, workout, navigate) {
   });
 
   container.querySelector('#finish-btn').addEventListener('click', () => {
-    container.style.paddingBottom = '';
-    container.style.overflow = '';
-    finishWorkout(container, session, navigate);
+    if (currentIdx < allCards.length - 1) {
+      goToSlide(currentIdx + 1, 'next');
+    } else {
+      container.style.paddingBottom = '';
+      container.style.overflow = '';
+      finishWorkout(container, session, navigate);
+    }
   });
 }
 
