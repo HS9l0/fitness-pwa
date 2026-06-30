@@ -279,21 +279,10 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; gap: 12px;
 }
 
-@keyframes set-row-flash {
-  0%   { background: rgba(168,230,53,0.22); }
-  100% { background: rgba(168,230,53,0.07); }
-}
-.set-row.done {
-  background: rgba(168,230,53,0.07);
-  animation: set-row-flash 0.5s ease forwards;
-}
-
 .set-num {
   width: 20px; flex-shrink: 0; text-align: center;
-  font-size: 0.7rem; font-weight: 700; color: var(--text-dim);
-  transition: color 0.25s;
+  font-size: 0.7rem; font-weight: 700; color: var(--dim);
 }
-.set-row.done .set-num { color: var(--accent-2); }
 
 .set-fields {
   flex: 1; display: flex; align-items: center; gap: 14px;
@@ -304,42 +293,37 @@ a { color: inherit; text-decoration: none; }
 }
 .set-val {
   width: 100%; padding: 10px 4px;
-  background: rgba(255,255,255,0.04);
+  background: var(--field);
   border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 1.25rem; font-weight: 700; text-align: center;
   color: var(--text);
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
   cursor: pointer; user-select: none; -webkit-user-select: none;
+  transition: border-color 0.15s, background 0.15s;
 }
-.set-val.empty { color: var(--text-dim); }
+.set-val.empty { color: var(--dim); }
 .set-field-tap:active .set-val,
 .set-field-tap.pressed .set-val {
   border-color: var(--accent);
-  background: rgba(0,122,255,0.12);
+  background: var(--accentSoft);
 }
-.set-row.done .set-val {
-  border-color: transparent; background: none;
-  color: var(--accent-2); pointer-events: none;
-}
+
 .set-field-lbl {
   font-size: 0.55rem; text-transform: uppercase;
-  letter-spacing: 0.6px; color: var(--text-dim);
-  transition: color 0.25s;
+  letter-spacing: 0.6px; color: var(--dim);
 }
-.set-row.done .set-field-lbl { color: rgba(168,230,53,0.5); }
 
 .set-sep {
-  font-size: 0.85rem; color: var(--text-dim);
+  font-size: 0.85rem; color: var(--dim);
   flex-shrink: 0; padding-bottom: 16px;
 }
 
 @keyframes check-pop {
-  0%   { transform: scale(1); box-shadow: 0 0 0 rgba(168,230,53,0); }
-  28%  { transform: scale(1.4); box-shadow: 0 0 22px rgba(168,230,53,0.65); }
+  0%   { transform: scale(1); }
+  28%  { transform: scale(1.4); }
   55%  { transform: scale(0.83); }
   78%  { transform: scale(1.1); }
-  100% { transform: scale(1); box-shadow: none; }
+  100% { transform: scale(1); }
 }
 .set-row-foot {
   display: flex; gap: 8px;
@@ -348,18 +332,12 @@ a { color: inherit; text-decoration: none; }
 .set-skip-btn {
   width: 68px; height: 44px; flex-shrink: 0;
   border-radius: 10px;
-  color: var(--text-dim); font-size: 0.82rem; font-weight: 600;
-  transition: color 0.15s, transform 0.1s;
+  background: var(--graySoft); color: var(--muted);
+  font-size: 0.82rem; font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
 }
-.set-skip-btn:active { color: var(--text-muted); transform: scale(0.95); }
+.set-skip-btn:active { opacity: 0.7; transform: scale(0.95); }
 .set-skip-btn.pop { animation: check-pop 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
-
-.set-row.skipped { background: rgba(100,100,100,0.04); }
-.set-row.skipped .set-num  { color: var(--text-dim); opacity: 0.5; }
-.set-row.skipped .set-val  { color: var(--text-dim); border-color: transparent; background: none; pointer-events: none; opacity: 0.45; }
-.set-row.skipped .set-field-lbl { opacity: 0.4; }
-.set-row.skipped .set-skip-btn { opacity: 0.45; pointer-events: none; }
-.set-row.skipped .set-check-btn { display: none; }
 
 @keyframes finish-appear {
   from { opacity: 0; transform: translateY(8px) scale(0.97); }
@@ -370,17 +348,14 @@ a { color: inherit; text-decoration: none; }
 .set-check-btn {
   flex: 1; height: 44px;
   border-radius: 10px;
-  /* Gray — secondary action that becomes tinted-green on completion */
-  background: rgba(120,120,128,.14); color: var(--text-muted);
+  background: var(--graySoft); color: var(--muted);
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.25s, color 0.25s, transform 0.1s;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
 }
 .set-check-btn:active { transform: scale(0.97); }
 .set-check-btn.pop { animation: check-pop 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
-.set-row.done .set-check-btn {
-  /* Tinted green — completion state */
-  background: rgba(168,230,53,.16); color: var(--accent); pointer-events: none;
-}
+/* Tinted lime when set is logged — the only row-level indicator */
+.set-row.done .set-check-btn { background: var(--accentSoft); color: var(--accent); }
 
 /* Exercise complete state */
 @keyframes ex-num-pop {
