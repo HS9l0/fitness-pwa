@@ -838,7 +838,7 @@ body { overscroll-behavior: none; }
 .drum-body-weight { justify-content: center; }
 .drum-body-weight .drum-col:not(.drum-col-frac) { flex: 0 0 100px; }
 .drum-body-weight .drum-band {
-  left: 50%; right: auto; width: 200px; transform: translateX(-50%);
+  left: 28px; right: auto; width: 164px;
 }
 
 /* ── Cogwheel button ─────────────────────────────────────── */

@@ -176,7 +176,7 @@ export function renderHome(container, navigate) {
               <div class="last-workout-name">${lastWorkout.label}</div>
               <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
             </div>
-            <span class="last-workout-done" style="color:var(--accent3)">${ICO_CHECK_CIRCLE}</span>
+            <span class="last-workout-done" style="color:var(--accent)">${ICO_CHECK_CIRCLE}</span>
           </div>
           <div class="last-workout-exs">
             ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {
