@@ -160,17 +160,6 @@ function renderPhoneWorkout(container, workout, navigate) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
           Home
         </button>
-        <div class="pwkt-hdr-center">
-          <div class="pwkt-label">${workout.label}</div>
-          <div class="pwkt-excount" id="pwkt-count">Exercise 1 of ${total}</div>
-        </div>
-        <div class="pwkt-hdr-timer">
-          <div class="pwkt-timer" id="workout-timer">0:00</div>
-          <div class="pwkt-timer-lbl">Elapsed</div>
-        </div>
-      </div>
-      <div class="pwkt-prog-track">
-        <div class="pwkt-prog-fill" id="pwkt-prog" style="width:${100/total}%"></div>
       </div>
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
@@ -187,15 +176,13 @@ function renderPhoneWorkout(container, workout, navigate) {
     </div>
   `;
 
-  startTimer(container.querySelector('#workout-timer'));
+  startTimer(null);
 
   const allCards = [...container.querySelectorAll('.exercise-card')];
 
   function updateNav() {
     container.querySelector('#pwkt-prev').style.opacity = currentIdx === 0 ? '0.3' : '1';
     container.querySelector('#pwkt-next').style.opacity = currentIdx === allCards.length - 1 ? '0.3' : '1';
-    container.querySelector('#pwkt-count').textContent  = `Exercise ${currentIdx + 1} of ${total}`;
-    container.querySelector('#pwkt-prog').style.width   = `${((currentIdx + 1) / total) * 100}%`;
     const centerBtn = container.querySelector('#finish-btn');
     if (centerBtn) {
       if (currentIdx === allCards.length - 1) {
@@ -518,7 +505,7 @@ function startTimer(el) {
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    el.textContent = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
+    if (el) el.textContent = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
   }, 1000);
 }
 
