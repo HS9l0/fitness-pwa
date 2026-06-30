@@ -47,6 +47,7 @@ export function showWeightPicker({ weight, label, onConfirm }) {
           ${WEIGHTS.map(v => `<div class="drum-item">${v}</div>`).join('')}
         </div>
       </div>
+      <div class="drum-unit-lbl">kg</div>
       <div class="drum-col drum-col-frac">
         <div class="drum-scroll" id="dp-frac">
           ${KG_FRACS.map(v => `<div class="drum-item">.${v === 0 ? '0' : '5'}</div>`).join('')}
@@ -55,7 +56,7 @@ export function showWeightPicker({ weight, label, onConfirm }) {
       <div class="drum-band"></div>
       <div class="drum-fade"></div>
     </div>`,
-    `<div class="drum-lbl-row"><div class="drum-col-lbl">kg</div></div>`
+    ``
   );
 
   const wScroll = sheet.querySelector('#dp-weight');

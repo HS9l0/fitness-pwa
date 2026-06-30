@@ -39,12 +39,9 @@ export function renderWorkout(container, navigate) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Home
       </button>
-      <h1>${workout.label}</h1>
-      <p>${workout.focus}</p>
     </div>
     <div class="section">
       <div class="card wkt-summary-card" style="margin-bottom:12px">
-        <div class="next-day-title">${workout.label}</div>
         <div class="next-day-focus">${workout.focus}</div>
         <div class="next-day-meta" style="margin-top:12px;margin-bottom:0">
           <div class="next-meta-item">${ICO_CLOCK} ~${workout.durationMin} min</div>
@@ -357,19 +354,21 @@ function revealFinish(container) {
 }
 
 // ── Shared event wiring ───────────────────────────────────
+// Uses event delegation (one listener on container) so clicks on SVG children
+// inside buttons are caught correctly on all browsers including iOS Safari.
 function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete }) {
-  // Drum pickers — separate picker for weight and for reps
-  container.querySelectorAll('.set-field-tap').forEach(field => {
-    field.addEventListener('click', () => {
+  container.addEventListener('click', e => {
+
+    // ── Field tap: drum picker ──────────────────────────────
+    const field = e.target.closest('.set-field-tap');
+    if (field) {
       const row = field.closest('.set-row');
-      if (row.classList.contains('done') || row.classList.contains('skipped')) return;
+      if (!row || row.classList.contains('done') || row.classList.contains('skipped')) return;
       const setIdx = parseInt(row.dataset.set);
       const exName = row.dataset.ex;
       const label  = `${exName} — Set ${setIdx + 1}`;
-
       field.classList.add('pressed');
       setTimeout(() => field.classList.remove('pressed'), 200);
-
       if (field.dataset.type === 'weight') {
         showWeightPicker({
           weight: parseFloat(row.dataset.weight) || 0,
@@ -391,20 +390,18 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
           }
         });
       }
-    });
-  });
+      return;
+    }
 
-  // Skip buttons
-  container.querySelectorAll('.set-skip-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.classList.add('pop');
-      btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
-
-      const exName    = btn.dataset.ex;
-      const setIdx    = parseInt(btn.dataset.set);
+    // ── Skip ───────────────────────────────────────────────
+    const skipBtn = e.target.closest('.set-skip-btn');
+    if (skipBtn) {
+      const row = skipBtn.closest('.set-row');
+      if (!row || row.classList.contains('skipped') || row.classList.contains('done')) return;
+      const exName    = skipBtn.dataset.ex;
+      const setIdx    = parseInt(skipBtn.dataset.set);
       const exId      = exName.replace(/[^a-z0-9]/gi, '-');
-      const row       = btn.closest('.set-row');
-      const exSession = session.exercises.find(e => e.name === exName);
+      const exSession = session.exercises.find(ex => ex.name === exName);
       if (!exSession) return;
 
       exSession.sets[setIdx] = { done: true, skipped: true, weight: null, reps: null, note: '' };
@@ -421,22 +418,19 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
       if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
       if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
-
       if (allExercisesDone(session)) revealFinish(container);
-    });
-  });
+      return;
+    }
 
-  // Strength sets
-  container.querySelectorAll('.set-check-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.classList.add('pop');
-      btn.addEventListener('animationend', () => btn.classList.remove('pop'), { once: true });
-
-      const exName    = btn.dataset.ex;
-      const setIdx    = parseInt(btn.dataset.set);
+    // ── Done (check tick) ──────────────────────────────────
+    const checkBtn = e.target.closest('.set-check-btn');
+    if (checkBtn) {
+      const row = checkBtn.closest('.set-row');
+      if (!row || row.classList.contains('done') || row.classList.contains('skipped')) return;
+      const exName    = checkBtn.dataset.ex;
+      const setIdx    = parseInt(checkBtn.dataset.set);
       const exId      = exName.replace(/[^a-z0-9]/gi, '-');
-      const row       = btn.closest('.set-row');
-      const exSession = session.exercises.find(e => e.name === exName);
+      const exSession = session.exercises.find(ex => ex.name === exName);
       if (!exSession) return;
 
       const w = parseFloat(row.dataset.weight) || null;
@@ -461,7 +455,6 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       incDone();
       const wktProg = container.querySelector('#wkt-progress');
       if (wktProg) wktProg.textContent = `${getDoneSets()} / ${getTotalSets()} sets`;
-
       if (allExercisesDone(session)) revealFinish(container);
 
       if (doneSets === totalSets) {
@@ -475,22 +468,21 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         document.activeElement?.blur();
         showRestTimer(container, 90);
       }
-    });
-  });
+      return;
+    }
 
-  // Cardio
-  container.querySelectorAll('.cardio-done-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const exName    = btn.dataset.ex;
+    // ── Cardio done toggle ─────────────────────────────────
+    const cardioBtn = e.target.closest('.cardio-done-btn');
+    if (cardioBtn) {
+      const exName    = cardioBtn.dataset.ex;
       const noteInput = container.querySelector(`.set-note[data-ex="${exName}"]`);
-      const exSession = session.exercises.find(e => e.name === exName);
+      const exSession = session.exercises.find(ex => ex.name === exName);
       if (!exSession) return;
-      const isDone = btn.classList.toggle('done');
+      const isDone = cardioBtn.classList.toggle('done');
       exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
       if ('vibrate' in navigator) navigator.vibrate(isDone ? 40 : 20);
-      const exCard   = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+      const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
       exCard?.classList.toggle('ex-complete', isDone);
-
       if (isDone) {
         if (allExercisesDone(session)) revealFinish(container);
         document.activeElement?.blur();
@@ -498,7 +490,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
         showRestTimer(container, 90, nextCard ? () => onExComplete(exCard, allCards, nextCard) : null);
       }
-    });
+    }
   });
 }
 
