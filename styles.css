@@ -438,7 +438,7 @@ a { color: inherit; text-decoration: none; }
 .next-day-focus { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px; }
 .next-day-meta  { display: flex; gap: 16px; margin-bottom: 18px; }
 .next-meta-item { font-size: 0.75rem; color: var(--text-dim); }
-.next-meta-item span { color: var(--accent); font-weight: 700; }
+.next-meta-item span { color: var(--text); font-weight: 700; }
 .rest-day-card { text-align: center; padding: 28px 20px; }
 .rest-day-card .rest-icon { font-size: 2.5rem; margin-bottom: 10px; }
 .rest-day-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
@@ -521,7 +521,7 @@ a { color: inherit; text-decoration: none; }
   height: 3px; background: var(--border); flex-shrink: 0;
 }
 .pwkt-prog-fill {
-  height: 100%; background: var(--accent);
+  height: 100%; background: var(--accent2);
   transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
 }
 
@@ -649,7 +649,7 @@ body { overscroll-behavior: none; }
 .rest-arc-wrap { position: relative; width: 80px; height: 80px; }
 .rest-arc-svg  { position: absolute; top: 0; left: 0; width: 80px; height: 80px; }
 .rest-arc-bg   { fill: none; stroke: var(--surface-raised); stroke-width: 5; }
-.rest-arc-fill { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.95s linear; }
+.rest-arc-fill { fill: none; stroke: var(--accent2); stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.95s linear; }
 .rest-arc-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .rest-count { font-size: 1.35rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
 .rest-btns  { display: flex; gap: 8px; }
