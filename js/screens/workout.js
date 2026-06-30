@@ -310,26 +310,29 @@ function renderSetRows(ex, lastWeights) {
     const initR = lastR ?? 5;
     return `
     <div class="set-row" data-set="${i}" data-ex="${ex.name}" data-weight="${initW}" data-reps="${initR}">
-      <div class="set-row-top">
-        <span class="set-num">${i + 1}</span>
-        <div class="set-fields">
-          <div class="set-field set-field-tap" data-type="weight">
-            <div class="set-val${!lastW ? ' empty' : ''}">${initW}</div>
-            <span class="set-field-lbl">kg</span>
-          </div>
-          <span class="set-sep">×</span>
-          <div class="set-field set-field-tap" data-type="reps">
-            <div class="set-val${!lastR ? ' empty' : ''}">${initR}</div>
-            <span class="set-field-lbl">reps</span>
+      <div class="set-row-body">
+        <div class="set-row-top">
+          <span class="set-num">${i + 1}</span>
+          <div class="set-fields">
+            <div class="set-field set-field-tap" data-type="weight">
+              <div class="set-val${!lastW ? ' empty' : ''}">${initW}</div>
+              <span class="set-field-lbl">kg</span>
+            </div>
+            <span class="set-sep">×</span>
+            <div class="set-field set-field-tap" data-type="reps">
+              <div class="set-val${!lastR ? ' empty' : ''}">${initR}</div>
+              <span class="set-field-lbl">reps</span>
+            </div>
           </div>
         </div>
+        <div class="set-row-foot">
+          <button class="set-skip-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Skip set">Skip</button>
+          <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
       </div>
-      <div class="set-row-foot">
-        <button class="set-skip-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Skip set">Skip</button>
-        <button class="set-check-btn" data-ex="${ex.name}" data-set="${i}" aria-label="Log set">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>
-      </div>
+      <div class="set-row-summary"></div>
     </div>
   `;
   }).join('');
@@ -366,8 +369,8 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
   // Drum pickers — separate picker for weight and for reps
   container.querySelectorAll('.set-field-tap').forEach(field => {
     field.addEventListener('click', () => {
-      if (field.closest('.set-row').classList.contains('done')) return;
-      const row    = field.closest('.set-row');
+      const row = field.closest('.set-row');
+      if (row.classList.contains('done') || row.classList.contains('skipped')) return;
       const setIdx = parseInt(row.dataset.set);
       const exName = row.dataset.ex;
       const label  = `${exName} — Set ${setIdx + 1}`;
@@ -413,6 +416,11 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       if (!exSession) return;
 
       exSession.sets[setIdx] = { done: true, skipped: true, weight: null, reps: null, note: '' };
+      const skipSummary = row.querySelector('.set-row-summary');
+      if (skipSummary) skipSummary.innerHTML =
+        `<span class="set-sum-num">Set ${setIdx + 1}</span>`+
+        `<span class="set-sum-icon is-skip">✕</span>`+
+        `<span class="set-sum-lbl">Skipped</span>`;
       row.classList.add('skipped');
       if ('vibrate' in navigator) navigator.vibrate(20);
 
@@ -440,12 +448,18 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const exSession = session.exercises.find(e => e.name === exName);
       if (!exSession) return;
 
-      exSession.sets[setIdx] = {
-        done: true,
-        weight: parseFloat(row.dataset.weight) || null,
-        reps:   parseInt(row.dataset.reps)     || null,
-        note: ''
-      };
+      const w = parseFloat(row.dataset.weight) || null;
+      const r = parseInt(row.dataset.reps)     || null;
+      exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
+      const doneSummary = row.querySelector('.set-row-summary');
+      if (doneSummary) {
+        const unit   = row.querySelector('.set-field[data-type="weight"] .set-field-lbl')?.textContent ?? 'kg';
+        const detail = w !== null && r !== null ? `${w} ${unit} × ${r}` : '';
+        doneSummary.innerHTML =
+          `<span class="set-sum-num">Set ${setIdx + 1}</span>`+
+          `<span class="set-sum-icon is-done">✓</span>`+
+          (detail ? `<span class="set-sum-detail">${detail}</span>` : '');
+      }
       row.classList.add('done');
       if ('vibrate' in navigator) navigator.vibrate(40);
 

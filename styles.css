@@ -268,12 +268,45 @@ a { color: inherit; text-decoration: none; }
 }
 
 .set-row {
-  display: flex; flex-direction: column; gap: 12px;
-  padding: 14px 14px;
+  display: flex; flex-direction: column;
+  padding: 14px;
   border-bottom: 1px solid var(--border);
-  transition: background 0.25s;
 }
 .set-row:last-child { border-bottom: none; }
+
+/* Collapsible body — expands normally, collapses when done/skipped */
+.set-row-body {
+  display: flex; flex-direction: column; gap: 12px;
+  overflow: hidden;
+  max-height: 220px;
+  opacity: 1;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.2s ease;
+}
+.set-row.done .set-row-body,
+.set-row.skipped .set-row-body {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Compact summary that appears after collapse */
+.set-row-summary {
+  display: flex; align-items: center; gap: 10px;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1) 0.22s,
+              opacity 0.22s ease 0.28s;
+}
+.set-row.done .set-row-summary,
+.set-row.skipped .set-row-summary {
+  max-height: 44px;
+  opacity: 1;
+}
+.set-sum-num { font-size: 0.78rem; font-weight: 700; color: var(--dim); min-width: 36px; }
+.set-sum-icon { font-size: 1rem; font-weight: 800; line-height: 1; }
+.set-sum-icon.is-done { color: var(--accent); }
+.set-sum-icon.is-skip { color: var(--dim); }
+.set-sum-detail { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+.set-sum-lbl    { font-size: 0.78rem; color: var(--dim); }
 
 .set-row-top {
   display: flex; align-items: center; gap: 12px;
@@ -785,10 +818,10 @@ body { overscroll-behavior: none; }
   pointer-events: none; z-index: 3;
   background: linear-gradient(
     to bottom,
-    #ffffff 0%,
-    rgba(255,255,255,0) 32%,
-    rgba(255,255,255,0) 68%,
-    #ffffff 100%
+    var(--surface) 0%,
+    transparent 32%,
+    transparent 68%,
+    var(--surface) 100%
   );
 }
 
