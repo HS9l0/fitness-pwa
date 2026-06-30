@@ -48,7 +48,7 @@ export function renderHome(container, navigate) {
 
   const WHEN_LABELS = ['Monday', 'Wednesday', 'Friday'];
   const dateLabel = `${DAY_NAMES[dow]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
-  const doneToday = sessions.some(s => s.date === todayStr);
+  const doneToday = todayDay !== null && sessions.some(s => s.date === todayStr && s.day === todayDay);
 
   // Next scheduled workout (for rest-day card)
   const nextScheduledDay = [1, 3, 5].find(d => d > dow) ?? 1; // next Mon/Wed/Fri
