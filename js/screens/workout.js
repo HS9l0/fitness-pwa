@@ -34,23 +34,21 @@ export function renderWorkout(container, navigate) {
   }
 
   container.innerHTML = `
-    <div class="screen-header">
-      <button class="wkt-back-btn" id="wkt-back">
+    <div class="screen-header" style="display:flex;align-items:center;gap:14px;padding-bottom:12px">
+      <button class="wkt-back-btn" id="wkt-back" style="margin-bottom:0;flex-shrink:0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Home
       </button>
-    </div>
-    <div class="section">
-      <div class="card wkt-summary-card" style="margin-bottom:12px">
-        <div class="next-day-focus">${workout.focus}</div>
-        <div class="next-day-meta" style="margin-top:12px;margin-bottom:0">
-          <div class="next-meta-item">${ICO_CLOCK} ~${workout.durationMin} min</div>
-          <div class="next-meta-item">${ICO_DUMBBELL} ${workout.exercises.length} exercises</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.72rem;font-weight:600;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.focus}</div>
+        <div style="font-size:0.68rem;color:var(--dim);margin-top:3px;display:flex;align-items:center;gap:10px">
+          <span style="display:flex;align-items:center;gap:4px">${ICO_CLOCK} ~${workout.durationMin} min</span>
+          <span style="display:flex;align-items:center;gap:4px">${ICO_DUMBBELL} ${workout.exercises.length} exercises</span>
         </div>
       </div>
-      <button class="btn-primary" id="begin-btn">Begin Workout ${ICO_CHEVRON_R}</button>
     </div>
-    <div class="section" style="padding-top:0">
+    <div class="section">
+      <button class="btn-primary" id="begin-btn" style="margin-bottom:16px">Begin Workout ${ICO_CHEVRON_R}</button>
       <div class="section-title">Exercises Today</div>
       ${workout.exercises.map((ex, i) => `
         <div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:8px">
@@ -572,6 +570,13 @@ function showRestTimer(container, seconds, onDone) {
     </div>
   `;
   document.body.appendChild(overlay);
+
+  // Position above the workout footer if present, otherwise above the tab nav
+  const foot = document.querySelector('.pwkt-foot');
+  if (foot) {
+    const footTop = foot.getBoundingClientRect().top;
+    overlay.style.bottom = `${window.innerHeight - footTop + 12}px`;
+  }
 
   const countEl = overlay.querySelector('#rest-count');
   const arcEl   = overlay.querySelector('#rest-fill');
