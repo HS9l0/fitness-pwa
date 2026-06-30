@@ -51,15 +51,6 @@ export function renderWorkout(container, navigate) {
           <div class="next-meta-item">${ICO_DUMBBELL} ${workout.exercises.length} exercises</div>
         </div>
       </div>
-      <div class="card" style="background:rgba(255,165,0,0.06);border-color:rgba(255,165,0,0.2);margin-bottom:12px">
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <span style="flex-shrink:0;display:flex">${ICO_FLAME}</span>
-          <div>
-            <div style="font-size:0.78rem;font-weight:700;color:#f0a500;margin-bottom:4px">Warm-Up First</div>
-            <div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5">${workout.warmup}</div>
-          </div>
-        </div>
-      </div>
       <button class="btn-primary" id="begin-btn">Begin Workout ${ICO_CHEVRON_R}</button>
     </div>
     <div class="section" style="padding-top:0">
