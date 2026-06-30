@@ -550,7 +550,7 @@ function showRestTimer(container, seconds, onDone) {
 
   const CIRC = 2 * Math.PI * 32;
   let remaining = seconds;
-  const total   = seconds;
+  let total     = seconds;
 
   const overlay = document.createElement('div');
   overlay.className = 'rest-overlay';
@@ -603,7 +603,9 @@ function showRestTimer(container, seconds, onDone) {
   });
   overlay.querySelector('#rest-add').addEventListener('click', () => {
     remaining += 30;
+    total     += 30;
     countEl.textContent = fmtRest(remaining);
+    arcEl.style.strokeDashoffset = (CIRC * (1 - remaining / total)).toFixed(1);
   });
 }
 
