@@ -31,6 +31,8 @@ export function getLastWeights(exerciseName) {
   return null;
 }
 
+export function clearSessions() { write(KEYS.sessions, []); }
+
 export function today() {
   return new Date().toISOString().slice(0, 10);
 }

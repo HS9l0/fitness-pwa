@@ -1,6 +1,6 @@
 import { renderHome }    from './screens/home.js';
 import { renderWorkout } from './screens/workout.js';
-import { getSessions, getSettings, saveSettings } from './store.js';
+import { getSessions, getSettings, saveSettings, clearSessions } from './store.js';
 
 const screens = {
   home:    document.getElementById('screen-home'),
@@ -93,6 +93,11 @@ function openSettings() {
             <span class="ios-track"></span>
           </label>
         </div>
+        <div class="settings-row" style="cursor:default">
+          <span class="settings-row-label">Version</span>
+          <span class="settings-info-val" id="sw-version-display">—</span>
+        </div>
+
         <div id="test-day-wrap" style="${testMode ? '' : 'display:none'}">
           <div class="settings-row" style="align-items:center">
             <span class="settings-row-label" style="font-size:0.82rem;color:var(--text-muted)">Test Day</span>
@@ -104,10 +109,6 @@ function openSettings() {
             </div>
           </div>
           <div class="settings-row" style="cursor:default">
-            <span class="settings-row-label">Version</span>
-            <span class="settings-info-val" id="sw-version-display">—</span>
-          </div>
-          <div class="settings-row" style="cursor:default">
             <span class="settings-row-label">Today</span>
             <span class="settings-info-val">${realDayLabel}</span>
           </div>
@@ -115,13 +116,12 @@ function openSettings() {
             <span class="settings-row-label">This week</span>
             <span class="settings-info-val">${weekCount} workout${weekCount !== 1 ? 's' : ''}</span>
           </div>
-          <div class="settings-row" style="cursor:default">
+          <div class="settings-row" style="cursor:default;border-bottom:none">
             <span class="settings-row-label">Total logged</span>
             <span class="settings-info-val">${sessions.length} workout${sessions.length !== 1 ? 's' : ''}</span>
           </div>
+          <button id="reset-data-btn" class="settings-reset-btn">Reset All Data</button>
         </div>
-
-        <a href="./admin.html" class="settings-admin-link" style="margin-top:8px">Admin Dashboard ${ICO_CHEVRON}</a>
       </div>
     </div>
   `;
@@ -169,8 +169,16 @@ function openSettings() {
       sheet.querySelectorAll('.dev-day-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       saveSettings({ testDay: parseInt(btn.dataset.day, 10) });
-      renderHome(screens.home, navigateTo); // re-render home immediately
+      renderHome(screens.home, navigateTo);
     });
+  });
+
+  // Reset all data
+  sheet.querySelector('#reset-data-btn')?.addEventListener('click', () => {
+    if (!confirm('Delete all workout sessions? This cannot be undone.')) return;
+    clearSessions();
+    renderHome(screens.home, navigateTo);
+    closeSettings();
   });
 }
 

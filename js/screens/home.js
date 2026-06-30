@@ -18,6 +18,58 @@ const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="52" height="52" fill="n
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+function fmtHistDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+}
+
+function showDateHistory(dateStr, sessions) {
+  const session = sessions.find(s => s.date === dateStr);
+  if (!session) return;
+  const workout = WORKOUTS[session.day - 1];
+  if (!workout) return;
+
+  document.querySelector('.hist-sheet')?.remove();
+  const sheet = document.createElement('div');
+  sheet.className = 'hist-sheet';
+  sheet.innerHTML = `
+    <div class="hist-backdrop"></div>
+    <div class="hist-panel">
+      <div class="settings-panel-hdr">
+        <span class="settings-panel-title">${fmtHistDate(dateStr)}</span>
+        <button class="settings-done-btn hist-close-btn">Done</button>
+      </div>
+      <div class="settings-body" style="padding-top:4px">
+        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:2px">${workout.label}</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px">${session.durationMin ?? '?'} min · ${session.exercises?.length ?? 0} exercises</div>
+        ${(session.exercises ?? []).map(ex => {
+          const doneSets = (ex.sets ?? []).filter(s => s.done);
+          const chips = doneSets.length === 0
+            ? '<span class="hist-set-chip is-skip">skipped</span>'
+            : doneSets.map((s, i) =>
+                s.skipped
+                  ? `<span class="hist-set-chip is-skip">Set ${i + 1} ✕</span>`
+                  : ex.isCardio
+                    ? `<span class="hist-set-chip">${s.note || 'done'}</span>`
+                    : `<span class="hist-set-chip">${s.weight ?? '?'} kg × ${s.reps ?? '?'}</span>`
+              ).join('');
+          return `<div class="hist-ex-row">
+            <div class="hist-ex-name">${ex.name}</div>
+            <div class="hist-ex-chips">${chips}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(sheet);
+  requestAnimationFrame(() => sheet.classList.add('open'));
+  const close = () => { sheet.classList.remove('open'); setTimeout(() => sheet.remove(), 340); };
+  sheet.querySelector('.hist-backdrop').addEventListener('click', close);
+  sheet.querySelector('.hist-close-btn').addEventListener('click', close);
+}
+
 export function renderHome(container, navigate) {
   const sessions     = getSessions();
   const todayStr     = today();
@@ -84,10 +136,10 @@ export function renderHome(container, navigate) {
       lblStyle = `style="font-size:9px;color:var(--dim);text-transform:uppercase;"`;
       dotContent = d.getDate();
     }
-    return `<div class="streak-dot">
+    return `<button class="streak-dot-btn${done ? ' has-session' : ''}" data-date="${dateStr}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;padding:4px 0;cursor:${done ? 'pointer' : 'default'}">
       <div ${dotStyle}>${dotContent}</div>
       <div ${lblStyle}>${label}</div>
-    </div>`;
+    </button>`;
   }).join('');
 
   // Next-up / done-today / rest-day card
@@ -115,7 +167,6 @@ export function renderHome(container, navigate) {
             <div class="next-meta-item">${ICO_CLOCK} <span>~${workout.durationMin}</span> min</div>
             <div class="next-meta-item">${ICO_DUMBBELL} <span>${workout.exercises.length}</span> exercises</div>
           </div>
-          <button class="hig-btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
         </div>
       </div>`;
   } else {
@@ -164,30 +215,32 @@ export function renderHome(container, navigate) {
         <div class="week-dots-row">
           ${dotsHtml}
         </div>
+        ${lastSession && lastWorkout ? `
+          <div class="last-wkt-merged">
+            <div class="last-wkt-top">
+              <div>
+                <div class="last-workout-name">${lastWorkout.label}</div>
+                <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
+              </div>
+              <span style="color:var(--accent);flex-shrink:0">${ICO_CHECK_CIRCLE}</span>
+            </div>
+            <div class="last-workout-exs">
+              ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {
+                const doneSets = (ex.sets ?? []).filter(s => s.done);
+                const lbl = !doneSets.length ? 'skipped' : ex.isCardio ? (doneSets[0].note || 'done') : `${doneSets[0].weight ?? '?'} kg × ${doneSets[0].reps ?? '?'}`;
+                return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${lbl}</span></span>`;
+              }).join('')}
+              ${(lastSession.exercises?.length ?? 0) > 4 ? `<span class="last-ex-chip" style="color:var(--dim)">+${lastSession.exercises.length - 4} more</span>` : ''}
+            </div>
+          </div>
+        ` : ''}
       </div>
 
       ${nextCardHtml}
 
-      ${lastSession && lastWorkout ? `
-        <div class="section-title" style="margin-top:8px">Last Workout</div>
-        <div class="card last-workout-card">
-          <div class="last-workout-top">
-            <div>
-              <div class="last-workout-name">${lastWorkout.label}</div>
-              <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
-            </div>
-            <span class="last-workout-done" style="color:var(--accent)">${ICO_CHECK_CIRCLE}</span>
-          </div>
-          <div class="last-workout-exs">
-            ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {
-              const done = (ex.sets ?? []).filter(s => s.done);
-              const label = !done.length ? 'skipped'
-                : ex.isCardio ? (done[0].note || 'done')
-                : `${done[0].weight ?? '?'} kg × ${done[0].reps ?? '?'}`;
-              return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${label}</span></span>`;
-            }).join('')}
-            ${(lastSession.exercises?.length ?? 0) > 4 ? `<span class="last-ex-chip" style="color:var(--text-dim)">+${lastSession.exercises.length - 4} more</span>` : ''}
-          </div>
+      ${todayDay && !doneToday ? `
+        <div class="home-cta-wrap">
+          <button class="hig-btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
         </div>
       ` : ''}
 
@@ -201,4 +254,7 @@ export function renderHome(container, navigate) {
   `;
 
   container.querySelector('#start-workout-btn')?.addEventListener('click', () => navigate('workout'));
+  container.querySelectorAll('.streak-dot-btn.has-session').forEach(btn => {
+    btn.addEventListener('click', () => showDateHistory(btn.dataset.date, sessions));
+  });
 }
