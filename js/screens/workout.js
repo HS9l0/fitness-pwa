@@ -40,8 +40,9 @@ export function renderWorkout(container, navigate) {
         Home
       </button>
       <div style="flex:1;min-width:0">
-        <div style="font-size:0.72rem;font-weight:600;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.focus}</div>
-        <div style="font-size:0.68rem;color:var(--dim);margin-top:3px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text);letter-spacing:-0.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.label}</div>
+        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.focus}</div>
+        <div style="font-size:0.65rem;color:var(--dim);margin-top:3px;display:flex;align-items:center;gap:10px">
           <span style="display:flex;align-items:center;gap:4px">${ICO_CLOCK} ~${workout.durationMin} min</span>
           <span style="display:flex;align-items:center;gap:4px">${ICO_DUMBBELL} ${workout.exercises.length} exercises</span>
         </div>
@@ -433,6 +434,22 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
 
       const w = parseFloat(row.dataset.weight) || null;
       const r = parseInt(row.dataset.reps)     || null;
+
+      // Block logging if weight or reps is missing/zero
+      if (w === null || r === null) {
+        if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
+        [['weight', w], ['reps', r]].forEach(([type, val]) => {
+          if (val !== null) return;
+          const f = row.querySelector(`.set-field[data-type="${type}"]`);
+          if (!f) return;
+          f.classList.remove('field-shake');
+          void f.offsetWidth; // reflow to restart animation
+          f.classList.add('field-shake');
+          f.addEventListener('animationend', () => f.classList.remove('field-shake'), { once: true });
+        });
+        return;
+      }
+
       exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
       const unit   = row.querySelector('.set-field[data-type="weight"] .set-field-lbl')?.textContent ?? 'kg';
       const detail = w !== null && r !== null ? `${w} ${unit} × ${r}` : '';

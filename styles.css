@@ -319,6 +319,18 @@ a { color: inherit; text-decoration: none; }
   transition: border-color 0.15s, background 0.15s;
 }
 .set-val.empty { color: var(--dim); }
+
+@keyframes field-shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-6px); }
+  40%     { transform: translateX(6px); }
+  60%     { transform: translateX(-5px); }
+  80%     { transform: translateX(5px); }
+}
+.set-field.field-shake .set-val {
+  animation: field-shake 0.38s ease;
+  border-color: #e05555;
+}
 .set-field-tap:active .set-val,
 .set-field-tap.pressed .set-val {
   border-color: var(--accent);
