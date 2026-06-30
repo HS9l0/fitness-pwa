@@ -278,19 +278,12 @@ function renderSetRowsWithVideo(ex, lastWeights) {
 function renderSetRows(ex, lastWeights) {
   const lastW    = lastWeights?.weight ?? null;
   const lastR    = lastWeights?.reps   ?? null;
-  const lastNote = lastWeights?.note   ?? null;
-  const lastHint = lastWeights
-    ? (ex.isCardio
-        ? (lastNote ? `Last: ${lastNote}` : 'Done before ✓')
-        : `Last: ${lastW ?? '?'} kg × ${lastR ?? '?'} reps`)
-    : 'First time — start light';
 
   const exId = ex.name.replace(/[^a-z0-9]/gi, '-');
 
   if (ex.isCardio) {
     return `
       <div class="cardio-section">
-        <div class="set-last-hint">${lastHint}</div>
         <div style="margin-bottom:12px">
           <label class="set-last-hint" style="display:block;margin-bottom:5px">Notes (optional)</label>
           <input type="text" class="set-note" placeholder="e.g. 10 min, 11 km/h" data-ex="${ex.name}"/>
@@ -338,7 +331,6 @@ function renderSetRows(ex, lastWeights) {
   }).join('');
 
   return `
-    <div class="set-last-hint">${lastHint}</div>
     <div class="sets-progress" id="sets-progress-${exId}">
       <div class="sets-progress-bar"><div class="sets-progress-fill" style="width:0%"></div></div>
       <span class="sets-progress-txt">0 / ${ex.defaultSets}</span>
@@ -416,11 +408,10 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       if (!exSession) return;
 
       exSession.sets[setIdx] = { done: true, skipped: true, weight: null, reps: null, note: '' };
-      const skipSummary = row.querySelector('.set-row-summary');
-      if (skipSummary) skipSummary.innerHTML =
+      collapseSetRow(row,
         `<span class="set-sum-num">Set ${setIdx + 1}</span>`+
         `<span class="set-sum-icon is-skip">✕</span>`+
-        `<span class="set-sum-lbl">Skipped</span>`;
+        `<span class="set-sum-lbl">Skipped</span>`);
       row.classList.add('skipped');
       if ('vibrate' in navigator) navigator.vibrate(20);
 
@@ -451,15 +442,12 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const w = parseFloat(row.dataset.weight) || null;
       const r = parseInt(row.dataset.reps)     || null;
       exSession.sets[setIdx] = { done: true, weight: w, reps: r, note: '' };
-      const doneSummary = row.querySelector('.set-row-summary');
-      if (doneSummary) {
-        const unit   = row.querySelector('.set-field[data-type="weight"] .set-field-lbl')?.textContent ?? 'kg';
-        const detail = w !== null && r !== null ? `${w} ${unit} × ${r}` : '';
-        doneSummary.innerHTML =
-          `<span class="set-sum-num">Set ${setIdx + 1}</span>`+
-          `<span class="set-sum-icon is-done">✓</span>`+
-          (detail ? `<span class="set-sum-detail">${detail}</span>` : '');
-      }
+      const unit   = row.querySelector('.set-field[data-type="weight"] .set-field-lbl')?.textContent ?? 'kg';
+      const detail = w !== null && r !== null ? `${w} ${unit} × ${r}` : '';
+      collapseSetRow(row,
+        `<span class="set-sum-num">Set ${setIdx + 1}</span>`+
+        `<span class="set-sum-icon is-done">✓</span>`+
+        (detail ? `<span class="set-sum-detail">${detail}</span>` : ''));
       row.classList.add('done');
       if ('vibrate' in navigator) navigator.vibrate(40);
 
@@ -512,6 +500,30 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       }
     });
   });
+}
+
+// ── Set row collapse (JS-driven so no CSS cache issues) ───
+function collapseSetRow(row, summaryHtml) {
+  const body    = row.querySelector('.set-row-body');
+  const summary = row.querySelector('.set-row-summary');
+  if (!body || !summary) return;
+
+  // Lock height to measured value, then animate to 0
+  const h = body.scrollHeight;
+  body.style.height    = h + 'px';
+  body.style.overflow  = 'hidden';
+  body.style.transition = 'height 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease';
+  requestAnimationFrame(() => {
+    body.style.height  = '0';
+    body.style.opacity = '0';
+  });
+
+  // Populate and fade-in summary after body has collapsed
+  summary.innerHTML      = summaryHtml;
+  summary.style.display  = 'flex';
+  summary.style.opacity  = '0';
+  summary.style.transition = 'opacity 0.22s ease';
+  setTimeout(() => { summary.style.opacity = '1'; }, 240);
 }
 
 // ── Helpers ───────────────────────────────────────────────

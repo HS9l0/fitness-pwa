@@ -274,32 +274,16 @@ a { color: inherit; text-decoration: none; }
 }
 .set-row:last-child { border-bottom: none; }
 
-/* Collapsible body — expands normally, collapses when done/skipped */
+/* Body collapses via JS (inline style height 0) when done/skipped */
 .set-row-body {
   display: flex; flex-direction: column; gap: 12px;
   overflow: hidden;
-  max-height: 220px;
-  opacity: 1;
-  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1),
-              opacity 0.2s ease;
-}
-.set-row.done .set-row-body,
-.set-row.skipped .set-row-body {
-  max-height: 0;
-  opacity: 0;
 }
 
-/* Compact summary that appears after collapse */
+/* Summary pill — JS shows it after collapse */
 .set-row-summary {
-  display: flex; align-items: center; gap: 10px;
-  max-height: 0; overflow: hidden; opacity: 0;
-  transition: max-height 0.3s cubic-bezier(0.16,1,0.3,1) 0.22s,
-              opacity 0.22s ease 0.28s;
-}
-.set-row.done .set-row-summary,
-.set-row.skipped .set-row-summary {
-  max-height: 44px;
-  opacity: 1;
+  display: none; align-items: center; gap: 10px;
+  padding: 2px 0;
 }
 .set-sum-num { font-size: 0.78rem; font-weight: 700; color: var(--dim); min-width: 36px; }
 .set-sum-icon { font-size: 1rem; font-weight: 800; line-height: 1; }
@@ -823,6 +807,13 @@ body { overscroll-behavior: none; }
     transparent 68%,
     var(--surface) 100%
   );
+}
+
+/* Weight picker: two narrow columns centered */
+.drum-body-weight { justify-content: center; }
+.drum-body-weight .drum-col:not(.drum-col-frac) { flex: 0 0 100px; }
+.drum-body-weight .drum-band {
+  left: 50%; right: auto; width: 168px; transform: translateX(-50%);
 }
 
 /* ── Cogwheel button ─────────────────────────────────────── */

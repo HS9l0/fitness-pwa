@@ -41,7 +41,7 @@ export function showWeightPicker({ weight, label, onConfirm }) {
   const fIdx    = fracKg === 0.5 ? 21 : 20;
 
   const sheet = buildSheet(label, `
-    <div class="drum-body">
+    <div class="drum-body drum-body-weight">
       <div class="drum-col">
         <div class="drum-scroll" id="dp-weight">
           ${WEIGHTS.map(v => `<div class="drum-item">${v}</div>`).join('')}
