@@ -988,6 +988,52 @@ body { overscroll-behavior: none; }
 }
 .hist-set-chip.is-skip { color: var(--dim); }
 
+/* ── History screen ──────────────────────────────────────── */
+.hist-nav-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(12px + var(--safe-top)) 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.hist-back-btn {
+  display: flex; align-items: center; gap: 2px;
+  color: var(--accent2); font-size: 0.95rem; font-weight: 500;
+  min-width: 70px;
+}
+.hist-nav-title {
+  font-size: 1.05rem; font-weight: 700; color: var(--text);
+}
+.hist-cal-section { padding: 4px 0 32px; }
+.hist-month-block { padding: 20px 16px 4px; }
+.hist-month-title { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.hist-cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+}
+.hist-cal-hdr-cell {
+  text-align: center; font-size: 0.68rem; color: var(--dim);
+  padding: 2px 0 8px; font-weight: 600; letter-spacing: 0.02em;
+}
+.hist-cal-cell {
+  display: flex; align-items: center; justify-content: center;
+  height: 40px; font-size: 0.86rem; color: var(--muted);
+  border-radius: 50%; cursor: default; border: none; background: none;
+}
+.hist-cal-empty { visibility: hidden; pointer-events: none; }
+.hist-cal-session {
+  background: var(--accent); color: var(--onAccent);
+  font-weight: 700; cursor: pointer;
+}
+.hist-cal-session:active { opacity: 0.75; }
+.hist-cal-today {
+  border: 1.5px solid var(--accent); color: var(--accent); font-weight: 600;
+}
+.hist-empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 32px; gap: 10px; text-align: center;
+}
+.hist-empty-icon { font-size: 3rem; }
+.hist-empty-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.hist-empty-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+
 /* ── iOS HIG Home Screen ─────────────────────────────────── */
 .hig-large-title {
   font-size: 34px; font-weight: 700; letter-spacing: -0.5px;
@@ -1029,7 +1075,12 @@ body { overscroll-behavior: none; }
   text-transform: uppercase; letter-spacing: 0.5px;
 }
 .ring-info { flex: 1; min-width: 0; }
-.ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
+.week-hist-link {
+  display: flex; align-items: center; gap: 2px;
+  color: var(--accent2); font-size: 0.78rem; font-weight: 600;
+}
 .ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
 

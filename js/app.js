@@ -1,10 +1,12 @@
 import { renderHome }    from './screens/home.js';
 import { renderWorkout } from './screens/workout.js';
+import { renderHistory } from './screens/history.js';
 import { getSessions, getSettings, saveSettings, clearSessions } from './store.js';
 
 const screens = {
   home:    document.getElementById('screen-home'),
   workout: document.getElementById('screen-workout'),
+  history: document.getElementById('screen-history'),
 };
 
 let currentScreen = null;
@@ -28,13 +30,14 @@ export function navigateTo(name) {
   currentScreen = name;
 
   const cogwheel = document.getElementById('cogwheel-btn');
-  if (cogwheel) cogwheel.style.display = name === 'workout' ? 'none' : '';
+  if (cogwheel) cogwheel.style.display = (name === 'workout' || name === 'history') ? 'none' : '';
 
   document.querySelectorAll('.sidebar-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.screen === name);
   });
   if (name === 'home')    renderHome(screens.home, navigateTo);
   if (name === 'workout') renderWorkout(screens.workout, navigateTo);
+  if (name === 'history') renderHistory(screens.history, navigateTo);
 }
 
 document.querySelectorAll('.sidebar-btn').forEach(btn => {
