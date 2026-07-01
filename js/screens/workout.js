@@ -212,10 +212,37 @@ function renderPhoneWorkout(container, workout, navigate) {
   allCards[0]?.classList.add('pwkt-active', 'open');
   updateNav();
 
+  function currentExDone() {
+    const ex = session.exercises[currentIdx];
+    if (!ex) return true;
+    return ex.isCardio ? ex.sets.some(s => s.done) : ex.sets.every(s => s.done);
+  }
+
+  function nudgeIncomplete() {
+    // Shake the Next Exercise / Finish button
+    const btn = container.querySelector('#finish-btn');
+    if (btn) {
+      btn.classList.remove('btn-nudge');
+      void btn.offsetWidth;
+      btn.classList.add('btn-nudge');
+      btn.addEventListener('animationend', () => btn.classList.remove('btn-nudge'), { once: true });
+    }
+    // Also shake each incomplete set row's action buttons
+    const activeCard = allCards[currentIdx];
+    activeCard?.querySelectorAll('.set-row:not(.done):not(.skipped) .set-row-foot').forEach(foot => {
+      foot.classList.remove('btn-nudge');
+      void foot.offsetWidth;
+      foot.classList.add('btn-nudge');
+      foot.addEventListener('animationend', () => foot.classList.remove('btn-nudge'), { once: true });
+    });
+    if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
+  }
+
   container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
   container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
   container.querySelector('#pwkt-next').addEventListener('click', () => {
     if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+    if (!currentExDone()) { nudgeIncomplete(); return; }
     goToSlide(currentIdx + 1, 'next');
   });
 
@@ -231,6 +258,7 @@ function renderPhoneWorkout(container, workout, navigate) {
 
   container.querySelector('#finish-btn').addEventListener('click', () => {
     if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+    if (!currentExDone()) { nudgeIncomplete(); return; }
     if (currentIdx < allCards.length - 1) {
       goToSlide(currentIdx + 1, 'next');
     } else {
