@@ -708,6 +708,15 @@ body { overscroll-behavior: none; }
 }
 .rest-card.rest-done { animation: rest-done 1s cubic-bezier(0.16,1,0.3,1) forwards; }
 
+@keyframes rest-nudge {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.06); }
+  55%  { transform: scale(0.96); }
+  80%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+.rest-card.rest-nudge { animation: rest-nudge 0.35s ease; }
+
 /* ── Drum Picker ─────────────────────────────────────────── */
 .drum-sheet {
   position: fixed; inset: 0; z-index: 700;

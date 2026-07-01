@@ -395,6 +395,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Skip ───────────────────────────────────────────────
     const skipBtn = e.target.closest('.set-skip-btn');
     if (skipBtn) {
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
       const row = skipBtn.closest('.set-row');
       if (!row || row.classList.contains('skipped') || row.classList.contains('done')) return;
       const exName    = skipBtn.dataset.ex;
@@ -424,6 +425,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Done (check tick) ──────────────────────────────────
     const checkBtn = e.target.closest('.set-check-btn');
     if (checkBtn) {
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
       const row = checkBtn.closest('.set-row');
       if (!row || row.classList.contains('done') || row.classList.contains('skipped')) return;
       const exName    = checkBtn.dataset.ex;
@@ -489,6 +491,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Cardio done toggle ─────────────────────────────────
     const cardioBtn = e.target.closest('.cardio-done-btn');
     if (cardioBtn) {
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
       const exName    = cardioBtn.dataset.ex;
       const noteInput = container.querySelector(`.set-note[data-ex="${exName}"]`);
       const exSession = session.exercises.find(ex => ex.name === exName);
@@ -554,10 +557,21 @@ function finishWorkout(container, session, navigate) {
 }
 
 // ── Rest Timer ────────────────────────────────────────────
+function nudgeRestTimer() {
+  const card = document.querySelector('.rest-card');
+  if (!card) return;
+  card.classList.remove('rest-nudge');
+  void card.offsetWidth;
+  card.classList.add('rest-nudge');
+  card.addEventListener('animationend', () => card.classList.remove('rest-nudge'), { once: true });
+  if ('vibrate' in navigator) navigator.vibrate(15);
+}
+
 function showRestTimer(container, seconds, onDone) {
   clearInterval(restInterval);
   restInterval = null;
   document.querySelector('.rest-overlay')?.remove();
+  container.classList.add('rest-blocking');
 
   const CIRC = 2 * Math.PI * 32;
   let remaining = seconds;
@@ -600,6 +614,7 @@ function showRestTimer(container, seconds, onDone) {
 
   function finish() {
     clearInterval(restInterval); restInterval = null;
+    container.classList.remove('rest-blocking');
     if ('vibrate' in navigator) navigator.vibrate([180, 80, 180]);
     overlay.querySelector('.rest-card')?.classList.add('rest-done');
     setTimeout(() => { overlay.remove(); onDone?.(); }, 1100);
@@ -616,6 +631,7 @@ function showRestTimer(container, seconds, onDone) {
 
   overlay.querySelector('#rest-skip').addEventListener('click', () => {
     clearInterval(restInterval); restInterval = null;
+    container.classList.remove('rest-blocking');
     overlay.remove();
     onDone?.();
   });
