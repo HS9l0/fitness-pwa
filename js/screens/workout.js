@@ -161,13 +161,7 @@ function renderPhoneWorkout(container, workout, navigate) {
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
       <div class="pwkt-foot">
-        <button class="pwkt-arrow" id="pwkt-prev" aria-label="Previous">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
         <button class="btn-primary pwkt-center-btn" id="finish-btn">Next Exercise <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <button class="pwkt-arrow" id="pwkt-next" aria-label="Next">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
       </div>
     </div>
   `;
@@ -177,8 +171,6 @@ function renderPhoneWorkout(container, workout, navigate) {
   const allCards = [...container.querySelectorAll('.exercise-card')];
 
   function updateNav() {
-    container.querySelector('#pwkt-prev').style.opacity = currentIdx === 0 ? '0.3' : '1';
-    container.querySelector('#pwkt-next').style.opacity = currentIdx === allCards.length - 1 ? '0.3' : '1';
     const centerBtn = container.querySelector('#finish-btn');
     if (centerBtn) {
       if (currentIdx === allCards.length - 1) {
@@ -239,12 +231,6 @@ function renderPhoneWorkout(container, workout, navigate) {
   }
 
   container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
-  container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
-  container.querySelector('#pwkt-next').addEventListener('click', () => {
-    if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
-    if (!currentExDone()) { nudgeIncomplete(); return; }
-    goToSlide(currentIdx + 1, 'next');
-  });
 
   wireWorkoutEvents(container, session, workout, {
     incDone() {},
