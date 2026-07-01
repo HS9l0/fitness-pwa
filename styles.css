@@ -1002,37 +1002,58 @@ body { overscroll-behavior: none; }
 .hist-nav-title {
   font-size: 1.05rem; font-weight: 700; color: var(--text);
 }
-.hist-cal-section { padding: 4px 0 32px; }
-.hist-month-block { padding: 20px 16px 4px; }
-.hist-month-title { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+
+/* Month navigation row */
+.hist-cal-wrap { padding: 0 16px 32px; }
+.hist-month-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0 16px;
+}
+.hist-month-arrow {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); color: var(--text);
+  transition: opacity 0.15s;
+}
+.hist-month-arrow:disabled { opacity: 0.25; pointer-events: none; }
+.hist-month-arrow:not(:disabled):active { opacity: 0.6; }
+.hist-month-label-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.hist-month-label {
+  font-size: 1.05rem; font-weight: 800; color: var(--text);
+}
+.hist-month-count {
+  font-size: 0.72rem; font-weight: 600; color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+/* Calendar grid */
 .hist-cal-grid {
-  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
 }
 .hist-cal-hdr-cell {
   text-align: center; font-size: 0.68rem; color: var(--dim);
-  padding: 2px 0 8px; font-weight: 600; letter-spacing: 0.02em;
+  padding: 0 0 10px; font-weight: 600; letter-spacing: 0.02em;
 }
 .hist-cal-cell {
-  display: flex; align-items: center; justify-content: center;
-  height: 40px; font-size: 0.86rem; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  aspect-ratio: 1; font-size: 0.9rem; color: var(--muted);
   border-radius: 50%; cursor: default; border: none; background: none;
+  gap: 1px;
 }
 .hist-cal-empty { visibility: hidden; pointer-events: none; }
+.hist-cal-future { color: var(--dim); }
 .hist-cal-session {
   background: var(--accent); color: var(--onAccent);
   font-weight: 700; cursor: pointer;
 }
 .hist-cal-session:active { opacity: 0.75; }
 .hist-cal-today {
-  border: 1.5px solid var(--accent); color: var(--accent); font-weight: 600;
+  border: 1.5px solid var(--accent); color: var(--accent); font-weight: 700;
 }
-.hist-empty-state {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 60px 32px; gap: 10px; text-align: center;
-}
-.hist-empty-icon { font-size: 3rem; }
-.hist-empty-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
-.hist-empty-sub { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+.hist-cal-day-num { line-height: 1; font-size: 0.82rem; }
+.hist-cal-dot-ico { line-height: 1; display: flex; align-items: center; }
 
 /* ── iOS HIG Home Screen ─────────────────────────────────── */
 .hig-large-title {
@@ -1078,9 +1099,12 @@ body { overscroll-behavior: none; }
 .ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
 .week-hist-link {
-  display: flex; align-items: center; gap: 2px;
-  color: var(--accent2); font-size: 0.78rem; font-weight: 600;
+  display: flex; align-items: center; gap: 5px;
+  color: var(--accent2); font-size: 0.76rem; font-weight: 600;
+  background: rgba(114,180,234,0.13); border-radius: 20px;
+  padding: 5px 10px;
 }
+.week-hist-link:active { opacity: 0.7; }
 .ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
 
