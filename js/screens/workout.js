@@ -214,7 +214,10 @@ function renderPhoneWorkout(container, workout, navigate) {
 
   container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
   container.querySelector('#pwkt-prev').addEventListener('click', () => goToSlide(currentIdx - 1, 'prev'));
-  container.querySelector('#pwkt-next').addEventListener('click', () => goToSlide(currentIdx + 1, 'next'));
+  container.querySelector('#pwkt-next').addEventListener('click', () => {
+    if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+    goToSlide(currentIdx + 1, 'next');
+  });
 
   wireWorkoutEvents(container, session, workout, {
     incDone() {},
@@ -227,6 +230,7 @@ function renderPhoneWorkout(container, workout, navigate) {
   });
 
   container.querySelector('#finish-btn').addEventListener('click', () => {
+    if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
     if (currentIdx < allCards.length - 1) {
       goToSlide(currentIdx + 1, 'next');
     } else {
