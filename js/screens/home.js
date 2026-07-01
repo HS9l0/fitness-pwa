@@ -178,8 +178,15 @@ export function renderHome(container, navigate) {
             </div>
             <div class="last-workout-exs">
               ${(lastSession.exercises ?? []).slice(0, 4).map(ex => {
-                const doneSets = (ex.sets ?? []).filter(s => s.done);
-                const lbl = !doneSets.length ? 'skipped' : ex.isCardio ? (doneSets[0].note || 'done') : `${doneSets[0].weight ?? '?'} kg × ${doneSets[0].reps ?? '?'}`;
+                const doneSets  = (ex.sets ?? []).filter(s => s.done);
+                const firstReal = doneSets.find(s => !s.skipped);
+                const lbl = !doneSets.length
+                  ? 'skipped'
+                  : ex.isCardio
+                    ? (doneSets[0].note || 'done')
+                    : firstReal
+                      ? `${firstReal.weight ?? '?'} kg × ${firstReal.reps ?? '?'}`
+                      : 'skipped';
                 return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${lbl}</span></span>`;
               }).join('')}
               ${(lastSession.exercises?.length ?? 0) > 4 ? `<span class="last-ex-chip" style="color:var(--dim)">+${lastSession.exercises.length - 4} more</span>` : ''}
