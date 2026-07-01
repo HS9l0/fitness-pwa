@@ -947,7 +947,7 @@ body { overscroll-behavior: none; }
 /* ── Last workout merged into week-card ─────────────────── */
 .last-wkt-merged {
   border-top: 1px solid var(--border);
-  padding: 14px 0 2px;
+  padding: 14px 20px 16px;
   margin-top: 4px;
 }
 .last-wkt-top {
