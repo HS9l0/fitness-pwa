@@ -207,7 +207,8 @@ function renderPhoneWorkout(container, workout, navigate) {
   function currentExDone() {
     const ex = session.exercises[currentIdx];
     if (!ex) return true;
-    return ex.isCardio ? ex.sets.some(s => s.done) : ex.sets.every(s => s.done);
+    if (ex.isCardio) return true; // cardio: never block Next Exercise
+    return ex.sets.every(s => s.done);
   }
 
   function nudgeIncomplete() {
