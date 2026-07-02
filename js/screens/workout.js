@@ -93,6 +93,11 @@ function renderActiveWorkout(container, workout, navigate) {
 
 // ── Desktop layout ────────────────────────────────────────
 function renderDesktopWorkout(container, workout, navigate) {
+  // Clear any stale rest state left over from a previous visit
+  if (restInterval) { clearInterval(restInterval); restInterval = null; }
+  document.querySelector('.rest-overlay')?.remove();
+  container.classList.remove('rest-blocking');
+
   const session = activeSession;
   const totalWorkoutSets = workout.exercises
     .filter(e => !e.isCardio)
@@ -142,6 +147,11 @@ function renderDesktopWorkout(container, workout, navigate) {
 
 // ── Phone layout ──────────────────────────────────────────
 function renderPhoneWorkout(container, workout, navigate) {
+  // Clear any stale rest state left over from a previous visit
+  if (restInterval) { clearInterval(restInterval); restInterval = null; }
+  document.querySelector('.rest-overlay')?.remove();
+  container.classList.remove('rest-blocking');
+
   const session = activeSession;
   const total   = workout.exercises.length;
   let currentIdx = 0;
@@ -207,8 +217,7 @@ function renderPhoneWorkout(container, workout, navigate) {
   function currentExDone() {
     const ex = session.exercises[currentIdx];
     if (!ex) return true;
-    if (ex.isCardio) return true; // cardio: never block Next Exercise
-    return ex.sets.every(s => s.done);
+    return ex.isCardio ? ex.sets.some(s => s.done) : ex.sets.every(s => s.done);
   }
 
   function nudgeIncomplete() {
@@ -231,7 +240,12 @@ function renderPhoneWorkout(container, workout, navigate) {
     if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
   }
 
-  container.querySelector('#pwkt-back-home').addEventListener('click', () => navigate('home'));
+  container.querySelector('#pwkt-back-home').addEventListener('click', () => {
+    clearInterval(restInterval); restInterval = null;
+    document.querySelector('.rest-overlay')?.remove();
+    container.classList.remove('rest-blocking');
+    navigate('home');
+  });
 
   wireWorkoutEvents(container, session, workout, {
     incDone() {},
@@ -567,6 +581,7 @@ function finishWorkout(container, session, navigate) {
   clearInterval(timerInterval); timerInterval = null;
   clearInterval(restInterval);  restInterval  = null;
   document.querySelector('.rest-overlay')?.remove();
+  container.classList.remove('rest-blocking');
   session.durationMin = Math.max(1, Math.round((Date.now() - startTime) / 60000));
   saveSession(session);
   const btn = container.querySelector('#finish-btn');
