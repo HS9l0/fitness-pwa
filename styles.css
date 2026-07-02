@@ -227,7 +227,7 @@ a { color: inherit; text-decoration: none; }
 .ex-info { flex: 1; min-width: 0; }
 .ex-name    { font-size: 0.92rem; font-weight: 700; color: var(--text); }
 .ex-muscles { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-.ex-meta    { font-size: 0.78rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.ex-meta    { font-size: 0.78rem; color: var(--accent2); font-weight: 700; white-space: nowrap; }
 .ex-chevron { color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
 @media (max-width: 479px) { .ex-chevron { display: none; } }
