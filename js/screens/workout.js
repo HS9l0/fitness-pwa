@@ -117,7 +117,6 @@ function renderPhoneWorkout(container, workout, navigate) {
   container.classList.remove('rest-blocking');
 
   const session = activeSession;
-  const total   = workout.exercises.length;
   let currentIdx = 0;
 
   container.style.paddingBottom = '0';
@@ -134,9 +133,6 @@ function renderPhoneWorkout(container, workout, navigate) {
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
-      <div class="pwkt-foot">
-        <button class="btn-primary pwkt-center-btn" id="finish-btn">Next Exercise <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-      </div>
     </div>
   `;
 
@@ -144,73 +140,21 @@ function renderPhoneWorkout(container, workout, navigate) {
 
   const allCards = [...container.querySelectorAll('.exercise-card')];
 
-  function updateNav() {
-    const centerBtn = container.querySelector('#finish-btn');
-    if (centerBtn) {
-      if (currentIdx === allCards.length - 1) {
-        centerBtn.innerHTML = 'Finish Workout ' + ICO_CHECK;
-      } else {
-        centerBtn.innerHTML = 'Next Exercise <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-      }
-    }
-  }
-
   function goToSlide(idx, dir = 'next') {
     if (idx < 0 || idx >= allCards.length) return;
-    const leaving = allCards[currentIdx];
+    const leaving  = allCards[currentIdx];
     const entering = allCards[idx];
     const outCls = dir === 'next' ? 'pwkt-slide-out-left'  : 'pwkt-slide-out-right';
     const inCls  = dir === 'next' ? 'pwkt-slide-in-right'  : 'pwkt-slide-in-left';
-
     leaving.classList.add(outCls);
     leaving.addEventListener('animationend', () => leaving.classList.remove('pwkt-active', outCls), { once: true });
-
     entering.classList.add('pwkt-active', inCls, 'open');
     entering.addEventListener('animationend', () => entering.classList.remove(inCls), { once: true });
-
-    // Scroll stage to top when switching
     container.querySelector('#pwkt-stage').scrollTop = 0;
-
     currentIdx = idx;
-    updateNav();
   }
 
   allCards[0]?.classList.add('pwkt-active', 'open');
-  updateNav();
-
-  function currentExDone() {
-    const ex = session.exercises[currentIdx];
-    if (!ex) return true;
-    return ex.isCardio ? ex.sets.some(s => s.done) : ex.sets.every(s => s.done);
-  }
-
-  function nudgeIncomplete() {
-    // Shake the Next Exercise / Finish button
-    const btn = container.querySelector('#finish-btn');
-    if (btn) {
-      btn.classList.remove('btn-nudge');
-      void btn.offsetWidth;
-      btn.classList.add('btn-nudge');
-      btn.addEventListener('animationend', () => btn.classList.remove('btn-nudge'), { once: true });
-    }
-    const activeCard = allCards[currentIdx];
-    // Shake each incomplete set row's action buttons (strength)
-    activeCard?.querySelectorAll('.set-row:not(.done):not(.skipped) .set-row-foot').forEach(foot => {
-      foot.classList.remove('btn-nudge');
-      void foot.offsetWidth;
-      foot.classList.add('btn-nudge');
-      foot.addEventListener('animationend', () => foot.classList.remove('btn-nudge'), { once: true });
-    });
-    // Red shake on the cardio Mark as Done button if not yet tapped
-    const cardioBtn = activeCard?.querySelector('.cardio-done-btn:not(.done)');
-    if (cardioBtn) {
-      cardioBtn.classList.remove('cardio-nudge');
-      void cardioBtn.offsetWidth;
-      cardioBtn.classList.add('cardio-nudge');
-      cardioBtn.addEventListener('animationend', () => cardioBtn.classList.remove('cardio-nudge'), { once: true });
-    }
-    if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
-  }
 
   container.querySelector('#pwkt-back-home').addEventListener('click', () => {
     clearInterval(restInterval); restInterval = null;
@@ -223,15 +167,10 @@ function renderPhoneWorkout(container, workout, navigate) {
     incDone() {},
     getTotalSets() { return 0; },
     getDoneSets()  { return 0; },
-    // no onExComplete — user navigates manually via Next Exercise
-  });
-
-  container.querySelector('#finish-btn').addEventListener('click', () => {
-    if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
-    if (!currentExDone()) { nudgeIncomplete(); return; }
-    if (currentIdx < allCards.length - 1) {
-      goToSlide(currentIdx + 1, 'next');
-    } else {
+    onExComplete(_exCard, cards, nextCard) {
+      goToSlide(cards.indexOf(nextCard), 'next');
+    },
+    onFinish() {
       container.style.paddingBottom = '';
       container.style.overflow = '';
       finishWorkout(container, session, navigate);
@@ -356,7 +295,7 @@ function revealFinish(container) {
 // ── Shared event wiring ───────────────────────────────────
 // Uses event delegation (one listener on container) so clicks on SVG children
 // inside buttons are caught correctly on all browsers including iOS Safari.
-function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete = null }) {
+function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete = null, onFinish = null }) {
   container.addEventListener('click', e => {
 
     // ── Field tap: drum picker ──────────────────────────────
@@ -480,9 +419,19 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         exCard?.classList.add('ex-complete');
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
         document.activeElement?.blur();
-        showRestTimer(container, 90);
+        if (onFinish) {
+          // Phone: timer button IS the navigation
+          const timerDone = nextCard && onExComplete
+            ? () => onExComplete(exCard, allCards, nextCard)
+            : onFinish;
+          const timerLabel = nextCard ? 'Next Exercise' : 'Finish Workout';
+          showRestTimer(container, 90, timerDone, timerLabel);
+        } else {
+          // Desktop: auto-open next card, timer just blocks
+          if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
+          showRestTimer(container, 90);
+        }
       } else {
         document.activeElement?.blur();
         showRestTimer(container, 90);
@@ -507,9 +456,17 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         if (allExercisesDone(session)) revealFinish(container);
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
         document.activeElement?.blur();
-        showRestTimer(container, 90);
+        if (onFinish) {
+          const timerDone = nextCard && onExComplete
+            ? () => onExComplete(exCard, allCards, nextCard)
+            : onFinish;
+          const timerLabel = nextCard ? 'Next Exercise' : 'Finish Workout';
+          showRestTimer(container, 90, timerDone, timerLabel);
+        } else {
+          if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
+          showRestTimer(container, 90);
+        }
       }
     }
   });
@@ -571,7 +528,7 @@ function nudgeRestTimer() {
   if ('vibrate' in navigator) navigator.vibrate(15);
 }
 
-function showRestTimer(container, seconds, onDone) {
+function showRestTimer(container, seconds, onDone, actionLabel = null) {
   clearInterval(restInterval);
   restInterval = null;
   document.querySelector('.rest-overlay')?.remove();
@@ -585,7 +542,7 @@ function showRestTimer(container, seconds, onDone) {
   overlay.className = 'rest-overlay';
   overlay.innerHTML = `
     <div class="rest-card">
-      <div class="rest-lbl">${onDone ? `Rest · Next ${ICO_CHEVRON_R}` : 'Rest'}</div>
+      <div class="rest-lbl">Rest</div>
 
       <div class="rest-arc-wrap">
         <svg viewBox="0 0 72 72" class="rest-arc-svg">
@@ -600,18 +557,13 @@ function showRestTimer(container, seconds, onDone) {
       </div>
       <div class="rest-btns">
         <button class="rest-btn-add" id="rest-add">+30s</button>
-        <button class="rest-btn-skip" id="rest-skip">${onDone ? `Skip ${ICO_CHEVRON_R}` : 'Skip'}</button>
+        <button class="rest-btn-skip" id="rest-skip">
+          ${actionLabel ? `${actionLabel} ${ICO_CHEVRON_R}` : 'Skip'}
+        </button>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
-
-  // Position above the workout footer if present, otherwise above the tab nav
-  const foot = document.querySelector('.pwkt-foot');
-  if (foot) {
-    const footTop = foot.getBoundingClientRect().top;
-    overlay.style.bottom = `${window.innerHeight - footTop + 12}px`;
-  }
 
   const countEl = overlay.querySelector('#rest-count');
   const arcEl   = overlay.querySelector('#rest-fill');
