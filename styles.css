@@ -413,8 +413,7 @@ a { color: inherit; text-decoration: none; }
 .cardio-done-btn {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; padding: 14px; border-radius: 14px;
-  /* Gray — secondary action */
-  background: rgba(120,120,128,.14); color: var(--text-muted);
+  background: rgba(120,120,128,.22); color: var(--text);
   font-size: 0.9rem; font-weight: 600; min-height: 50px;
   transition: background 0.2s, color 0.2s, transform 0.12s;
   margin-top: 4px;
