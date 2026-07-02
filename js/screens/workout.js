@@ -266,7 +266,6 @@ function renderExerciseCard(ex, num, lastWeights) {
           <div class="ex-name">${ex.name}</div>
           <div class="ex-muscles">${ex.muscles}</div>
         </div>
-        <div class="ex-meta">${ex.setsLabel}</div>
         <svg class="ex-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="ex-body-outer">
