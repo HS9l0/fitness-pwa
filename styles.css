@@ -957,13 +957,30 @@ body { overscroll-behavior: none; }
 /* ── Last workout merged into week-card ─────────────────── */
 .last-wkt-merged {
   border-top: 1px solid var(--border);
-  padding: 14px 20px 16px;
+  padding: 0 20px;
   margin-top: 4px;
 }
 .last-wkt-top {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-  margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0;
+  width: 100%; background: none; border: none; text-align: left; cursor: pointer;
 }
+.last-wkt-top:active { opacity: 0.7; }
+.last-wkt-chevron {
+  color: var(--dim); flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.last-wkt-merged.open .last-wkt-chevron { transform: rotate(90deg); }
+
+/* Collapsible exercise chips */
+.last-wkt-exs-collapse {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+.last-wkt-merged.open .last-wkt-exs-collapse {
+  max-height: 600px; opacity: 1;
+}
+.last-wkt-merged .last-workout-exs { padding-bottom: 16px; }
 
 /* ── Sticky Start Workout CTA ───────────────────────────── */
 .home-cta-wrap {

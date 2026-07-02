@@ -14,7 +14,8 @@ const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none
 const ICO_MOON = `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 const ICO_PHONE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>`;
 const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
-const ICO_CALENDAR = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+const ICO_CALENDAR    = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+const ICO_CHEVRON_D   = `<svg class="last-wkt-chevron" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -169,26 +170,31 @@ export function renderHome(container, navigate) {
         </div>
         ${lastSession && lastWorkout ? `
           <div class="last-wkt-merged">
-            <div class="last-wkt-top">
+            <button class="last-wkt-top" id="last-wkt-toggle">
               <div>
                 <div class="last-workout-name">${lastWorkout.label}</div>
                 <div class="last-workout-meta">${lastSession.date} · ${lastSession.durationMin ?? '?'} min · ${lastSession.exercises?.length ?? 0} exercises</div>
               </div>
-              <span style="color:var(--accent);flex-shrink:0">${ICO_CHECK_CIRCLE}</span>
-            </div>
-            <div class="last-workout-exs">
-              ${(lastSession.exercises ?? []).map(ex => {
-                const doneSets  = (ex.sets ?? []).filter(s => s.done);
-                const firstReal = doneSets.find(s => !s.skipped);
-                const lbl = !doneSets.length
-                  ? 'Skipped'
-                  : ex.isCardio
-                    ? (doneSets[0].note || 'done')
-                    : firstReal
-                      ? `${firstReal.weight ?? '?'} kg × ${firstReal.reps ?? '?'}`
-                      : 'Skipped';
-                return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${lbl}</span></span>`;
-              }).join('')}
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                <span style="color:var(--accent)">${ICO_CHECK_CIRCLE}</span>
+                ${ICO_CHEVRON_D}
+              </div>
+            </button>
+            <div class="last-wkt-exs-collapse">
+              <div class="last-workout-exs">
+                ${(lastSession.exercises ?? []).map(ex => {
+                  const doneSets  = (ex.sets ?? []).filter(s => s.done);
+                  const firstReal = doneSets.find(s => !s.skipped);
+                  const lbl = !doneSets.length
+                    ? 'Skipped'
+                    : ex.isCardio
+                      ? (doneSets[0].note || 'done')
+                      : firstReal
+                        ? `${firstReal.weight ?? '?'} kg × ${firstReal.reps ?? '?'}`
+                        : 'Skipped';
+                  return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${lbl}</span></span>`;
+                }).join('')}
+              </div>
             </div>
           </div>
         ` : ''}
@@ -213,4 +219,8 @@ export function renderHome(container, navigate) {
 
   container.querySelector('#start-workout-btn')?.addEventListener('click', () => navigate('workout'));
   container.querySelector('#view-history-btn')?.addEventListener('click', () => navigate('history'));
+
+  container.querySelector('#last-wkt-toggle')?.addEventListener('click', () => {
+    container.querySelector('.last-wkt-merged')?.classList.toggle('open');
+  });
 }
