@@ -18,9 +18,8 @@ function isPhone() {
 }
 
 export function renderWorkout(container, navigate) {
-  const todayDay = getTodayWorkoutDay(); // 1, 2, 3, or null
+  const todayDay = getTodayWorkoutDay();
 
-  // Guard: if it's not a scheduled workout day, send back to home
   if (!todayDay && !activeSession) {
     navigate('home');
     return;
@@ -28,46 +27,11 @@ export function renderWorkout(container, navigate) {
 
   const workout = WORKOUTS[(todayDay ?? activeSession?.day ?? 1) - 1];
 
-  if (activeSession) {
-    renderActiveWorkout(container, workout, navigate);
-    return;
+  if (!activeSession) {
+    beginWorkout(todayDay);
   }
 
-  container.innerHTML = `
-    <div class="screen-header" style="display:flex;align-items:center;gap:14px;padding-bottom:12px">
-      <button class="wkt-back-btn" id="wkt-back" style="margin-bottom:0;flex-shrink:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Home
-      </button>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:0.82rem;font-weight:800;color:var(--text);letter-spacing:-0.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.label}</div>
-        <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${workout.focus}</div>
-        <div style="font-size:0.65rem;color:var(--dim);margin-top:3px;display:flex;align-items:center;gap:10px">
-          <span style="display:flex;align-items:center;gap:4px">${ICO_CLOCK} ~${workout.durationMin} min</span>
-          <span style="display:flex;align-items:center;gap:4px">${ICO_DUMBBELL} ${workout.exercises.length} exercises</span>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <button class="btn-primary" id="begin-btn" style="margin-bottom:16px">Begin Workout ${ICO_CHEVRON_R}</button>
-      <div class="section-title">Exercises Today</div>
-      ${workout.exercises.map((ex, i) => `
-        <div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:8px">
-          <div class="ex-num">${i + 1}</div>
-          <div>
-            <div style="font-size:0.88rem;font-weight:700">${ex.name}</div>
-            <div style="font-size:0.72rem;color:var(--text-muted)">${ex.setsLabel} · ${ex.muscles}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  container.querySelector('#wkt-back').addEventListener('click', () => navigate('home'));
-  container.querySelector('#begin-btn').addEventListener('click', () => {
-    beginWorkout(todayDay);
-    renderActiveWorkout(container, workout, navigate);
-  });
+  renderActiveWorkout(container, workout, navigate);
 }
 
 function beginWorkout(day) {
