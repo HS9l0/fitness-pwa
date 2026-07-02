@@ -259,10 +259,7 @@ function renderPhoneWorkout(container, workout, navigate) {
     incDone() {},
     getTotalSets() { return 0; },
     getDoneSets()  { return 0; },
-    onExComplete(_exCard, cards, nextCard) {
-      if (!nextCard) return;
-      goToSlide(cards.indexOf(nextCard), 'next');
-    }
+    // no onExComplete — user navigates manually via Next Exercise
   });
 
   container.querySelector('#finish-btn').addEventListener('click', () => {
@@ -395,7 +392,7 @@ function revealFinish(container) {
 // ── Shared event wiring ───────────────────────────────────
 // Uses event delegation (one listener on container) so clicks on SVG children
 // inside buttons are caught correctly on all browsers including iOS Safari.
-function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete }) {
+function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete = null }) {
   container.addEventListener('click', e => {
 
     // ── Field tap: drum picker ──────────────────────────────
@@ -519,8 +516,9 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         exCard?.classList.add('ex-complete');
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
+        if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
         document.activeElement?.blur();
-        showRestTimer(container, 90, nextCard ? () => onExComplete(exCard, allCards, nextCard) : null);
+        showRestTimer(container, 90);
       } else {
         document.activeElement?.blur();
         showRestTimer(container, 90);
@@ -543,10 +541,11 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       exCard?.classList.toggle('ex-complete', isDone);
       if (isDone) {
         if (allExercisesDone(session)) revealFinish(container);
-        document.activeElement?.blur();
         const allCards = [...container.querySelectorAll('.exercise-card')];
         const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        showRestTimer(container, 90, nextCard ? () => onExComplete(exCard, allCards, nextCard) : null);
+        if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
+        document.activeElement?.blur();
+        showRestTimer(container, 90);
       }
     }
   });
