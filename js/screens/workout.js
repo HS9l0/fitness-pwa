@@ -229,14 +229,22 @@ function renderPhoneWorkout(container, workout, navigate) {
       btn.classList.add('btn-nudge');
       btn.addEventListener('animationend', () => btn.classList.remove('btn-nudge'), { once: true });
     }
-    // Also shake each incomplete set row's action buttons
     const activeCard = allCards[currentIdx];
+    // Shake each incomplete set row's action buttons (strength)
     activeCard?.querySelectorAll('.set-row:not(.done):not(.skipped) .set-row-foot').forEach(foot => {
       foot.classList.remove('btn-nudge');
       void foot.offsetWidth;
       foot.classList.add('btn-nudge');
       foot.addEventListener('animationend', () => foot.classList.remove('btn-nudge'), { once: true });
     });
+    // Red shake on the cardio Mark as Done button if not yet tapped
+    const cardioBtn = activeCard?.querySelector('.cardio-done-btn:not(.done)');
+    if (cardioBtn) {
+      cardioBtn.classList.remove('cardio-nudge');
+      void cardioBtn.offsetWidth;
+      cardioBtn.classList.add('cardio-nudge');
+      cardioBtn.addEventListener('animationend', () => cardioBtn.classList.remove('cardio-nudge'), { once: true });
+    }
     if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
   }
 

@@ -439,6 +439,19 @@ a { color: inherit; text-decoration: none; }
 }
 .cardio-done-btn.done .cardio-done-icon { background: var(--accent-2); color: #fff; }
 
+@keyframes cardio-nudge {
+  0%   { transform: translateX(0)  scale(1);    background: rgba(120,120,128,.22); }
+  15%  { transform: translateX(-6px) scale(1.02); background: rgba(255,59,48,.25); }
+  35%  { transform: translateX(5px)  scale(1.01); background: rgba(255,59,48,.22); }
+  55%  { transform: translateX(-4px) scale(1.01); background: rgba(255,59,48,.20); }
+  75%  { transform: translateX(3px)  scale(1);    background: rgba(255,59,48,.15); }
+  100% { transform: translateX(0)  scale(1);    background: rgba(120,120,128,.22); }
+}
+.cardio-done-btn.cardio-nudge {
+  animation: cardio-nudge 0.45s ease;
+  color: #ff3b30;
+}
+
 /* ── Workout header ─────────────────────────────────────── */
 .workout-header {
   background: var(--surface);
