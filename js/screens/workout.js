@@ -398,6 +398,23 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
       if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
       if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
+
+      if (doneSets === totalSets) {
+        // All sets done/skipped — move on. No rest needed since nothing was
+        // actually performed, so advance straight through instead of resting.
+        const exCard   = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
+        exCard?.classList.add('ex-complete');
+        const allCards = [...container.querySelectorAll('.exercise-card')];
+        const nextCard = allCards[allCards.indexOf(exCard) + 1];
+        document.activeElement?.blur();
+        if (nextCard && onExComplete) {
+          onExComplete(exCard, allCards, nextCard);
+        } else if (!nextCard && onFinish) {
+          // Last exercise on phone — the rest timer's action button is still
+          // how the workout actually gets saved, so keep that path here.
+          showRestTimer(container, 90, onFinish, 'Finish Workout');
+        }
+      }
       if (allExercisesDone(session)) revealFinish(container);
       return;
     }
