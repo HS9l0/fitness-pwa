@@ -306,6 +306,33 @@ function renderSetRows(ex, lastWeights) {
 }
 
 // ── Helpers ───────────────────────────────────────────────
+function openFieldPicker(row, type) {
+  const setIdx = parseInt(row.dataset.set);
+  const exName = row.dataset.ex;
+  const label  = `${exName} — Set ${setIdx + 1}`;
+  if (type === 'weight') {
+    showWeightPicker({
+      weight: parseFloat(row.dataset.weight) || 0,
+      label,
+      onConfirm(newW) {
+        row.dataset.weight = newW;
+        const wVal = row.querySelector('.set-field[data-type="weight"] .set-val');
+        if (wVal) { wVal.textContent = newW; wVal.classList.remove('empty'); }
+      }
+    });
+  } else {
+    showRepsPicker({
+      reps: parseInt(row.dataset.reps) || 5,
+      label,
+      onConfirm(newR) {
+        row.dataset.reps = newR;
+        const rVal = row.querySelector('.set-field[data-type="reps"] .set-val');
+        if (rVal) { rVal.textContent = newR; rVal.classList.remove('empty'); }
+      }
+    });
+  }
+}
+
 function allExercisesDone(session) {
   return session.exercises.every(ex =>
     ex.isCardio
@@ -339,32 +366,9 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     if (field) {
       const row = field.closest('.set-row');
       if (!row || row.classList.contains('done') || row.classList.contains('skipped')) return;
-      const setIdx = parseInt(row.dataset.set);
-      const exName = row.dataset.ex;
-      const label  = `${exName} — Set ${setIdx + 1}`;
       field.classList.add('pressed');
       setTimeout(() => field.classList.remove('pressed'), 200);
-      if (field.dataset.type === 'weight') {
-        showWeightPicker({
-          weight: parseFloat(row.dataset.weight) || 0,
-          label,
-          onConfirm(newW) {
-            row.dataset.weight = newW;
-            const wVal = row.querySelector('.set-field[data-type="weight"] .set-val');
-            if (wVal) { wVal.textContent = newW; wVal.classList.remove('empty'); }
-          }
-        });
-      } else {
-        showRepsPicker({
-          reps: parseInt(row.dataset.reps) || 5,
-          label,
-          onConfirm(newR) {
-            row.dataset.reps = newR;
-            const rVal = row.querySelector('.set-field[data-type="reps"] .set-val');
-            if (rVal) { rVal.textContent = newR; rVal.classList.remove('empty'); }
-          }
-        });
-      }
+      openFieldPicker(row, field.dataset.type);
       return;
     }
 
@@ -413,7 +417,9 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const w = parseFloat(row.dataset.weight) || null;
       const r = parseInt(row.dataset.reps)     || null;
 
-      // Block logging if weight or reps is missing/zero
+      // Block logging if weight or reps is missing/zero — but rather than a
+      // dead-end shake, open the picker for the missing field so the tap
+      // actually does something the user can act on.
       if (w === null || r === null) {
         if ('vibrate' in navigator) navigator.vibrate([30, 50, 30]);
         [['weight', w], ['reps', r]].forEach(([type, val]) => {
@@ -425,6 +431,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
           f.classList.add('field-shake');
           f.addEventListener('animationend', () => f.classList.remove('field-shake'), { once: true });
         });
+        openFieldPicker(row, w === null ? 'weight' : 'reps');
         return;
       }
 
