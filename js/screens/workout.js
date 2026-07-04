@@ -326,7 +326,13 @@ function revealFinish(container) {
 // Uses event delegation (one listener on container) so clicks on SVG children
 // inside buttons are caught correctly on all browsers including iOS Safari.
 function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets, getDoneSets, onExComplete = null, onFinish = null }) {
-  container.addEventListener('click', e => {
+  // container (#screen-workout) is a persistent element reused across renders —
+  // remove any listener from a previous render before adding a fresh one, or
+  // clicks fire once per accumulated listener (e.g. start+stop in one tap).
+  if (container.__workoutClickHandler) {
+    container.removeEventListener('click', container.__workoutClickHandler);
+  }
+  const handleClick = e => {
 
     // ── Field tap: drum picker ──────────────────────────────
     const field = e.target.closest('.set-field-tap');
@@ -533,7 +539,10 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         showRestTimer(container, 90);
       }
     }
-  });
+  };
+
+  container.addEventListener('click', handleClick);
+  container.__workoutClickHandler = handleClick;
 }
 
 // ── Set row collapse (JS-driven so no CSS cache issues) ───
