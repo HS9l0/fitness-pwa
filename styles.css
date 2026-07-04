@@ -308,8 +308,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .set-num {
-  width: 20px; flex-shrink: 0; text-align: center;
-  font-size: 0.7rem; font-weight: 700; color: var(--dim);
+  width: 26px; flex-shrink: 0; text-align: center;
+  font-size: 1.55rem; font-weight: 700; color: var(--dim);
 }
 
 .set-fields {
@@ -563,6 +563,7 @@ a { color: inherit; text-decoration: none; }
   .ex-muscles         { font-size: 0.76rem; }
   .ex-header          { padding: 16px; }
   .set-val            { font-size: 1.7rem; padding: 10px 4px; }
+  .set-num            { font-size: 1.7rem; width: 30px; }
   .set-check-btn      { height: 50px; border-radius: 12px; font-size: 1rem; }
   .set-skip-btn       { height: 50px; border-radius: 12px; }
   .section-title      { font-size: 0.78rem; }
