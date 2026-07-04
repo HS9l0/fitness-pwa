@@ -16,6 +16,7 @@ const ICO_PHONE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" s
 const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 const ICO_CALENDAR    = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
 const ICO_CHEVRON_D   = `<svg class="last-wkt-chevron" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
+const ICO_DUMBBELL_LOGO = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#16230b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -129,7 +130,10 @@ export function renderHome(container, navigate) {
   }
 
   container.innerHTML = `
-    <div class="hig-large-title">FitPlan</div>
+    <div class="hig-title-row">
+      <div class="hig-logo-badge">${ICO_DUMBBELL_LOGO}</div>
+      <div class="hig-large-title">FitPlan</div>
+    </div>
     <div class="hig-date-label">${dateLabel}</div>
 
     <div class="section" style="padding-top:0">

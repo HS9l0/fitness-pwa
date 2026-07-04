@@ -350,7 +350,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Skip ───────────────────────────────────────────────
     const skipBtn = e.target.closest('.set-skip-btn');
     if (skipBtn) {
-      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); nudgeEl(skipBtn.closest('.set-row')); return; }
       const row = skipBtn.closest('.set-row');
       if (!row || row.classList.contains('skipped') || row.classList.contains('done')) return;
       const exName    = skipBtn.dataset.ex;
@@ -380,7 +380,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Done (check tick) ──────────────────────────────────
     const checkBtn = e.target.closest('.set-check-btn');
     if (checkBtn) {
-      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); nudgeEl(checkBtn.closest('.set-row')); return; }
       const row = checkBtn.closest('.set-row');
       if (!row || row.classList.contains('done') || row.classList.contains('skipped')) return;
       const exName    = checkBtn.dataset.ex;
@@ -457,7 +457,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
     // ── Cardio done toggle ─────────────────────────────────
     const cardioBtn = e.target.closest('.cardio-done-btn');
     if (cardioBtn) {
-      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); return; }
+      if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); nudgeEl(cardioBtn, 'cardio-nudge'); return; }
       const exName    = cardioBtn.dataset.ex;
       const noteInput = container.querySelector(`.set-note[data-ex="${exName}"]`);
       const exSession = session.exercises.find(ex => ex.name === exName);
@@ -530,6 +530,18 @@ function finishWorkout(container, session, navigate) {
   const btn = container.querySelector('#finish-btn');
   if (btn) { btn.classList.add('finishing'); btn.innerHTML = `${ICO_CHECK} Saved`; }
   setTimeout(() => { activeSession = null; navigate('home'); }, 600);
+}
+
+// ── Blocked-tap feedback ──────────────────────────────────
+// Nudges the element the user actually tapped, so a rest-blocked
+// skip/tick/cardio-done tap is obviously "blocked" rather than "broken".
+function nudgeEl(el, cls = 'row-nudge') {
+  if (!el) return;
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+  el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+  if ('vibrate' in navigator) navigator.vibrate(15);
 }
 
 // ── Rest Timer ────────────────────────────────────────────
