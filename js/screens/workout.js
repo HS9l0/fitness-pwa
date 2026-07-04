@@ -7,11 +7,25 @@ const ICO_CHECK = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" s
 const ICO_FLAME = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2C10 6 7 9 7 13a5 5 0 0010 0c0-4-2.5-7-5-11z"/><path d="M12 13c-1.1.8-2 2-2 3a2 2 0 004 0c0-1-.9-2.2-2-3z" fill="#f0a500" stroke="none"/></svg>`;
 const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
 const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_PLAY = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20"/></svg>`;
+const ICO_STOP = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
 
-let timerInterval = null;
-let restInterval  = null;
-let startTime     = null;
-let activeSession = null;
+let timerInterval  = null;
+let restInterval   = null;
+let startTime      = null;
+let activeSession  = null;
+let cardioTimers   = {}; // exName -> { start, interval }
+
+function fmtMinSec(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function clearCardioTimers() {
+  Object.values(cardioTimers).forEach(t => clearInterval(t.interval));
+  cardioTimers = {};
+}
 
 function isPhone() {
   return window.matchMedia('(max-width: 479px)').matches;
@@ -35,6 +49,7 @@ export function renderWorkout(container, navigate) {
 }
 
 function beginWorkout(day) {
+  clearCardioTimers();
   startTime     = Date.now();
   activeSession = {
     day,
@@ -57,8 +72,9 @@ function renderActiveWorkout(container, workout, navigate) {
 
 // ── Desktop layout ────────────────────────────────────────
 function renderDesktopWorkout(container, workout, navigate) {
-  // Clear any stale rest state left over from a previous visit
+  // Clear any stale rest/cardio-timer state left over from a previous visit
   if (restInterval) { clearInterval(restInterval); restInterval = null; }
+  clearCardioTimers();
   document.querySelector('.rest-overlay')?.remove();
   container.classList.remove('rest-blocking');
 
@@ -111,8 +127,9 @@ function renderDesktopWorkout(container, workout, navigate) {
 
 // ── Phone layout ──────────────────────────────────────────
 function renderPhoneWorkout(container, workout, navigate) {
-  // Clear any stale rest state left over from a previous visit
+  // Clear any stale rest/cardio-timer state left over from a previous visit
   if (restInterval) { clearInterval(restInterval); restInterval = null; }
+  clearCardioTimers();
   document.querySelector('.rest-overlay')?.remove();
   container.classList.remove('rest-blocking');
 
@@ -235,15 +252,13 @@ function renderSetRows(ex, lastWeights) {
   if (ex.isCardio) {
     return `
       <div class="cardio-section">
-        <div style="margin-bottom:12px">
-          <label class="set-last-hint" style="display:block;margin-bottom:5px">Notes (optional)</label>
-          <input type="text" class="set-note" placeholder="e.g. 10 min, 11 km/h" data-ex="${ex.name}"/>
+        <div class="cardio-timer-wrap">
+          <div class="cardio-timer-val" id="cardio-timer-${exId}">0:00</div>
+          <div class="cardio-timer-lbl">Elapsed</div>
         </div>
-        <button class="cardio-done-btn" data-ex="${ex.name}">
-          <span class="cardio-done-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>
-          </span>
-          <span class="cardio-done-label">Mark as Done</span>
+        <button class="cardio-done-btn" data-ex="${ex.name}" data-timer-state="idle">
+          <span class="cardio-done-icon">${ICO_PLAY}</span>
+          <span class="cardio-done-label">Start Timer</span>
         </button>
       </div>
     `;
@@ -454,34 +469,68 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       return;
     }
 
-    // ── Cardio done toggle ─────────────────────────────────
+    // ── Cardio timer: start, then stop & mark as done ───────
     const cardioBtn = e.target.closest('.cardio-done-btn');
     if (cardioBtn) {
       if (container.classList.contains('rest-blocking')) { nudgeRestTimer(); nudgeEl(cardioBtn, 'cardio-nudge'); return; }
       const exName    = cardioBtn.dataset.ex;
-      const noteInput = container.querySelector(`.set-note[data-ex="${exName}"]`);
+      const exId      = exName.replace(/[^a-z0-9]/gi, '-');
       const exSession = session.exercises.find(ex => ex.name === exName);
-      if (!exSession) return;
-      const isDone = cardioBtn.classList.toggle('done');
-      exSession.sets[0] = { done: isDone, weight: null, reps: null, note: noteInput?.value || '' };
-      if ('vibrate' in navigator) navigator.vibrate(isDone ? 40 : 20);
+      if (!exSession || cardioBtn.dataset.timerState === 'done') return;
+
+      if (cardioBtn.dataset.timerState !== 'running') {
+        // Start the timer
+        cardioBtn.dataset.timerState = 'running';
+        cardioBtn.classList.add('timing');
+        cardioBtn.querySelector('.cardio-done-icon').innerHTML = ICO_STOP;
+        cardioBtn.querySelector('.cardio-done-label').textContent = 'Stop & Mark as Done';
+        const displayEl = container.querySelector(`#cardio-timer-${exId}`);
+        const start = Date.now();
+        cardioTimers[exName] = {
+          start,
+          interval: setInterval(() => {
+            if (displayEl) displayEl.textContent = fmtMinSec(Math.floor((Date.now() - start) / 1000));
+          }, 1000)
+        };
+        if ('vibrate' in navigator) navigator.vibrate(20);
+        return;
+      }
+
+      // Stop the timer & mark as done
+      const timer = cardioTimers[exName];
+      let elapsedSec = 0;
+      if (timer) {
+        clearInterval(timer.interval);
+        elapsedSec = Math.floor((Date.now() - timer.start) / 1000);
+        delete cardioTimers[exName];
+      }
+      const timeStr = fmtMinSec(elapsedSec);
+      const displayEl = container.querySelector(`#cardio-timer-${exId}`);
+      if (displayEl) displayEl.textContent = timeStr;
+      exSession.sets[0] = { done: true, weight: null, reps: null, note: timeStr };
+
+      cardioBtn.dataset.timerState = 'done';
+      cardioBtn.classList.remove('timing');
+      cardioBtn.classList.add('done');
+      cardioBtn.querySelector('.cardio-done-icon').innerHTML = ICO_CHECK;
+      cardioBtn.querySelector('.cardio-done-label').textContent = `Done · ${timeStr}`;
+      if ('vibrate' in navigator) navigator.vibrate(40);
+
       const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
-      exCard?.classList.toggle('ex-complete', isDone);
-      if (isDone) {
-        if (allExercisesDone(session)) revealFinish(container);
-        const allCards = [...container.querySelectorAll('.exercise-card')];
-        const nextCard = allCards[allCards.indexOf(exCard) + 1];
-        document.activeElement?.blur();
-        if (onFinish) {
-          const timerDone = nextCard && onExComplete
-            ? () => onExComplete(exCard, allCards, nextCard)
-            : onFinish;
-          const timerLabel = nextCard ? 'Next Exercise' : 'Finish Workout';
-          showRestTimer(container, 90, timerDone, timerLabel);
-        } else {
-          if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
-          showRestTimer(container, 90);
-        }
+      exCard?.classList.add('ex-complete');
+      if (allExercisesDone(session)) revealFinish(container);
+      const allCards = [...container.querySelectorAll('.exercise-card')];
+      const nextCard = allCards[allCards.indexOf(exCard) + 1];
+      document.activeElement?.blur();
+      if (onFinish) {
+        const timerDone = nextCard && onExComplete
+          ? () => onExComplete(exCard, allCards, nextCard)
+          : onFinish;
+        const timerLabel = nextCard ? 'Next Exercise' : 'Finish Workout';
+        showRestTimer(container, 90, timerDone, timerLabel);
+      } else {
+        if (nextCard && onExComplete) onExComplete(exCard, allCards, nextCard);
+        showRestTimer(container, 90);
       }
     }
   });
