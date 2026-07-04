@@ -122,6 +122,8 @@ function renderPhoneWorkout(container, workout, navigate) {
   container.style.paddingBottom = '0';
   container.style.overflow = 'hidden';
 
+  const exCount = workout.exercises.length;
+
   container.innerHTML = `
     <div class="pwkt">
       <div class="pwkt-hdr">
@@ -129,16 +131,28 @@ function renderPhoneWorkout(container, workout, navigate) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
           Home
         </button>
+        <div class="pwkt-hdr-center">
+          <div class="pwkt-label">Exercise <span id="pwkt-excount">1 of ${exCount}</span></div>
+        </div>
+        <div class="pwkt-hdr-timer" id="pwkt-elapsed">0:00</div>
       </div>
+      <div class="pwkt-prog-track"><div class="pwkt-prog-fill" id="pwkt-prog-fill" style="width:${(100 / exCount).toFixed(2)}%"></div></div>
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
     </div>
   `;
 
-  startTimer(null);
+  startTimer(container.querySelector('#pwkt-elapsed'));
 
-  const allCards = [...container.querySelectorAll('.exercise-card')];
+  const allCards   = [...container.querySelectorAll('.exercise-card')];
+  const excountEl  = container.querySelector('#pwkt-excount');
+  const progFillEl = container.querySelector('#pwkt-prog-fill');
+
+  function updateProgress(idx) {
+    if (excountEl)  excountEl.textContent = `${idx + 1} of ${exCount}`;
+    if (progFillEl) progFillEl.style.width = `${(((idx + 1) / exCount) * 100).toFixed(2)}%`;
+  }
 
   function goToSlide(idx, dir = 'next') {
     if (idx < 0 || idx >= allCards.length) return;
@@ -149,9 +163,10 @@ function renderPhoneWorkout(container, workout, navigate) {
     leaving.classList.add(outCls);
     leaving.addEventListener('animationend', () => leaving.classList.remove('pwkt-active', outCls), { once: true });
     entering.classList.add('pwkt-active', inCls, 'open');
+    entering.scrollTop = 0;
     entering.addEventListener('animationend', () => entering.classList.remove(inCls), { once: true });
-    container.querySelector('#pwkt-stage').scrollTop = 0;
     currentIdx = idx;
+    updateProgress(idx);
   }
 
   allCards[0]?.classList.add('pwkt-active', 'open');

@@ -544,78 +544,70 @@ a { color: inherit; text-decoration: none; }
 }
 
 .pwkt-hdr {
-  display: flex; align-items: center;
-  padding: 4px 8px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.pwkt-hdr-left   { display: flex; flex-direction: column; gap: 2px; }
-.pwkt-hdr-center { flex: 1; min-width: 0; }
-.pwkt-hdr-timer  { text-align: right; flex-shrink: 0; }
-.pwkt-label    { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
-.pwkt-excount  { font-size: 1.05rem; font-weight: 800; color: var(--text); }
-
-.pwkt-timer      { color: var(--accent); font-size: 29px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
-.pwkt-timer-lbl  { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.pwkt-hdr-center { flex: 1; min-width: 0; text-align: center; }
+.pwkt-label {
+  font-size: 0.68rem; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pwkt-label span { color: var(--text); }
+.pwkt-hdr-timer {
+  flex-shrink: 0; min-width: 38px; text-align: right;
+  font-size: 0.9rem; font-weight: 800; color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
 
 .pwkt-prog-track {
   height: 3px; background: var(--border); flex-shrink: 0;
 }
 .pwkt-prog-fill {
   height: 100%; background: var(--accent2);
-  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
-}
-
-.pwkt-timer-row {
-  display: flex; align-items: baseline; justify-content: center; gap: 5px;
-  padding: 5px 0 3px;
-  flex-shrink: 0;
+  transition: width 0.45s cubic-bezier(0.32,0.72,0,1);
 }
 
 .pwkt-stage {
   flex: 1; min-height: 0;
-  overflow-y: auto; overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   position: relative;
 }
 
-/* In phone stage: hide all cards, show only active */
+/* In phone stage: hide all cards, show only active (absolutely positioned so
+   leaving/entering cards overlap during the slide transition) */
 .pwkt-stage .exercise-card {
   display: none;
   border-radius: 0; border-left: none; border-right: none; border-top: none;
   margin-bottom: 0; box-shadow: none;
 }
-.pwkt-stage .exercise-card.pwkt-active { display: block; }
-
-/* Slide animations between exercises */
-@keyframes pwkt-fade-in  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pwkt-fade-out { from { opacity: 1; } to { opacity: 0; } }
-
-.pwkt-stage .exercise-card.pwkt-slide-in-right,
-.pwkt-stage .exercise-card.pwkt-slide-in-left  { animation: pwkt-fade-in  0.3s ease both; }
-.pwkt-stage .exercise-card.pwkt-slide-out-left,
-.pwkt-stage .exercise-card.pwkt-slide-out-right { display: block !important; animation: pwkt-fade-out 0.18s ease both; }
-
-.pwkt-foot {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 20px;
-  padding-bottom: calc(12px + var(--safe-bottom));
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
+.pwkt-stage .exercise-card.pwkt-active {
+  display: block;
+  position: absolute; inset: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(16px + var(--safe-bottom));
 }
-.pwkt-arrow {
-  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-  /* Gray — navigation secondary */
-  background: rgba(120,120,128,.14); color: var(--text-muted);
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.2s, transform 0.1s;
-  touch-action: manipulation;
-}
-.pwkt-arrow:active { transform: scale(0.88); opacity: 0.7; }
-.pwkt-finish-btn { flex: 1; height: 52px; font-size: 1rem; }
-.pwkt-center-btn { flex: 1; width: 100%; }
+
+/* Slide + fade between exercises, Apple-style spring easing */
+@keyframes pwkt-in-from-right { from { opacity: 0; transform: translateX(32px) scale(0.98); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes pwkt-in-from-left  { from { opacity: 0; transform: translateX(-32px) scale(0.98); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@keyframes pwkt-out-to-left   { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-32px); } }
+@keyframes pwkt-out-to-right  { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(32px); } }
+
+.pwkt-stage .exercise-card.pwkt-slide-in-right  { animation: pwkt-in-from-right 0.4s cubic-bezier(0.32,0.72,0,1) both; }
+.pwkt-stage .exercise-card.pwkt-slide-in-left   { animation: pwkt-in-from-left  0.4s cubic-bezier(0.32,0.72,0,1) both; }
+.pwkt-stage .exercise-card.pwkt-slide-out-left  { display: block !important; animation: pwkt-out-to-left  0.22s cubic-bezier(0.4,0,1,1) both; }
+.pwkt-stage .exercise-card.pwkt-slide-out-right { display: block !important; animation: pwkt-out-to-right 0.22s cubic-bezier(0.4,0,1,1) both; }
+
+/* Hero-style exercise title — the top progress bar already conveys "which
+   exercise", so drop the numbered badge and let the name lead */
+.pwkt-stage .ex-header  { padding: 22px 20px 16px; }
+.pwkt-stage .ex-num     { display: none; }
+.pwkt-stage .ex-name    { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
+.pwkt-stage .ex-muscles { font-size: 0.8rem; margin-top: 4px; }
 
 /* ── Number inputs ──────────────────────────────────────── */
 input[type="number"]::-webkit-inner-spin-button,
