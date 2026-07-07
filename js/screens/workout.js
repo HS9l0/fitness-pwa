@@ -267,9 +267,10 @@ function renderSetRows(ex, lastWeights) {
   const rows = Array.from({ length: ex.defaultSets }, (_, i) => {
     const initW = lastW ?? 0;
     const initR = lastR ?? 5;
+    const locked = i > 0; // only the first set is workable up front; rest unlock in turn
     return `
-    <div class="set-row" data-set="${i}" data-ex="${ex.name}" data-weight="${initW}" data-reps="${initR}">
-      <div class="set-row-body">
+    <div class="set-row${locked ? ' locked' : ''}" data-set="${i}" data-ex="${ex.name}" data-weight="${initW}" data-reps="${initR}">
+      <div class="set-row-body"${locked ? ' style="display:none"' : ''}>
         <div class="set-row-top">
           <span class="set-num">${i + 1}</span>
           <div class="set-fields">
@@ -291,7 +292,7 @@ function renderSetRows(ex, lastWeights) {
           </button>
         </div>
       </div>
-      <div class="set-row-summary"></div>
+      <div class="set-row-summary"${locked ? ' style="display:flex"' : ''}>${locked ? `<span class="set-sum-num">Set ${i + 1}</span>` : ''}</div>
     </div>
   `;
   }).join('');
@@ -392,6 +393,11 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       row.classList.add('skipped');
       if ('vibrate' in navigator) navigator.vibrate(20);
 
+      const nextRow = row.nextElementSibling;
+      if (nextRow?.classList.contains('set-row') && nextRow.classList.contains('locked')) {
+        expandSetRow(nextRow);
+      }
+
       const doneSets  = exSession.sets.filter(s => s.done).length;
       const totalSets = exSession.sets.length;
       const fill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
@@ -461,6 +467,11 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
         (detail ? `<span class="set-sum-detail">${detail}</span>` : ''));
       row.classList.add('done');
       if ('vibrate' in navigator) navigator.vibrate(40);
+
+      const nextRow = row.nextElementSibling;
+      if (nextRow?.classList.contains('set-row') && nextRow.classList.contains('locked')) {
+        expandSetRow(nextRow);
+      }
 
       const doneSets  = exSession.sets.filter(s => s.done).length;
       const totalSets = exSession.sets.length;
@@ -592,6 +603,38 @@ function collapseSetRow(row, summaryHtml) {
   summary.style.opacity  = '0';
   summary.style.transition = 'opacity 0.22s ease';
   setTimeout(() => { summary.style.opacity = '1'; }, 240);
+}
+
+// Reveal the next locked set once the current one is done/skipped
+function expandSetRow(row) {
+  const body    = row.querySelector('.set-row-body');
+  const summary = row.querySelector('.set-row-summary');
+  if (!body || !summary) return;
+
+  row.classList.remove('locked');
+
+  // Fade out the "Set N" placeholder summary
+  summary.style.transition = 'opacity 0.15s ease';
+  summary.style.opacity = '0';
+  setTimeout(() => { summary.style.display = 'none'; summary.innerHTML = ''; }, 150);
+
+  // Measure natural height, then animate open from 0
+  body.style.display  = '';
+  body.style.height   = 'auto';
+  const h = body.scrollHeight;
+  body.style.height   = '0px';
+  body.style.overflow = 'hidden';
+  body.style.opacity  = '0';
+  void body.offsetHeight; // reflow to start from 0
+  body.style.transition = 'height 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease';
+  requestAnimationFrame(() => {
+    body.style.height  = h + 'px';
+    body.style.opacity = '1';
+  });
+  body.addEventListener('transitionend', () => {
+    body.style.height   = '';
+    body.style.overflow = '';
+  }, { once: true });
 }
 
 // ── Helpers ───────────────────────────────────────────────

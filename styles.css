@@ -275,6 +275,10 @@ a { color: inherit; text-decoration: none; }
 }
 .set-row:last-child { border-bottom: none; }
 
+/* Not-yet-reached set — closed until the current one is done/skipped */
+.set-row.locked { opacity: 0.5; }
+.set-row.locked .set-row-summary { padding: 2px 0; }
+
 /* Tapped while rest timer is blocking input — nudge to show it's blocked, not broken */
 @keyframes set-row-nudge {
   0%, 100% { transform: translateX(0); }
