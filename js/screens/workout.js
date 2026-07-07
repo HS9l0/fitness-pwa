@@ -555,7 +555,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       cardioBtn.classList.add('done');
       cardioBtn.disabled = true;
       cardioBtn.querySelector('.cardio-done-icon').innerHTML = ICO_CHECK;
-      cardioBtn.querySelector('.cardio-done-label').textContent = `Done · ${timeStr}`;
+      cardioBtn.querySelector('.cardio-done-label').textContent = 'Done';
       if ('vibrate' in navigator) navigator.vibrate(40);
 
       const exCard = container.querySelector(`.exercise-card[data-ex-name="${exName}"]`);
