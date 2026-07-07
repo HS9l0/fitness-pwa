@@ -196,7 +196,7 @@ export function renderHome(container, navigate) {
                       : firstReal
                         ? `${firstReal.weight ?? '?'} kg × ${firstReal.reps ?? '?'}`
                         : 'Skipped';
-                  return `<span class="last-ex-chip">${ex.name}<span class="last-ex-val">${lbl}</span></span>`;
+                  return `<button class="last-ex-chip" data-date="${lastSession.date}">${ex.name}<span class="last-ex-val">${lbl}</span></button>`;
                 }).join('')}
               </div>
             </div>
@@ -226,5 +226,9 @@ export function renderHome(container, navigate) {
 
   container.querySelector('#last-wkt-toggle')?.addEventListener('click', () => {
     container.querySelector('.last-wkt-merged')?.classList.toggle('open');
+  });
+
+  container.querySelectorAll('.last-ex-chip').forEach(chip => {
+    chip.addEventListener('click', () => navigate('history', chip.dataset.date));
   });
 }

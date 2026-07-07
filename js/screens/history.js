@@ -60,7 +60,7 @@ function showSessionDetail(dateStr, sessions) {
   sheet.querySelector('.hist-close-btn').addEventListener('click', close);
 }
 
-export function renderHistory(container, navigate) {
+export function renderHistory(container, navigate, autoOpenDate) {
   const sessions     = getSessions();
   const sessionDates = new Set(sessions.map(s => s.date));
   const todayStr     = new Date().toISOString().slice(0, 10);
@@ -167,4 +167,6 @@ export function renderHistory(container, navigate) {
   container.querySelector('#hist-back').addEventListener('click', () => navigate('home'));
   container.querySelector('#hist-cal-body').innerHTML = buildGrid();
   wireNav();
+
+  if (autoOpenDate) showSessionDetail(autoOpenDate, sessions);
 }

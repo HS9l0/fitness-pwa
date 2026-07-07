@@ -11,9 +11,10 @@ const screens = {
 
 let currentScreen = null;
 
-export function navigateTo(name) {
+export function navigateTo(name, data) {
   if (name === currentScreen) {
     if (name === 'home') renderHome(screens.home, navigateTo);
+    if (name === 'history') renderHistory(screens.history, navigateTo, data);
     return;
   }
 
@@ -37,7 +38,7 @@ export function navigateTo(name) {
   });
   if (name === 'home')    renderHome(screens.home, navigateTo);
   if (name === 'workout') renderWorkout(screens.workout, navigateTo);
-  if (name === 'history') renderHistory(screens.history, navigateTo);
+  if (name === 'history') renderHistory(screens.history, navigateTo, data);
 }
 
 document.querySelectorAll('.sidebar-btn').forEach(btn => {
