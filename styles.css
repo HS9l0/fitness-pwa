@@ -647,8 +647,22 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 /* ── Scroll ─────────────────────────────────────────────── */
-.screen { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+.screen { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 body { overscroll-behavior: none; }
+
+/* Installed PWA: iOS/Android standalone webviews still rubber-band the whole
+   page even with overflow:hidden on body — pinning html/body with
+   position:fixed is the only reliable way to kill that. Scrolling for
+   content taller than the viewport still works via .screen's own
+   overflow-y:auto; this only removes the outer page's bounce/drag. */
+@media (display-mode: standalone) {
+  html, body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
+}
 
 /* ── Home stat strip ────────────────────────────────────── */
 .home-stats {
