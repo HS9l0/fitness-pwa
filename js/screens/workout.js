@@ -542,6 +542,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       cardioBtn.dataset.timerState = 'done';
       cardioBtn.classList.remove('timing');
       cardioBtn.classList.add('done');
+      cardioBtn.disabled = true;
       cardioBtn.querySelector('.cardio-done-icon').innerHTML = ICO_CHECK;
       cardioBtn.querySelector('.cardio-done-label').textContent = `Done · ${timeStr}`;
       if ('vibrate' in navigator) navigator.vibrate(40);
