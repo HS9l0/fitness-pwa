@@ -691,12 +691,6 @@ body { overscroll-behavior: none; }
 .last-ex-val { font-size: 0.62rem; color: var(--accent); font-weight: 500; }
 
 
-/* ── iOS install card ───────────────────────────────────── */
-.install-card  { border-color: rgba(0,122,255,0.3); background: rgba(0,122,255,0.05); }
-.install-title { font-size: 0.78rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-.install-body  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
-
-
 /* ── Video tutorial button ───────────────────────────────── */
 .yt-search-btn {
   display: flex; align-items: center; justify-content: center; gap: 7px;
