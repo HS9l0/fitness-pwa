@@ -1198,11 +1198,12 @@ body { overscroll-behavior: none; }
 .ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
 .week-hist-link {
-  display: flex; align-items: center; gap: 5px;
-  color: var(--accent2); font-size: 0.76rem; font-weight: 600;
-  background: rgba(114,180,234,0.13); border-radius: 20px;
-  padding: 5px 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent2);
+  background: rgba(114,180,234,0.13); border-radius: 50%;
+  width: 30px; height: 30px;
 }
+.week-hist-link svg { width: 15px; height: 15px; }
 .week-hist-link:active { opacity: 0.7; }
 .ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }

@@ -151,7 +151,7 @@ export function renderHome(container, navigate) {
           <div class="ring-info">
             <div class="ring-headline-row">
               <div class="ring-headline">This Week</div>
-              <button class="week-hist-link" id="view-history-btn">${ICO_CALENDAR} History</button>
+              <button class="week-hist-link" id="view-history-btn" aria-label="History">${ICO_CALENDAR}</button>
             </div>
             <div class="ring-sub">
               ${weekDone === 0
