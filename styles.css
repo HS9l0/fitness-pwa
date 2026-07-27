@@ -1199,6 +1199,7 @@ body { overscroll-behavior: none; }
 .ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
 .week-hist-link {
   display: flex; align-items: center; justify-content: center;
+  position: relative; top: 4px;
   color: var(--accent2);
   background: rgba(114,180,234,0.13); border-radius: 50%;
   width: 30px; height: 30px;
