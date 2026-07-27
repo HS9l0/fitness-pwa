@@ -1171,7 +1171,10 @@ body { overscroll-behavior: none; }
   display: flex; gap: 6px; justify-content: space-between;
   padding: 14px 20px;
   border-top: 1px solid var(--border);
+  width: 100%; background: none; border-left: none; border-right: none; border-bottom: none;
+  text-align: left; cursor: pointer;
 }
+.week-dots-row:active { opacity: 0.7; }
 
 /* Activity ring row (inside week-card) */
 .ring-card {
@@ -1197,15 +1200,6 @@ body { overscroll-behavior: none; }
 .ring-info { flex: 1; min-width: 0; }
 .ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
-.week-hist-link {
-  display: flex; align-items: center; justify-content: center;
-  position: relative; top: 4px;
-  color: var(--accent2);
-  background: rgba(114,180,234,0.13); border-radius: 50%;
-  width: 30px; height: 30px;
-}
-.week-hist-link svg { width: 15px; height: 15px; }
-.week-hist-link:active { opacity: 0.7; }
 .ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
 

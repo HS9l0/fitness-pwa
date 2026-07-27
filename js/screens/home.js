@@ -8,7 +8,6 @@ const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" s
 const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 const ICO_MOON = `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
-const ICO_CALENDAR    = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
 const ICO_CHEVRON_D   = `<svg class="last-wkt-chevron" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
 const ICO_DUMBBELL_LOGO = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#16230b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 
@@ -151,7 +150,6 @@ export function renderHome(container, navigate) {
           <div class="ring-info">
             <div class="ring-headline-row">
               <div class="ring-headline">This Week</div>
-              <button class="week-hist-link" id="view-history-btn" aria-label="History">${ICO_CALENDAR}</button>
             </div>
             <div class="ring-sub">
               ${weekDone === 0
@@ -163,9 +161,9 @@ export function renderHome(container, navigate) {
             </div>
           </div>
         </div>
-        <div class="week-dots-row">
+        <button type="button" class="week-dots-row" id="view-history-btn" aria-label="View history">
           ${dotsHtml}
-        </div>
+        </button>
         ${lastSession && lastWorkout ? `
           <div class="last-wkt-merged">
             <button class="last-wkt-top" id="last-wkt-toggle">
