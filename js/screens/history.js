@@ -38,9 +38,9 @@ function showSessionDetail(dateStr, sessions) {
           const doneSets = (ex.sets ?? []).filter(s => s.done);
           const chips = doneSets.length === 0
             ? '<span class="hist-set-chip is-skip">skipped</span>'
-            : doneSets.map((s, i) =>
+            : doneSets.map(s =>
                 s.skipped
-                  ? `<span class="hist-set-chip is-skip">Set ${i + 1} ✕</span>`
+                  ? `<span class="hist-set-chip is-skip">✕</span>`
                   : ex.isCardio
                     ? `<span class="hist-set-chip">${s.note || 'done'}</span>`
                     : `<span class="hist-set-chip">${s.weight ?? '?'} kg × ${s.reps ?? '?'}</span>`
