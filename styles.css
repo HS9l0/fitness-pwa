@@ -682,13 +682,7 @@ body { overscroll-behavior: none; }
 /* ── Last workout card ──────────────────────────────────── */
 .last-workout-card  { padding: 16px 18px; }
 .last-workout-top   { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.last-workout-name  { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-.last-workout-meta  { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 .last-workout-done  { color: var(--accent-2); flex-shrink: 0; display: flex; align-items: center; }
-.last-workout-exs   { display: flex; flex-wrap: wrap; gap: 6px; }
-.last-ex-chip { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; background: var(--surface2); border-radius: 6px; padding: 5px 8px; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); transition: opacity 0.15s, transform 0.1s; }
-.last-ex-chip:active { opacity: 0.6; transform: scale(0.96); }
-.last-ex-val { font-size: 0.62rem; color: var(--accent); font-weight: 500; }
 
 
 /* ── Video tutorial button ───────────────────────────────── */
@@ -1004,34 +998,6 @@ body { overscroll-behavior: none; }
   transition: opacity 0.15s;
 }
 .settings-reset-btn:active { opacity: 0.7; }
-
-/* ── Last workout merged into week-card ─────────────────── */
-.last-wkt-merged {
-  border-top: 1px solid var(--border);
-  padding: 0 20px;
-  margin-top: 4px;
-}
-.last-wkt-top {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 14px 0;
-  width: 100%; background: none; border: none; text-align: left; cursor: pointer;
-}
-.last-wkt-top:active { opacity: 0.7; }
-.last-wkt-chevron {
-  color: var(--dim); flex-shrink: 0;
-  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.last-wkt-merged.open .last-wkt-chevron { transform: rotate(90deg); }
-
-/* Collapsible exercise chips */
-.last-wkt-exs-collapse {
-  max-height: 0; overflow: hidden; opacity: 0;
-  transition: max-height 0.35s ease, opacity 0.25s ease;
-}
-.last-wkt-merged.open .last-wkt-exs-collapse {
-  max-height: 600px; opacity: 1;
-}
-.last-wkt-merged .last-workout-exs { padding-bottom: 16px; }
 
 /* ── Sticky Start Workout CTA ───────────────────────────── */
 .home-cta-wrap {
