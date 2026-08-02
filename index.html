@@ -11,6 +11,17 @@
   <meta name="apple-mobile-web-app-title" content="FitPlan" />
   <link rel="apple-touch-icon" href="icons/icon-192.svg" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    (function () {
+      function setVVH() {
+        var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        document.documentElement.style.setProperty('--vvh', h + 'px');
+      }
+      setVVH();
+      window.addEventListener('resize', setVVH);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', setVVH);
+    })();
+  </script>
 </head>
 <body>
 
