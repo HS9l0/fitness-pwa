@@ -40,7 +40,7 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 a { color: inherit; text-decoration: none; }
 
 /* ── App shell ──────────────────────────────────────────── */
-#app { display: flex; flex-direction: column; height: var(--vvh, 100dvh); }
+#app { display: flex; flex-direction: column; height: 100dvh; }
 #screens { flex: 1; overflow: hidden; position: relative; }
 .screen {
   position: absolute; inset: 0;
@@ -668,26 +668,14 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .screen { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 body { overscroll-behavior: none; }
 
-/* Installed PWA: iOS/Android standalone webviews still rubber-band the whole
-   page even with overflow:hidden on body — pinning html/body with
-   position:fixed is the only reliable way to kill that. Scrolling for
-   content taller than the viewport still works via .screen's own
-   overflow-y:auto; this only removes the outer page's bounce/drag.
-   Neither width/height:100% nor inset:0 was reliable here — iOS
-   Safari resolves position:fixed against the wrong (taller) viewport
-   in standalone mode regardless of how the box's size is expressed,
-   leaving a dead gap above the home indicator on every screen. An
-   explicit pixel height read from the VisualViewport API (set as
-   --vvh in index.html, kept live on resize) sidesteps that entirely
-   since it isn't a percentage or inset the engine can miscompute. */
-@media (display-mode: standalone) {
-  html, body {
-    position: fixed;
-    overflow: hidden;
-    top: 0; left: 0; right: 0;
-    height: var(--vvh, 100dvh);
-  }
-}
+/* The bottom gap was stacked safe-area padding (see .screen /
+   .home-cta-wrap), not a mis-measured viewport. Two earlier attempts at
+   overriding the standalone viewport height — position:fixed html/body,
+   then a JS --vvh from the VisualViewport API — were built on that wrong
+   theory and never fixed anything. Both are reverted: a JS-measured height
+   is strictly worse than 100dvh here, because if the installed webview
+   under-reports visualViewport.height the app renders short and the
+   shortfall shows as dead background. */
 
 /* ── Home stat strip ────────────────────────────────────── */
 .home-stats {
@@ -794,7 +782,7 @@ body { overscroll-behavior: none; }
 
 /* ── Drum Picker ─────────────────────────────────────────── */
 .drum-sheet {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--vvh, 100dvh); z-index: 700;
+  position: fixed; top: 0; left: 0; right: 0; height: 100dvh; z-index: 700;
   display: flex; flex-direction: column; justify-content: flex-end;
 }
 .drum-backdrop {
@@ -946,7 +934,7 @@ body { overscroll-behavior: none; }
 
 /* ── Settings sheet ─────────────────────────────────────── */
 .settings-sheet {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--vvh, 100dvh); z-index: 500;
+  position: fixed; top: 0; left: 0; right: 0; height: 100dvh; z-index: 500;
   display: flex; flex-direction: column; justify-content: flex-end;
   opacity: 0; pointer-events: none;
   transition: opacity 0.25s;
@@ -1033,7 +1021,7 @@ body { overscroll-behavior: none; }
 
 /* ── Workout history bottom sheet ───────────────────────── */
 .hist-sheet {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--vvh, 100dvh); z-index: 500;
+  position: fixed; top: 0; left: 0; right: 0; height: 100dvh; z-index: 500;
   display: flex; flex-direction: column; justify-content: flex-end;
   opacity: 0; pointer-events: none;
   transition: opacity 0.25s;
