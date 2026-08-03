@@ -17,7 +17,14 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  // cache:'reload' bypasses the browser HTTP cache. Without it addAll can
+  // populate a brand-new SW cache with stale copies still inside their
+  // max-age, so the SW version bumps while the JS behind it does not.
+  e.waitUntil(
+    caches.open(CACHE).then(c =>
+      c.addAll(ASSETS.map(url => new Request(url, { cache: 'reload' })))
+    )
+  );
   self.skipWaiting();
 });
 
