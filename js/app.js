@@ -113,6 +113,10 @@ function openSettings() {
           <span class="settings-row-label">Safe area</span>
           <span class="settings-info-val" id="dbg-safe">—</span>
         </div>
+        <div class="settings-row" id="force-update-row">
+          <span class="settings-row-label">Force update</span>
+          <span class="settings-info-val" style="color:var(--accent)">Reload</span>
+        </div>
 
         <div id="test-day-wrap" style="${testMode ? '' : 'display:none'}">
           <div class="settings-row" style="align-items:center">
@@ -172,6 +176,26 @@ function openSettings() {
     set('#dbg-viewport', `${window.innerHeight} · vv ${vvh ?? '—'} · scr ${screen.height}`);
     set('#dbg-safe', `top ${safeTop} · bot ${safeBot}`);
   })();
+
+  // Escape hatch for a stale install: drop every cache and unregister the
+  // service worker, then reload from network. Recovers the case where the
+  // SW version has moved on but the cached app code has not. Only touches
+  // caches — localStorage (workout history, settings) is left alone.
+  sheet.querySelector('#force-update-row')?.addEventListener('click', async () => {
+    const val = sheet.querySelector('#force-update-row .settings-info-val');
+    if (val) val.textContent = 'Updating…';
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+    } catch (_) { /* fall through to the reload regardless */ }
+    location.reload();
+  });
 
   // Fetch version from active service worker
   if (navigator.serviceWorker.controller) {
