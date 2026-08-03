@@ -44,7 +44,9 @@ a { color: inherit; text-decoration: none; }
 #screens { flex: 1; overflow: hidden; position: relative; }
 .screen {
   position: absolute; inset: 0;
-  overflow-y: auto; padding-bottom: calc(16px + var(--safe-bottom));
+  /* Bottom inset is the home-indicator safe area, NOT safe area + 16.
+     Adding to it stacked a second inset under every screen. */
+  overflow-y: auto; padding-bottom: max(16px, var(--safe-bottom));
   display: none;
   background: var(--bg);
   opacity: 1;
@@ -1023,7 +1025,9 @@ body { overscroll-behavior: none; }
      (design handoff v2 — FitHome pins it in a flex-shrink:0 footer) */
   margin-top: auto;
   position: sticky; bottom: 0;
-  padding: 6px 0 calc(10px + var(--safe-bottom));
+  /* Only the home-indicator inset — #screen-home drops its own bottom
+     padding so these two don't stack into a dead black band. */
+  padding: 6px 0 max(10px, var(--safe-bottom));
   background: linear-gradient(to top, var(--bg) 65%, transparent);
 }
 
@@ -1134,27 +1138,31 @@ body { overscroll-behavior: none; }
    instead of trailing the content (design handoff v2 — FitHome). */
 #screen-home.screen.active { display: flex; flex-direction: column; }
 #screen-home .home-section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* The pinned CTA supplies the bottom inset — don't add a second one here. */
+#screen-home { padding-bottom: 0; }
 
 .hig-title-row {
   display: flex; align-items: center; gap: 11px;
-  padding: max(10px, env(safe-area-inset-top,0px)) 20px 8px;
+  /* Bottom padding keeps the This Week card clear of the 44px fixed
+     cogwheel, which is anchored at the same safe-area top. */
+  padding: max(12px, env(safe-area-inset-top,0px)) 20px 14px;
   flex-shrink: 0;
 }
 .hig-logo-badge {
-  width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
   background: var(--accent);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 0 14px rgba(168,230,53,0.6), 0 0 2px rgba(168,230,53,0.9);
 }
 .hig-masthead-text { flex: 1; min-width: 0; }
 .hig-large-title {
-  font-size: 18px; font-weight: 800; letter-spacing: -0.6px;
+  font-size: 26px; font-weight: 800; letter-spacing: -0.6px;
   color: var(--text);
-  line-height: 1;
+  line-height: 1.05;
 }
 .hig-date-label {
-  font-size: 10px; color: var(--text-muted);
-  font-weight: 500; margin-top: 2px;
+  font-size: 13px; color: var(--text-muted);
+  font-weight: 500; margin-top: 3px;
 }
 
 /* Merged "This Week" card */
