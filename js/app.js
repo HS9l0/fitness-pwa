@@ -172,8 +172,9 @@ function openSettings() {
       const el = sheet.querySelector(sel);
       if (el) el.textContent = txt;
     };
+    const shortfall = (screen.height || 0) - window.innerHeight;
     set('#dbg-display', `sa ${sa} · dm ${dm}`);
-    set('#dbg-viewport', `${window.innerHeight} · vv ${vvh ?? '—'} · scr ${screen.height}`);
+    set('#dbg-viewport', `${window.innerHeight} · vv ${vvh ?? '—'} · scr ${screen.height} · short ${shortfall}`);
     set('#dbg-safe', `top ${safeTop} · bot ${safeBot}`);
   })();
 

@@ -11,6 +11,32 @@
   <meta name="apple-mobile-web-app-title" content="FitPlan" />
   <link rel="apple-touch-icon" href="icons/icon-192.svg" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    /* iOS standalone can hand the web app a viewport shorter than the screen.
+       Measured on an installed iPhone build: screen.height 874, innerHeight
+       812 — short by exactly the 62pt top inset. The window stops at y=812
+       while the home indicator sits at y=840..874, i.e. entirely OUTSIDE
+       what the page can paint. Reserving env(safe-area-inset-bottom) there
+       buys nothing and just stacks more dead space above the gap.
+
+       So only honour the bottom inset when the viewport actually reaches the
+       bottom of the screen. Re-measured on resize because the shortfall is
+       not guaranteed to be stable across launches or iOS versions. */
+    (function () {
+      function calibrateBottomInset() {
+        var shortfall = (window.screen && screen.height ? screen.height : 0) - window.innerHeight;
+        var reaches = !(shortfall > 8);
+        document.documentElement.style.setProperty(
+          '--safe-bottom',
+          reaches ? '' : '0px'
+        );
+        if (reaches) document.documentElement.style.removeProperty('--safe-bottom');
+      }
+      calibrateBottomInset();
+      window.addEventListener('resize', calibrateBottomInset);
+      window.addEventListener('orientationchange', calibrateBottomInset);
+    })();
+  </script>
 </head>
 <body>
 
