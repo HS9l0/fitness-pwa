@@ -101,6 +101,18 @@ function openSettings() {
           <span class="settings-row-label">Version</span>
           <span class="settings-info-val" id="sw-version-display">—</span>
         </div>
+        <div class="settings-row" style="cursor:default">
+          <span class="settings-row-label">Display mode</span>
+          <span class="settings-info-val" id="dbg-display">—</span>
+        </div>
+        <div class="settings-row" style="cursor:default">
+          <span class="settings-row-label">Viewport</span>
+          <span class="settings-info-val" id="dbg-viewport">—</span>
+        </div>
+        <div class="settings-row" style="cursor:default">
+          <span class="settings-row-label">Safe area</span>
+          <span class="settings-info-val" id="dbg-safe">—</span>
+        </div>
 
         <div id="test-day-wrap" style="${testMode ? '' : 'display:none'}">
           <div class="settings-row" style="align-items:center">
@@ -131,6 +143,35 @@ function openSettings() {
   `;
   document.body.appendChild(sheet);
   requestAnimationFrame(() => sheet.classList.add('open'));
+
+  // Layout diagnostics. iOS standalone behaviour can't be reproduced in a
+  // desktop browser, so let the device report its own numbers instead of
+  // guessing at them. `sa` is the legacy iOS standalone flag, `dm` the
+  // display-mode media query — if either reads NO, the app is running as a
+  // Safari tab and the browser chrome is reserving the space at the bottom.
+  (() => {
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;left:-9999px;top:0;width:0;' +
+      'padding-top:env(safe-area-inset-top,0px);' +
+      'padding-bottom:env(safe-area-inset-bottom,0px);';
+    document.body.appendChild(probe);
+    const cs = getComputedStyle(probe);
+    const safeTop = Math.round(parseFloat(cs.paddingTop) || 0);
+    const safeBot = Math.round(parseFloat(cs.paddingBottom) || 0);
+    probe.remove();
+
+    const sa = ('standalone' in navigator) ? (navigator.standalone ? 'yes' : 'NO') : 'n/a';
+    const dm = matchMedia('(display-mode: standalone)').matches ? 'yes' : 'NO';
+    const vvh = window.visualViewport ? Math.round(window.visualViewport.height) : null;
+
+    const set = (sel, txt) => {
+      const el = sheet.querySelector(sel);
+      if (el) el.textContent = txt;
+    };
+    set('#dbg-display', `sa ${sa} · dm ${dm}`);
+    set('#dbg-viewport', `${window.innerHeight} · vv ${vvh ?? '—'} · scr ${screen.height}`);
+    set('#dbg-safe', `top ${safeTop} · bot ${safeBot}`);
+  })();
 
   // Fetch version from active service worker
   if (navigator.serviceWorker.controller) {
