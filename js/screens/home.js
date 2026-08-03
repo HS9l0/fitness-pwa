@@ -2,13 +2,13 @@ import { WORKOUTS, getTodayWorkoutDay } from '../data.js';
 import { getSessions, today } from '../store.js';
 
 const ICO_CHEVRON_R = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
-const ICO_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
-const ICO_CHECK_SM = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
-const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
-const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+const ICO_CHECK_SM = `<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
+const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 const ICO_MOON = `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
-const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
-const ICO_DUMBBELL_LOGO = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#16230b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
+const ICO_DUMBBELL_LOGO = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#16230b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -65,19 +65,19 @@ export function renderHome(container, navigate) {
     const isToday = dateStr === todayStr;
     let dotStyle, lblStyle, dotContent;
     if (done) {
-      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--accent);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--onAccent);"`;
-      lblStyle = `style="font-size:9px;color:var(--dim);text-transform:uppercase;"`;
+      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--accent);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--onAccent);"`;
+      lblStyle = `style="font-size:8px;color:var(--dim);text-transform:uppercase;"`;
       dotContent = ICO_CHECK_SM;
     } else if (isToday) {
-      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--accentSoft);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);"`;
-      lblStyle = `style="font-size:9px;color:var(--accent);text-transform:uppercase;"`;
+      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--accentSoft);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent);"`;
+      lblStyle = `style="font-size:8px;color:var(--accent);text-transform:uppercase;"`;
       dotContent = d.getDate();
     } else {
-      dotStyle = `style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--dim);"`;
-      lblStyle = `style="font-size:9px;color:var(--dim);text-transform:uppercase;"`;
+      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--dim);"`;
+      lblStyle = `style="font-size:8px;color:var(--dim);text-transform:uppercase;"`;
       dotContent = d.getDate();
     }
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0">
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
       <div ${dotStyle}>${dotContent}</div>
       <div ${lblStyle}>${label}</div>
     </div>`;
@@ -87,7 +87,7 @@ export function renderHome(container, navigate) {
   let nextCardHtml;
   if (doneToday) {
     nextCardHtml = `
-      <div class="card done-today-card" style="margin-bottom:12px">
+      <div class="card done-today-card" style="margin-bottom:8px">
         <div class="done-today-icon">${ICO_CHECK_CIRCLE}</div>
         <div class="done-today-text">
           <div class="done-today-title">Workout complete!</div>
@@ -96,7 +96,7 @@ export function renderHome(container, navigate) {
       </div>`;
   } else if (todayDay) {
     nextCardHtml = `
-      <div class="card next-card" style="margin-bottom:12px">
+      <div class="card next-card" style="margin-bottom:8px">
         <div class="next-gradient">
           <div class="next-dumbbell-icon">${ICO_DUMBBELL_LG}</div>
           <div class="next-when-lbl">Today · ${WHEN_LABELS[todayDay - 1]}</div>
@@ -112,7 +112,7 @@ export function renderHome(container, navigate) {
       </div>`;
   } else {
     nextCardHtml = `
-      <div class="card rest-day-card" style="margin-bottom:12px">
+      <div class="card rest-day-card" style="margin-bottom:8px">
         <div class="rest-icon">${ICO_MOON}</div>
         <h3>Rest Day</h3>
         <p>Walk, stretch, or recover fully.<br/>Next up: <strong>${nextWorkout.label}</strong> on ${nextScheduledDayName}.</p>
@@ -122,17 +122,19 @@ export function renderHome(container, navigate) {
   container.innerHTML = `
     <div class="hig-title-row">
       <div class="hig-logo-badge">${ICO_DUMBBELL_LOGO}</div>
-      <div class="hig-large-title">FitPlan</div>
+      <div class="hig-masthead-text">
+        <div class="hig-large-title">FitPlan</div>
+        <div class="hig-date-label">${dateLabel}</div>
+      </div>
     </div>
-    <div class="hig-date-label">${dateLabel}</div>
 
-    <div class="section" style="padding-top:0">
+    <div class="section home-section" style="padding:0 20px">
 
       <!-- Merged "This Week" card: ring + streak dots -->
-      <div class="card week-card" style="margin-bottom:12px">
+      <div class="card week-card" style="margin-bottom:8px">
         <div class="ring-card">
           <div class="ring-wrap">
-            <svg width="104" height="104" viewBox="0 0 104 104">
+            <svg width="66" height="66" viewBox="0 0 104 104">
               <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accentSoft)" stroke-width="13"/>
               <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accent)" stroke-width="13"
                 stroke-linecap="round"
