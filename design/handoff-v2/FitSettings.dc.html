@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="height:100%;position:relative;display:flex;flex-direction:column;justify-content:flex-end;background:var(--bg);font-family:-apple-system,'SF Pro Display','SF Pro Text',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;">
+
+  <!-- dimmed app behind -->
+  <div style="position:absolute;inset:0;background:var(--backdropTint);"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);"></div>
+
+  <!-- panel -->
+  <div style="position:relative;background:var(--surface);color:var(--text);border-radius:18px 18px 0 0;border:1px solid var(--border);border-bottom:none;max-height:88%;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,0.4);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;">
+      <span style="font-size:17px;font-weight:700;">Settings</span>
+      <button style="color:var(--accent);font-weight:700;font-size:15px;min-height:44px;display:flex;align-items:center;">Done</button>
+    </div>
+    <div style="padding:8px 20px 24px;">
+
+      <!-- UNITS group -->
+      <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.8px;margin:14px 4px 6px;">Units</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
+          <span style="font-size:15px;">Weight</span>
+          <div style="display:flex;background:var(--bg);border-radius:9px;padding:2px;gap:2px;">
+            <button style="padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;background:var(--seg);color:var(--text);">kg</button>
+            <button style="padding:6px 16px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);">lbs</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEVELOPER group -->
+      <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.8px;margin:22px 4px 6px;">Developer</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
+          <span style="font-size:15px;">Test Mode</span>
+          <div style="position:relative;width:51px;height:31px;flex-shrink:0;">
+            <div style="position:absolute;inset:0;background:var(--accent2);border-radius:15.5px;"></div>
+            <div style="position:absolute;top:2px;left:22px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,0.35);"></div>
+          </div>
+        </div>
+        <div style="height:1px;background:var(--border);margin-left:16px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;">
+          <span style="font-size:15px;color:var(--muted);">Test Day</span>
+          <div style="display:flex;background:var(--bg);border-radius:9px;padding:2px;gap:2px;">
+            <button style="padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;color:var(--muted);">Day 1</button>
+            <button style="padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;background:var(--seg);color:var(--text);">Day 2</button>
+            <button style="padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;color:var(--muted);">Day 3</button>
+            <button style="padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;color:var(--muted);">Rest</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- INFO group -->
+      <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.8px;margin:22px 4px 6px;">Info</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;"><span style="font-size:15px;">Version</span><span style="font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;">v2.4.1</span></div>
+        <div style="height:1px;background:var(--border);margin-left:16px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;"><span style="font-size:15px;">Today</span><span style="font-size:14px;color:var(--muted);">Wednesday, 1 Jul</span></div>
+        <div style="height:1px;background:var(--border);margin-left:16px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;"><span style="font-size:15px;">This week</span><span style="font-size:14px;color:var(--muted);">2 workouts</span></div>
+        <div style="height:1px;background:var(--border);margin-left:16px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;"><span style="font-size:15px;">Total logged</span><span style="font-size:14px;color:var(--muted);">37 workouts</span></div>
+      </div>
+
+      <!-- Admin link row (grouped, with chevron) -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:22px;">
+        <a style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
+          <span style="font-size:15px;font-weight:500;color:var(--accent);">Admin Dashboard</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--dim)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:820}}"></script>
+</body>
+</html>

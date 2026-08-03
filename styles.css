@@ -226,7 +226,16 @@ a { color: inherit; text-decoration: none; }
 }
 .ex-info { flex: 1; min-width: 0; }
 .ex-name    { font-size: 0.92rem; font-weight: 700; color: var(--text); }
-.ex-muscles { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+/* Muscles + set target share a row (design handoff v2 — FitWorkout hero) */
+.ex-sub-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 2px;
+}
+.ex-muscles { font-size: 0.72rem; color: var(--text-muted); min-width: 0; }
+.ex-target  {
+  font-size: 0.72rem; color: var(--accent2); font-weight: 700;
+  white-space: nowrap; flex-shrink: 0;
+}
 .ex-meta    { font-size: 0.78rem; color: var(--accent2); font-weight: 700; white-space: nowrap; }
 .ex-chevron { color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
@@ -641,10 +650,12 @@ a { color: inherit; text-decoration: none; }
 
 /* Hero-style exercise title — the top progress bar already conveys "which
    exercise", so drop the numbered badge and let the name lead */
-.pwkt-stage .ex-header  { padding: 22px 20px 16px; }
+.pwkt-stage .ex-header  { padding: 14px 20px 10px; }
 .pwkt-stage .ex-num     { display: none; }
-.pwkt-stage .ex-name    { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; }
-.pwkt-stage .ex-muscles { font-size: 0.8rem; margin-top: 4px; }
+.pwkt-stage .ex-name    { font-size: 23px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; }
+.pwkt-stage .ex-sub-row { margin-top: 5px; }
+.pwkt-stage .ex-muscles { font-size: 13px; }
+.pwkt-stage .ex-target  { font-size: 13px; }
 
 /* ── Number inputs ──────────────────────────────────────── */
 input[type="number"]::-webkit-inner-spin-button,
@@ -695,10 +706,10 @@ body { overscroll-behavior: none; }
 /* ── Video tutorial button ───────────────────────────────── */
 .yt-search-btn {
   display: flex; align-items: center; justify-content: center; gap: 7px;
-  width: 100%; padding: 10px 16px; min-height: 44px;
+  width: 100%; padding: 9px 16px; min-height: 40px;
   background: rgba(120,120,128,.12);
   border-radius: var(--radius-sm);
-  color: var(--text); font-size: 0.84rem; font-weight: 600;
+  color: var(--text); font-size: 13px; font-weight: 600;
   text-decoration: none;
   transition: background 0.15s;
 }
@@ -1008,10 +1019,11 @@ body { overscroll-behavior: none; }
 
 /* ── Sticky Start Workout CTA ───────────────────────────── */
 .home-cta-wrap {
+  /* margin-top:auto pins the CTA to the bottom of the home flex column
+     (design handoff v2 — FitHome pins it in a flex-shrink:0 footer) */
+  margin-top: auto;
   position: sticky; bottom: 0;
-  /* No top padding: the next-card's own margin-bottom already provides the
-     gap above, matching the week-card → next-card gap below it */
-  padding: 0 0 calc(10px + var(--safe-bottom));
+  padding: 6px 0 calc(10px + var(--safe-bottom));
   background: linear-gradient(to top, var(--bg) 65%, transparent);
 }
 
@@ -1118,31 +1130,38 @@ body { overscroll-behavior: none; }
 .hist-cal-dot-ico { line-height: 1; display: flex; align-items: center; }
 
 /* ── iOS HIG Home Screen ─────────────────────────────────── */
+/* Home is a flex column so the Start Workout CTA pins to the bottom edge
+   instead of trailing the content (design handoff v2 — FitHome). */
+#screen-home.screen.active { display: flex; flex-direction: column; }
+#screen-home .home-section { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
 .hig-title-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: max(16px, env(safe-area-inset-top,0px)) 20px 4px;
+  display: flex; align-items: center; gap: 11px;
+  padding: max(10px, env(safe-area-inset-top,0px)) 20px 8px;
+  flex-shrink: 0;
 }
 .hig-logo-badge {
-  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
   background: var(--accent);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 0 14px rgba(168,230,53,0.6), 0 0 2px rgba(168,230,53,0.9);
 }
+.hig-masthead-text { flex: 1; min-width: 0; }
 .hig-large-title {
-  font-size: 34px; font-weight: 700; letter-spacing: -0.5px;
+  font-size: 18px; font-weight: 800; letter-spacing: -0.6px;
   color: var(--text);
-  line-height: 1.1;
+  line-height: 1;
 }
 .hig-date-label {
-  font-size: 0.78rem; color: var(--text-muted);
-  padding: 0 20px 14px; font-weight: 500;
+  font-size: 10px; color: var(--text-muted);
+  font-weight: 500; margin-top: 2px;
 }
 
 /* Merged "This Week" card */
 .week-card { padding: 0; overflow: hidden; }
 .week-dots-row {
-  display: flex; gap: 6px; justify-content: space-between;
-  padding: 14px 20px;
+  display: flex; gap: 5px; justify-content: space-between;
+  padding: 8px 16px;
   border-top: 1px solid var(--border);
   width: 100%; background: none; border-left: none; border-right: none; border-bottom: none;
   text-align: left; cursor: pointer;
@@ -1151,11 +1170,11 @@ body { overscroll-behavior: none; }
 
 /* Activity ring row (inside week-card) */
 .ring-card {
-  display: flex; align-items: center; gap: 18px;
-  padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 16px;
 }
 .ring-wrap {
-  position: relative; width: 104px; height: 104px; flex-shrink: 0;
+  position: relative; width: 66px; height: 66px; flex-shrink: 0;
 }
 .ring-inner {
   position: absolute; inset: 0;
@@ -1163,31 +1182,31 @@ body { overscroll-behavior: none; }
   align-items: center; justify-content: center; gap: 1px;
 }
 .ring-count {
-  font-size: 1.7rem; font-weight: 800; color: var(--text);
+  font-size: 17px; font-weight: 800; color: var(--text);
   line-height: 1; font-variant-numeric: tabular-nums;
 }
 .ring-of {
-  font-size: 0.62rem; color: var(--text-muted);
+  font-size: 8px; color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.5px;
 }
 .ring-info { flex: 1; min-width: 0; }
-.ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.ring-headline { font-size: 1rem; font-weight: 700; color: var(--text); }
-.ring-sub { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
+.ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+.ring-headline { font-size: 14px; font-weight: 700; color: var(--text); }
+.ring-sub { font-size: 12px; color: var(--text-muted); line-height: 1.35; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
 
 /* Done-today card */
 .done-today-card {
-  display: flex; align-items: center; gap: 16px;
-  padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
   background: rgba(168,230,53,.08);
   border-color: rgba(168,230,53,.22);
 
 }
 .done-today-icon { color: var(--accent-2); flex-shrink: 0; display: flex; }
-.done-today-icon svg { width: 32px; height: 32px; }
-.done-today-title { font-size: 0.95rem; font-weight: 700; color: var(--accent-2); margin-bottom: 3px; }
-.done-today-sub   { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; }
+.done-today-icon svg { width: 26px; height: 26px; }
+.done-today-title { font-size: 14px; font-weight: 700; color: var(--accent-2); margin-bottom: 2px; }
+.done-today-sub   { font-size: 12px; color: var(--text-muted); line-height: 1.35; }
 
 /* Gradient "Next Up" card */
 .next-card {
@@ -1195,39 +1214,39 @@ body { overscroll-behavior: none; }
 }
 .next-gradient {
   background: var(--grad);
-  padding: 18px 20px 22px; position: relative;
-  min-height: 90px;
+  padding: 10px 16px 13px; position: relative;
+  min-height: 50px;
 }
 .next-dumbbell-icon {
-  position: absolute; top: 14px; right: 16px;
+  position: absolute; top: 10px; right: 12px;
   opacity: 0.28;
 }
 .next-when-lbl {
-  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.2px; color: rgba(255,255,255,0.78); margin-bottom: 6px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.2px; color: rgba(255,255,255,0.78); margin-bottom: 4px;
 }
 .next-workout-name {
-  font-size: 1.3rem; font-weight: 800; color: #fff; letter-spacing: -0.3px;
+  font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px;
 }
-.next-body { padding: 16px 20px 18px; }
+.next-body { padding: 10px 16px 12px; }
 .next-focus-txt {
-  font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;
+  font-size: 11px; color: var(--text-muted); margin-bottom: 8px;
 }
 .next-meta-row {
-  display: flex; gap: 16px; margin-bottom: 16px;
+  display: flex; gap: 14px;
 }
 .next-meta-item {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.76rem; color: var(--text-dim); font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--text-dim); font-weight: 600;
 }
 .next-meta-item svg { color: var(--accent); }
 .next-meta-item span { color: var(--text); font-weight: 700; }
 .hig-btn-primary {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; padding: 14px;
+  width: 100%; padding: 12px;
   background: var(--accent); color: var(--onAccent);
-  font-weight: 700; font-size: 1rem;
-  border-radius: 14px; min-height: 50px;
+  font-weight: 600; font-size: 15px;
+  border-radius: 13px; min-height: 44px;
   transition: opacity 0.15s, transform 0.12s ease;
   letter-spacing: -0.1px;
 }

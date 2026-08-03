@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin:0; height:100%; }
+  body { font-family: -apple-system, 'SF Pro Display', system-ui, sans-serif; }
+  button { background: none; border: none; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+</style>
+</helmet>
+
+<div style="height:100dvh;width:100vw;display:flex;align-items:center;justify-content:center;background:#1c1c1e;overflow:hidden;">
+<div style="width:430px;height:932px;max-height:96dvh;border-radius:44px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.06);display:flex;flex-direction:column;background:#000;--bg:#000000;--surface:#0f1115;--surface2:#181b21;--border:rgba(255,255,255,.10);--text:#f2f5fa;--muted:rgba(232,238,247,.62);--dim:rgba(232,238,247,.38);--accent:#a8e635;--accentSoft:rgba(168,230,53,.16);--accent2:#72b4ea;--accent3:#a78bfa;--onAccent:#16230b;--grad:linear-gradient(135deg,#6a9e1c 0%,#2f6db0 100%);--shadow:0 1px 6px rgba(0,0,0,0.6);--field:rgba(255,255,255,.05);--graySoft:rgba(255,255,255,.09);--okSoft:rgba(114,180,234,0.12);--okSoft2:rgba(114,180,234,.22);--okDim:rgba(114,180,234,0.66);--seg:#22262e;--backdropTint:#000000;">
+
+  <!-- Full-screen page, inset for safe area (status bar + side/bottom bezel clearance) -->
+  <div style="flex:1;min-height:0;position:relative;padding:54px 8px 8px;box-sizing:border-box;background:#000;">
+    <div style="height:100%;border-radius:22px;overflow:hidden;position:relative;">
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      
+    </sc-if>
+    <sc-if value="{{ isWorkout }}">
+      <div style="height:100%;"><dc-import name="FitWorkout" hint-size="100%,100%"></dc-import></div>
+    </sc-if>
+    <sc-if value="{{ isSettings }}">
+      <div style="height:100%;"><dc-import name="FitSettings" hint-size="100%,100%"></dc-import></div>
+    </sc-if>
+    <sc-if value="{{ isAdmin }}">
+      <div style="height:100%;overflow:auto;"><dc-import name="FitAdmin" hint-size="100%,100%"></dc-import></div>
+    </sc-if>
+  <div style="height:100%;"><dc-import name="FitHome" hint-size="100%,100%"></dc-import></div></div></div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { screen: 'home' };
+  renderVals() {
+    const s = this.state.screen;
+    const on = '#a8e635', off = 'rgba(232,238,247,.42)';
+    return {
+      isHome: s === 'home', isWorkout: s === 'workout', isSettings: s === 'settings', isAdmin: s === 'admin',
+      homeColor: s === 'home' ? on : off,
+      workoutColor: s === 'workout' ? on : off,
+      settingsColor: s === 'settings' ? on : off,
+      adminColor: s === 'admin' ? on : off,
+      goHome: () => this.setState({ screen: 'home' }),
+      goWorkout: () => this.setState({ screen: 'workout' }),
+      goSettings: () => this.setState({ screen: 'settings' }),
+      goAdmin: () => this.setState({ screen: 'admin' }),
+    };
+  }
+}
+</script>
+</body>
+</html>
