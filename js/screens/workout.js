@@ -237,7 +237,7 @@ function renderExerciseCard(ex, num, lastWeights) {
 function renderSetRowsWithVideo(ex, lastWeights) {
   const setHtml   = renderSetRows(ex, lastWeights);
   const videoHtml = ex.videoId ? `
-    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+    <div class="yt-wrap">
       <a class="yt-search-btn" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise tutorial')}" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         Watch Tutorial
@@ -295,7 +295,7 @@ function renderSetRows(ex, lastWeights) {
           </button>
         </div>
       </div>
-      <div class="set-row-summary"${locked ? ' style="display:flex"' : ''}>${locked ? `<span class="set-sum-num">Set ${i + 1}</span>` : ''}</div>
+      <div class="set-row-summary"${locked ? ' style="display:flex"' : ''}>${locked ? `<span class="set-sum-num">${i + 1}</span><span class="set-sum-target"><strong>${initW}</strong> kg <span class="set-sum-x">×</span> <strong>${initR}</strong> reps</span>` : ''}</div>
     </div>
   `;
   }).join('');

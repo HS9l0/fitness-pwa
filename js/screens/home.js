@@ -123,18 +123,20 @@ export function renderHome(container, navigate) {
     <div class="hig-title-row">
       <div class="hig-logo-badge">${ICO_DUMBBELL_LOGO}</div>
       <div class="hig-masthead-text">
-        <div class="hig-large-title">FitPlan</div>
         <div class="hig-date-label">${dateLabel}</div>
+        <div class="hig-large-title">FitPlan</div>
       </div>
     </div>
 
     <div class="section home-section" style="padding:0 20px">
 
+      ${nextCardHtml}
+
       <!-- Merged "This Week" card: ring + streak dots -->
       <div class="card week-card" style="margin-bottom:8px">
         <div class="ring-card">
           <div class="ring-wrap">
-            <svg width="66" height="66" viewBox="0 0 104 104">
+            <svg width="84" height="84" viewBox="0 0 104 104">
               <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accentSoft)" stroke-width="13"/>
               <circle cx="52" cy="52" r="44" fill="none" stroke="var(--accent)" stroke-width="13"
                 stroke-linecap="round"
@@ -164,8 +166,6 @@ export function renderHome(container, navigate) {
           ${dotsHtml}
         </button>
       </div>
-
-      ${nextCardHtml}
 
       ${todayDay && !doneToday ? `
         <div class="home-cta-wrap">

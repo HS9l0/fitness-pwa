@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin:0; height:100%; background:#0d0d0f; }
+  body { font-family:-apple-system,'SF Pro Display','SF Pro Text',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  button, a { background:none; border:none; font:inherit; color:inherit; cursor:pointer; text-decoration:none; -webkit-tap-highlight-color:transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition-property:opacity,background-color,background,color !important; transition-duration:150ms !important; }
+  }
+</style>
+</helmet>
+
+<div style="height:100dvh;width:100vw;display:flex;align-items:center;justify-content:center;background:#0d0d0f;overflow:hidden;">
+<div style="width:430px;height:932px;flex-shrink:0;transform:scale({{ scale }});transform-origin:center center;border-radius:52px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);display:flex;flex-direction:column;background:#000;--bg:#000000;--fill1:#1C1C1E;--fill2:#2C2C2E;--fill3:#3A3A3C;--sep:rgba(84,84,88,.5);--label:#FFFFFF;--label2:rgba(235,235,245,.60);--label3:rgba(235,235,245,.32);--accent:#A8E635;--onAccent:#182A04;--blue:#0A84FF;--e:cubic-bezier(0.32,0.72,0,1);">
+  <div style="flex:1;min-height:0;padding:54px 8px 8px;box-sizing:border-box;background:#000;">
+    <div style="height:100%;border-radius:24px;overflow:hidden;position:relative;background:var(--bg);color:var(--label);display:flex;flex-direction:column;">
+
+      <!-- Translucent nav bar -->
+      <div style="flex-shrink:0;background:rgba(20,20,22,.72);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);box-shadow:0 0.5px 0 var(--sep);">
+        <div style="display:flex;align-items:center;gap:10px;padding:4px 12px;">
+          <button style="display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 8px 0 4px;font-size:17px;color:var(--accent);flex-shrink:0;transition:opacity 240ms var(--e);" style-active="opacity:.4;transition:opacity 60ms var(--e)">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Settings
+          </button>
+          <div style="flex:1;min-width:0;text-align:center;font-size:15px;font-weight:600;letter-spacing:-0.1px;">Admin</div>
+          <button style="min-height:44px;padding:0 6px;font-size:17px;color:var(--accent);flex-shrink:0;transition:opacity 240ms var(--e);" style-active="opacity:.4;transition:opacity 60ms var(--e)">Sign Out</button>
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;overflow-y:auto;">
+
+        <!-- Large title -->
+        <div style="padding:14px 20px 4px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:34px;font-weight:700;letter-spacing:-0.9px;line-height:1.06;">Members</div>
+            <span style="background:rgba(168,230,53,.16);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:20px;">Staff</span>
+          </div>
+          <div style="font-size:15px;color:var(--label2);margin-top:4px;">coach@fitplan.app</div>
+        </div>
+
+        <!-- Search -->
+        <div style="padding:14px 20px 4px;">
+          <div style="display:flex;align-items:center;gap:8px;background:rgba(118,118,128,.24);border-radius:12px;padding:11px 12px;">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <span style="font-size:17px;color:var(--label2);">Search members</span>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 20px 0;">
+          <div style="background:var(--fill1);border-radius:16px;padding:16px;">
+            <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.7px;font-variant-numeric:tabular-nums;">128</div>
+            <div style="font-size:13px;color:var(--label2);margin-top:6px;">Total members</div>
+          </div>
+          <div style="background:var(--fill1);border-radius:16px;padding:16px;">
+            <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.7px;color:var(--accent);font-variant-numeric:tabular-nums;">47</div>
+            <div style="font-size:13px;color:var(--label2);margin-top:6px;">Active this week</div>
+          </div>
+          <div style="background:var(--fill1);border-radius:16px;padding:16px;">
+            <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.7px;font-variant-numeric:tabular-nums;">1,204</div>
+            <div style="font-size:13px;color:var(--label2);margin-top:6px;">Workouts logged</div>
+          </div>
+          <div style="background:var(--fill1);border-radius:16px;padding:16px;">
+            <div style="font-size:30px;font-weight:700;line-height:1;letter-spacing:-0.7px;font-variant-numeric:tabular-nums;">2.8</div>
+            <div style="font-size:13px;color:var(--label2);margin-top:6px;">Avg. per week</div>
+          </div>
+        </div>
+
+        <!-- Roster -->
+        <div style="font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.7px;padding:26px 24px 8px;">All Members</div>
+        <div style="margin:0 20px 24px;background:var(--fill1);border-radius:16px;overflow:hidden;">
+
+          <button style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 16px;box-shadow:0 0.5px 0 var(--sep);transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+            <div style="width:42px;height:42px;border-radius:21px;background:rgba(168,230,53,.18);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--accent);flex-shrink:0;">EM</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:17px;font-weight:500;letter-spacing:-0.2px;">Elena Martins</span><span style="width:7px;height:7px;border-radius:4px;background:var(--accent);flex-shrink:0;"></span></div>
+              <div style="font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;">42 workouts · Today</div>
+            </div>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 16px;box-shadow:0 0.5px 0 var(--sep);transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+            <div style="width:42px;height:42px;border-radius:21px;background:rgba(168,230,53,.18);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--accent);flex-shrink:0;">JK</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:17px;font-weight:500;letter-spacing:-0.2px;">Jonas Keller</span><span style="width:7px;height:7px;border-radius:4px;background:var(--accent);flex-shrink:0;"></span></div>
+              <div style="font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;">31 workouts · Yesterday</div>
+            </div>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 16px;box-shadow:0 0.5px 0 var(--sep);transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+            <div style="width:42px;height:42px;border-radius:21px;background:var(--fill2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--label2);flex-shrink:0;">PD</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:17px;font-weight:500;letter-spacing:-0.2px;">Priya Desai</div>
+              <div style="font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;">18 workouts · 5 days ago</div>
+            </div>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 16px;box-shadow:0 0.5px 0 var(--sep);transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+            <div style="width:42px;height:42px;border-radius:21px;background:rgba(168,230,53,.18);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--accent);flex-shrink:0;">RO</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:17px;font-weight:500;letter-spacing:-0.2px;">Rafael Ortiz</span><span style="width:7px;height:7px;border-radius:4px;background:var(--accent);flex-shrink:0;"></span></div>
+              <div style="font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;">56 workouts · 2 days ago</div>
+            </div>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button style="display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 16px;transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+            <div style="width:42px;height:42px;border-radius:21px;background:var(--fill2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--label2);flex-shrink:0;">AN</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:17px;font-weight:500;letter-spacing:-0.2px;">Amara Nwosu</div>
+              <div style="font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums;">9 workouts · 2 weeks ago</div>
+            </div>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932}}">
+class Component extends DCLogic {
+  state = { scale: 1 };
+  componentDidMount() { this.fit(); this._h = () => this.fit(); window.addEventListener('resize', this._h); }
+  componentWillUnmount() { window.removeEventListener('resize', this._h); }
+  fit() {
+    this.setState({ scale: Math.min(1, (window.innerHeight - 24) / 932, (window.innerWidth - 24) / 430) });
+  }
+  renderVals() { return { scale: this.state.scale }; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin:0; height:100%; background:#0d0d0f; }
+  body { font-family:-apple-system,'SF Pro Display','SF Pro Text',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  button, a { background:none; border:none; font:inherit; color:inherit; cursor:pointer; text-decoration:none; -webkit-tap-highlight-color:transparent; }
+  /* Sheet presentation: large deliberate surface, so it earns >300ms. iOS sheet curve. */
+  @keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pushBack { from { transform: scale(1) translateY(0); } to { transform: scale(.94) translateY(-12px); } }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition-property:opacity,background-color,background,color !important; transition-duration:150ms !important; }
+  }
+</style>
+</helmet>
+
+<div style="height:100dvh;width:100vw;display:flex;align-items:center;justify-content:center;background:#0d0d0f;overflow:hidden;">
+<div style="width:430px;height:932px;flex-shrink:0;transform:scale({{ scale }});transform-origin:center center;border-radius:52px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);display:flex;flex-direction:column;background:#000;--bg:#000000;--fill1:#1C1C1E;--fill2:#2C2C2E;--fill3:#3A3A3C;--sep:rgba(84,84,88,.5);--label:#FFFFFF;--label2:rgba(235,235,245,.60);--label3:rgba(235,235,245,.32);--accent:#A8E635;--onAccent:#182A04;--blue:#0A84FF;--e:cubic-bezier(0.32,0.72,0,1);">
+  <div style="flex:1;min-height:0;padding:54px 8px 8px;box-sizing:border-box;background:#000;">
+    <div style="height:100%;border-radius:24px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:flex-end;background:var(--bg);color:var(--label);">
+
+      <!-- Dimmed parent screen pushed back -->
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1a1a1c 0%,#0a0a0b 100%);transform:scale(.94) translateY(-12px);border-radius:20px;opacity:.5;animation:pushBack 460ms cubic-bezier(0.32,0.72,0,1) both;"></div>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:scrimIn 460ms cubic-bezier(0.32,0.72,0,1) both;"></div>
+
+      <!-- Sheet -->
+      <div style="position:relative;background:rgba(28,28,30,.94);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-radius:22px 22px 0 0;max-height:92%;overflow-y:auto;box-shadow:0 -12px 48px rgba(0,0,0,.55),inset 0 0.5px 0 rgba(255,255,255,.12);animation:sheetIn 460ms cubic-bezier(0.32,0.72,0,1) both;will-change:transform;">
+
+        <div style="position:sticky;top:0;z-index:2;background:rgba(28,28,30,.86);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 0.5px 0 var(--sep);">
+          <div style="display:flex;justify-content:center;padding:8px 0 2px;"><div style="width:38px;height:5px;border-radius:3px;background:var(--fill3);"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 20px 10px;">
+            <span style="font-size:22px;font-weight:700;letter-spacing:-0.5px;">Settings</span>
+            <button style="color:var(--accent);font-weight:600;font-size:17px;min-height:44px;display:flex;align-items:center;transition:opacity 240ms var(--e);" style-active="opacity:.4;transition:opacity 60ms var(--e)">Done</button>
+          </div>
+        </div>
+
+        <div style="padding:6px 20px 28px;">
+
+          <div style="font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.7px;margin:16px 4px 8px;">Units</div>
+          <div style="background:var(--fill1);border-radius:16px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;min-height:52px;box-sizing:border-box;">
+              <span style="font-size:17px;">Weight</span>
+              <div style="display:flex;background:rgba(118,118,128,.24);border-radius:10px;padding:2px;gap:2px;flex-shrink:0;">
+                <button style="min-width:56px;padding:7px 14px;border-radius:8px;font-size:15px;font-weight:600;background:var(--fill3);color:var(--label);box-shadow:0 2px 6px rgba(0,0,0,.3);">kg</button>
+                <button style="min-width:56px;padding:7px 14px;border-radius:8px;font-size:15px;font-weight:500;color:var(--label2);">lbs</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.7px;margin:26px 4px 8px;">Developer</div>
+          <div style="background:var(--fill1);border-radius:16px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;min-height:52px;box-sizing:border-box;box-shadow:0 0.5px 0 var(--sep);">
+              <span style="font-size:17px;">Test Mode</span>
+              <div style="position:relative;width:51px;height:31px;flex-shrink:0;">
+                <div style="position:absolute;inset:0;background:#30D158;border-radius:16px;"></div>
+                <div style="position:absolute;top:2px;left:22px;width:27px;height:27px;border-radius:14px;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.3);"></div>
+              </div>
+            </div>
+            <div style="padding:12px 16px 14px;">
+              <div style="font-size:17px;margin-bottom:10px;">Test Day</div>
+              <div style="display:flex;background:rgba(118,118,128,.24);border-radius:10px;padding:2px;gap:2px;">
+                <button style="flex:1;padding:8px 4px;border-radius:8px;font-size:15px;font-weight:500;color:var(--label2);">Day 1</button>
+                <button style="flex:1;padding:8px 4px;border-radius:8px;font-size:15px;font-weight:600;background:var(--fill3);color:var(--label);box-shadow:0 2px 6px rgba(0,0,0,.3);">Day 2</button>
+                <button style="flex:1;padding:8px 4px;border-radius:8px;font-size:15px;font-weight:500;color:var(--label2);">Day 3</button>
+                <button style="flex:1;padding:8px 4px;border-radius:8px;font-size:15px;font-weight:500;color:var(--label2);">Rest</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.7px;margin:26px 4px 8px;">Info</div>
+          <div style="background:var(--fill1);border-radius:16px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;box-shadow:0 0.5px 0 var(--sep);"><span style="font-size:17px;">Version</span><span style="font-size:17px;color:var(--label2);font-variant-numeric:tabular-nums;">2.4.1</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;box-shadow:0 0.5px 0 var(--sep);"><span style="font-size:17px;">Today</span><span style="font-size:17px;color:var(--label2);">Wed, 1 Jul</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;box-shadow:0 0.5px 0 var(--sep);"><span style="font-size:17px;">This Week</span><span style="font-size:17px;color:var(--label2);">2 workouts</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;"><span style="font-size:17px;">Total Logged</span><span style="font-size:17px;color:var(--label2);">37 workouts</span></div>
+          </div>
+
+          <div style="background:var(--fill1);border-radius:16px;overflow:hidden;margin-top:26px;">
+            <a style="display:flex;align-items:center;gap:14px;padding:15px 16px;min-height:52px;box-sizing:border-box;transition:background 200ms var(--e);" style-hover="background:var(--fill2)">
+              <span style="flex:1;font-size:17px;color:var(--accent);">Admin Dashboard</span>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932}}">
+class Component extends DCLogic {
+  state = { scale: 1 };
+  componentDidMount() { this.fit(); this._h = () => this.fit(); window.addEventListener('resize', this._h); }
+  componentWillUnmount() { window.removeEventListener('resize', this._h); }
+  fit() {
+    this.setState({ scale: Math.min(1, (window.innerHeight - 24) / 932, (window.innerWidth - 24) / 430) });
+  }
+  renderVals() { return { scale: this.state.scale }; }
+}
+</script>
+</body>
+</html>
