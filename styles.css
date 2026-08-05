@@ -1,34 +1,53 @@
 /* ── Variables ─────────────────────────────────────────── */
+/* Palette follows design/handoff-v3: iOS system grays on true black.
+   The established names below carry the handoff's values, so existing
+   rules inherit the new palette without being rewritten. The v3 token
+   names are aliased at the end for markup written against the handoff. */
 :root {
   --bg:             #000000;
-  --surface:        #0f1115;
-  --surface2:       #181b21;
+  --surface:        #1C1C1E;   /* .secondarySystemGroupedBackground */
+  --surface2:       #2C2C2E;   /* .tertiarySystemFill */
+  --surface3:       #3A3A3C;   /* .quaternarySystemFill — seg thumb */
   --surface-raised: var(--surface2);
-  --border:         rgba(255,255,255,.10);
-  --text:           #f2f5fa;
-  --muted:          rgba(232,238,247,.62);
+  --border:         rgba(84,84,88,.5);        /* .separator */
+  --text:           #FFFFFF;                  /* .label */
+  --muted:          rgba(235,235,245,.60);    /* .secondaryLabel */
   --text-muted:     var(--muted);
-  --dim:            rgba(232,238,247,.38);
+  --dim:            rgba(235,235,245,.32);    /* .tertiaryLabel */
   --text-dim:       var(--dim);
   --accent:         #a8e635;
   --accentSoft:     rgba(168,230,53,.16);
-  --onAccent:       #16230b;
+  --onAccent:       #182A04;
   --accent2:        #72b4ea;
   --accent3:        #a78bfa;
   --accent-2:       var(--accent2);
   --accent-blue:    var(--accent2);
-  --grad:           linear-gradient(135deg,#6a9e1c 0%,#2f6db0 100%);
+  --green:          #30D158;   /* iOS system green — toggle on */
+  --blue:           #0A84FF;   /* .systemBlue, reserved */
+  --grad:           linear-gradient(140deg,#5E8F14 0%,#2C6AAE 100%);
   --field:          rgba(255,255,255,.05);
   --graySoft:       rgba(255,255,255,.09);
   --okSoft:         rgba(114,180,234,.12);
   --okSoft2:        rgba(114,180,234,.22);
-  --seg:            #22262e;
+  --seg:            rgba(118,118,128,.24);    /* segmented / search track */
   --shadow:         0 1px 6px rgba(0,0,0,.6);
+  --chrome:         rgba(20,20,22,.72);       /* translucent bar backing */
+  --blur:           blur(24px) saturate(180%);
+  --e:              cubic-bezier(0.32,0.72,0,1);
   --radius:         20px;
   --radius-sm:      10px;
   --nav-h:          54px;
   --safe-bottom:    env(safe-area-inset-bottom, 0px);
   --safe-top:       env(safe-area-inset-top, 0px);
+
+  /* v3 handoff aliases */
+  --fill1:  var(--surface);
+  --fill2:  var(--surface2);
+  --fill3:  var(--surface3);
+  --sep:    var(--border);
+  --label:  var(--text);
+  --label2: var(--muted);
+  --label3: var(--dim);
 }
 
 /* ── Reset ──────────────────────────────────────────────── */
@@ -268,7 +287,7 @@ a { color: inherit; text-decoration: none; }
 
 .sets-progress       { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .sets-progress-bar   { flex: 1; height: 4px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
-.sets-progress-fill  { height: 100%; background: var(--accent-2); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); }
+.sets-progress-fill  { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); }
 .sets-progress-txt   { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* ── Set rows — iOS grouped list style ──────────────────── */
@@ -615,7 +634,7 @@ a { color: inherit; text-decoration: none; }
   height: 3px; background: var(--border); flex-shrink: 0;
 }
 .pwkt-prog-fill {
-  height: 100%; background: var(--accent2);
+  height: 100%; background: var(--accent);
   transition: width 0.45s cubic-bezier(0.32,0.72,0,1);
 }
 
@@ -946,40 +965,75 @@ body { overscroll-behavior: none; }
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
+/* v3 sheet: grabber, sticky translucent header, grouped inset sections.
+   The panel sits on --bg so each group reads as a raised --fill1 card,
+   which is what makes it look like a real iOS grouped list. */
 .settings-panel {
   position: relative;
-  background: var(--surface);
+  background: var(--bg);
   border-radius: 18px 18px 0 0;
   border: 1px solid var(--border); border-bottom: none;
-  max-height: 82vh; overflow-y: auto;
+  max-height: 88vh; overflow-y: auto;
   padding-bottom: max(16px, var(--safe-bottom));
   transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  transition: transform 0.46s var(--e);
 }
 .settings-sheet.open .settings-panel { transform: translateY(0); }
+.settings-grabber {
+  width: 36px; height: 5px; border-radius: 3px;
+  background: var(--fill3);
+  margin: 6px auto 0; flex-shrink: 0;
+}
 .settings-panel-hdr {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; background: var(--surface); z-index: 1;
+  padding: 12px 20px 12px;
+  box-shadow: 0 0.5px 0 var(--sep);
+  position: sticky; top: 0; z-index: 1;
+  background: var(--chrome);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
 }
-.settings-panel-title { font-size: 1rem; font-weight: 700; }
-.settings-done-btn { color: var(--accent); font-weight: 700; font-size: 0.92rem; padding: 10px 8px; min-height: 44px; display: flex; align-items: center; }
-.settings-body { padding: 8px 20px 20px; }
+.settings-panel-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.settings-done-btn {
+  color: var(--accent); font-weight: 600; font-size: 17px;
+  padding: 10px 8px; min-height: 44px; display: flex; align-items: center;
+  transition: opacity 240ms var(--e);
+}
+.settings-done-btn:active { opacity: .4; transition: opacity 60ms var(--e); }
+.settings-body { padding: 4px 20px 20px; }
 .settings-section-label {
-  font-size: 0.65rem; font-weight: 700; color: var(--text-dim);
-  text-transform: uppercase; letter-spacing: 0.8px;
-  margin: 14px 0 4px;
+  font-size: 13px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.7px;
+  margin: 22px 4px 8px;
+}
+/* Grouped inset card — rows live inside, hairlines between them only. */
+.settings-group {
+  background: var(--fill1);
+  border-radius: 16px;
+  overflow: hidden;
 }
 .settings-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(30,45,68,0.6);
+  gap: 12px;
+  padding: 0 16px; min-height: 52px;
+  box-shadow: 0 0.5px 0 var(--sep);
   cursor: pointer;
 }
-.settings-row:last-of-type { border-bottom: none; }
-.settings-row-label { font-size: 0.88rem; font-weight: 500; color: var(--text); }
-.settings-info-val  { font-size: 0.82rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.settings-group > .settings-row:last-child { box-shadow: none; }
+.settings-row-stack {
+  flex-direction: column; align-items: stretch; gap: 10px;
+  padding-top: 12px; padding-bottom: 12px;
+}
+.settings-row-label { font-size: 17px; font-weight: 400; color: var(--text); flex-shrink: 0; }
+/* 15px rather than the handoff's 17px body: the diagnostic rows carry much
+   longer strings than the mock's "2.4.1" and would otherwise collide. */
+.settings-info-val  {
+  font-size: 15px; color: var(--text-muted);
+  font-variant-numeric: tabular-nums; text-align: right;
+  min-width: 0; overflow-wrap: anywhere;
+}
+.unit-seg-wide { width: 100%; }
+.unit-seg-wide .unit-seg-btn { flex: 1; }
 .ios-toggle { position: relative; display: inline-block; width: 51px; height: 31px; flex-shrink: 0; }
 .ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
 .ios-track {
@@ -993,7 +1047,7 @@ body { overscroll-behavior: none; }
   background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.35);
   transition: left 0.2s;
 }
-.ios-toggle input:checked + .ios-track { background: var(--accent2); }
+.ios-toggle input:checked + .ios-track { background: var(--green); }
 .ios-toggle input:checked + .ios-track::after { left: 22px; }
 .unit-seg { display: flex; background: var(--surface-raised); border-radius: 8px; padding: 2px; gap: 2px; }
 .unit-seg-btn { padding: 5px 14px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); transition: all 0.15s; }
@@ -1143,21 +1197,24 @@ body { overscroll-behavior: none; }
   box-shadow: 0 0 14px rgba(168,230,53,0.6), 0 0 2px rgba(168,230,53,0.9);
 }
 .hig-masthead-text { flex: 1; min-width: 0; }
+/* v3 large-title scale: 34px / 700 / -0.9px tracking, with the date as a
+   15px secondary line ABOVE it (handoff FitHome header order). */
 .hig-large-title {
-  font-size: 26px; font-weight: 800; letter-spacing: -0.6px;
+  font-size: 34px; font-weight: 700; letter-spacing: -0.9px;
   color: var(--text);
-  line-height: 1.05;
+  line-height: 1.06;
+  margin-top: 2px;
 }
 .hig-date-label {
-  font-size: 13px; color: var(--text-muted);
-  font-weight: 500; margin-top: 3px;
+  font-size: 15px; color: var(--text-muted);
+  font-weight: 600; letter-spacing: 0;
 }
 
 /* Merged "This Week" card */
 .week-card { padding: 0; overflow: hidden; }
 .week-dots-row {
   display: flex; gap: 5px; justify-content: space-between;
-  padding: 8px 16px;
+  padding: 14px 20px 18px;
   border-top: 1px solid var(--border);
   width: 100%; background: none; border-left: none; border-right: none; border-bottom: none;
   text-align: left; cursor: pointer;
@@ -1166,11 +1223,11 @@ body { overscroll-behavior: none; }
 
 /* Activity ring row (inside week-card) */
 .ring-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 10px 16px;
+  display: flex; align-items: center; gap: 18px;
+  padding: 18px 20px;
 }
 .ring-wrap {
-  position: relative; width: 66px; height: 66px; flex-shrink: 0;
+  position: relative; width: 84px; height: 84px; flex-shrink: 0;
 }
 .ring-inner {
   position: absolute; inset: 0;
@@ -1178,17 +1235,17 @@ body { overscroll-behavior: none; }
   align-items: center; justify-content: center; gap: 1px;
 }
 .ring-count {
-  font-size: 17px; font-weight: 800; color: var(--text);
+  font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.5px;
   line-height: 1; font-variant-numeric: tabular-nums;
 }
 .ring-of {
-  font-size: 8px; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.5px;
+  font-size: 12px; color: var(--text-muted);
+  font-weight: 400; letter-spacing: 0;
 }
 .ring-info { flex: 1; min-width: 0; }
 .ring-headline-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
-.ring-headline { font-size: 14px; font-weight: 700; color: var(--text); }
-.ring-sub { font-size: 12px; color: var(--text-muted); line-height: 1.35; }
+.ring-headline { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+.ring-sub { font-size: 15px; color: var(--text-muted); line-height: 1.35; }
 .ring-sub strong { color: var(--accent); font-weight: 700; }
 
 /* Done-today card */
@@ -1210,33 +1267,43 @@ body { overscroll-behavior: none; }
 }
 .next-gradient {
   background: var(--grad);
-  padding: 10px 16px 13px; position: relative;
-  min-height: 50px;
+  padding: 18px 20px 20px; position: relative;
+  min-height: 96px;
 }
 .next-dumbbell-icon {
-  position: absolute; top: 10px; right: 12px;
+  position: absolute; top: 18px; right: 18px;
   opacity: 0.28;
 }
 .next-when-lbl {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.2px; color: rgba(255,255,255,0.78); margin-bottom: 4px;
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.3px; color: rgba(255,255,255,0.78); margin-bottom: 6px;
 }
 .next-workout-name {
-  font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.3px;
+  font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -0.7px;
+  line-height: 1.08;
 }
-.next-body { padding: 10px 16px 12px; }
+.next-body { padding: 14px 16px 16px; }
 .next-focus-txt {
-  font-size: 11px; color: var(--text-muted); margin-bottom: 8px;
+  font-size: 15px; color: var(--text-muted); margin-bottom: 12px;
 }
 .next-meta-row {
-  display: flex; gap: 14px;
+  display: flex; gap: 10px;
 }
+/* v3 meta pills: filled --fill2 chips rather than loose inline text, so
+   duration and exercise count read as two discrete facts. */
 .next-meta-item {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 10px; color: var(--text-dim); font-weight: 600;
+  display: flex; align-items: center; gap: 7px;
+  flex: 1; min-width: 0;
+  padding: 11px 14px;
+  background: var(--fill2);
+  border-radius: 12px;
+  font-size: 15px; color: var(--text-muted); font-weight: 400;
 }
-.next-meta-item svg { color: var(--accent); }
-.next-meta-item span { color: var(--text); font-weight: 700; }
+.next-meta-item svg { color: var(--accent); flex-shrink: 0; }
+.next-meta-item span {
+  color: var(--text); font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
 .hig-btn-primary {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 12px;
@@ -1268,3 +1335,97 @@ body { overscroll-behavior: none; }
 .pwkt-back svg { width: 18px; height: 18px; flex-shrink: 0; }
 .pwkt-back:active { opacity: 0.6; }
 
+
+/* ── v3 motion: asymmetric press feedback ───────────────── */
+/* Press snaps in (90ms), release eases back (260ms) on the one curve.
+   Fires on pointer-down. Scale is per element class per the handoff:
+   0.94 icon buttons · 0.96 set actions · 0.975 primary CTA ·
+   0.985 full-width rows and cards. */
+.hig-btn-primary,
+.btn-primary,
+#cogwheel-btn,
+.settings-row,
+.week-dots-row,
+.set-check-btn,
+.set-skip-btn,
+.yt-search-btn,
+.unit-seg-btn {
+  transition: transform 260ms var(--e), background 200ms var(--e), opacity 200ms var(--e);
+}
+.hig-btn-primary:active,
+.btn-primary:active { transform: scale(0.975); transition: transform 90ms var(--e); }
+
+#cogwheel-btn:active { transform: scale(0.94); transition: transform 90ms var(--e); }
+
+.set-check-btn:active,
+.set-skip-btn:active,
+.unit-seg-btn:active { transform: scale(0.96); transition: transform 90ms var(--e); }
+
+.settings-row:active,
+.week-dots-row:active,
+.yt-search-btn:active { transform: scale(0.985); transition: transform 90ms var(--e); }
+
+/* Bar-button labels dim rather than scale. */
+.wkt-back-btn { transition: opacity 240ms var(--e); }
+.wkt-back-btn:active { opacity: .4; transition: opacity 60ms var(--e); }
+
+/* Hover carries no movement, and only on real pointers. */
+@media (hover: hover) and (pointer: fine) {
+  .settings-row:hover { background: var(--fill2); }
+}
+
+/* Reduced motion keeps opacity and colour, drops movement — gentler, not zero. */
+@media (prefers-reduced-motion: reduce) {
+  .hig-btn-primary:active,
+  .btn-primary:active,
+  #cogwheel-btn:active,
+  .settings-row:active,
+  .week-dots-row:active,
+  .set-check-btn:active,
+  .set-skip-btn:active,
+  .yt-search-btn:active,
+  .unit-seg-btn:active { transform: none; }
+}
+
+/* ── v3 workout: sets card fills the column ─────────────── */
+/* Handoff FitWorkout: "completed and upcoming sets ... expand to absorb
+   spare vertical space so the card fills the column with no dead zone."
+   Only the collapsed (.locked) rows stretch — the active row keeps its
+   natural height so its inputs never distort. */
+.pwkt-stage .exercise-card.pwkt-active {
+  display: flex; flex-direction: column;
+}
+.pwkt-stage .exercise-card.pwkt-active .ex-body-outer,
+.pwkt-stage .exercise-card.pwkt-active .ex-body {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+}
+.pwkt-stage .exercise-card.pwkt-active .sets-list {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+}
+.pwkt-stage .exercise-card.pwkt-active .set-row { flex: 0 0 auto; }
+/* Collapsed rows share the slack so the card fills its column. They end up
+   tall — that is the handoff's own proportion, not an accident. */
+.pwkt-stage .exercise-card.pwkt-active .set-row.locked {
+  flex: 1 1 auto;
+  display: flex; flex-direction: column; justify-content: center;
+}
+/* Styles live here rather than inline on the element: an inline
+   margin-top would win the cascade and defeat the auto below. */
+.yt-wrap {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+/* Whatever slack is left pushes the tutorial button to the bottom edge
+   instead of leaving it stranded mid-screen. */
+.pwkt-stage .exercise-card.pwkt-active .yt-wrap { margin-top: auto; }
+
+/* Collapsed set summary — v3 shows the target, not a bare "Set n". */
+.set-row-summary { align-items: center; gap: 14px; }
+.set-sum-num {
+  font-size: 17px; font-weight: 600; color: var(--text-dim);
+  font-variant-numeric: tabular-nums; min-width: 14px;
+}
+.set-sum-target { font-size: 17px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.set-sum-target strong { color: var(--text-muted); font-weight: 600; }
+.set-sum-x { color: var(--text-dim); margin: 0 2px; }

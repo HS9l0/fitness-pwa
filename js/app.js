@@ -74,6 +74,7 @@ function openSettings() {
   sheet.innerHTML = `
     <div class="settings-backdrop"></div>
     <div class="settings-panel">
+      <div class="settings-grabber"></div>
       <div class="settings-panel-hdr">
         <span class="settings-panel-title">Settings</span>
         <button class="settings-done-btn">Done</button>
@@ -81,64 +82,78 @@ function openSettings() {
       <div class="settings-body">
 
         <div class="settings-section-label">Units</div>
-        <div class="settings-row">
-          <span class="settings-row-label">Weight</span>
-          <div class="unit-seg">
-            <button class="unit-seg-btn ${unit === 'kg'  ? 'active' : ''}" data-unit="kg">kg</button>
-            <button class="unit-seg-btn ${unit === 'lbs' ? 'active' : ''}" data-unit="lbs">lbs</button>
+        <div class="settings-group">
+          <div class="settings-row">
+            <span class="settings-row-label">Weight</span>
+            <div class="unit-seg">
+              <button class="unit-seg-btn ${unit === 'kg'  ? 'active' : ''}" data-unit="kg">kg</button>
+              <button class="unit-seg-btn ${unit === 'lbs' ? 'active' : ''}" data-unit="lbs">lbs</button>
+            </div>
           </div>
         </div>
 
-        <div class="settings-section-label" style="margin-top:18px">Developer</div>
-        <div class="settings-row">
-          <span class="settings-row-label">Test Mode</span>
-          <label class="ios-toggle">
-            <input type="checkbox" id="test-mode-chk" ${testMode ? 'checked' : ''}>
-            <span class="ios-track"></span>
-          </label>
+        <div class="settings-section-label">Developer</div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <span class="settings-row-label">Test Mode</span>
+            <label class="ios-toggle">
+              <input type="checkbox" id="test-mode-chk" ${testMode ? 'checked' : ''}>
+              <span class="ios-track"></span>
+            </label>
+          </div>
         </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Version</span>
-          <span class="settings-info-val" id="sw-version-display">—</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Display mode</span>
-          <span class="settings-info-val" id="dbg-display">—</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Viewport</span>
-          <span class="settings-info-val" id="dbg-viewport">—</span>
-        </div>
-        <div class="settings-row" style="cursor:default">
-          <span class="settings-row-label">Safe area</span>
-          <span class="settings-info-val" id="dbg-safe">—</span>
-        </div>
-        <div class="settings-row" id="force-update-row">
-          <span class="settings-row-label">Force update</span>
-          <span class="settings-info-val" style="color:var(--accent)">Reload</span>
+
+        <div class="settings-section-label">Diagnostics</div>
+        <div class="settings-group">
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Version</span>
+            <span class="settings-info-val" id="sw-version-display">—</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Display mode</span>
+            <span class="settings-info-val" id="dbg-display">—</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Viewport</span>
+            <span class="settings-info-val" id="dbg-viewport">—</span>
+          </div>
+          <div class="settings-row" style="cursor:default">
+            <span class="settings-row-label">Safe area</span>
+            <span class="settings-info-val" id="dbg-safe">—</span>
+          </div>
+          <div class="settings-row" id="force-update-row">
+            <span class="settings-row-label">Force update</span>
+            <span class="settings-info-val" style="color:var(--accent)">Reload</span>
+          </div>
         </div>
 
         <div id="test-day-wrap" style="${testMode ? '' : 'display:none'}">
-          <div class="settings-row" style="align-items:center">
-            <span class="settings-row-label" style="font-size:0.82rem;color:var(--text-muted)">Test Day</span>
-            <div class="unit-seg">
-              <button class="unit-seg-btn dev-day-btn ${testDay===1?'active':''}" data-day="1" style="padding:5px 10px;font-size:0.76rem">Day 1</button>
-              <button class="unit-seg-btn dev-day-btn ${testDay===2?'active':''}" data-day="2" style="padding:5px 10px;font-size:0.76rem">Day 2</button>
-              <button class="unit-seg-btn dev-day-btn ${testDay===3?'active':''}" data-day="3" style="padding:5px 10px;font-size:0.76rem">Day 3</button>
-              <button class="unit-seg-btn dev-day-btn ${testDay===0?'active':''}" data-day="0" style="padding:5px 10px;font-size:0.76rem">Rest</button>
+          <div class="settings-section-label">Test day</div>
+          <div class="settings-group">
+            <div class="settings-row settings-row-stack">
+              <div class="unit-seg unit-seg-wide">
+                <button class="unit-seg-btn dev-day-btn ${testDay===1?'active':''}" data-day="1">Day 1</button>
+                <button class="unit-seg-btn dev-day-btn ${testDay===2?'active':''}" data-day="2">Day 2</button>
+                <button class="unit-seg-btn dev-day-btn ${testDay===3?'active':''}" data-day="3">Day 3</button>
+                <button class="unit-seg-btn dev-day-btn ${testDay===0?'active':''}" data-day="0">Rest</button>
+              </div>
             </div>
           </div>
-          <div class="settings-row" style="cursor:default">
-            <span class="settings-row-label">Today</span>
-            <span class="settings-info-val">${realDayLabel}</span>
-          </div>
-          <div class="settings-row" style="cursor:default">
-            <span class="settings-row-label">This week</span>
-            <span class="settings-info-val">${weekCount} workout${weekCount !== 1 ? 's' : ''}</span>
-          </div>
-          <div class="settings-row" style="cursor:default;border-bottom:none">
-            <span class="settings-row-label">Total logged</span>
-            <span class="settings-info-val">${sessions.length} workout${sessions.length !== 1 ? 's' : ''}</span>
+
+          <div class="settings-section-label">Info</div>
+          <div class="settings-group">
+            <div class="settings-row" style="cursor:default">
+              <span class="settings-row-label">Today</span>
+              <span class="settings-info-val">${realDayLabel}</span>
+            </div>
+            <div class="settings-row" style="cursor:default">
+              <span class="settings-row-label">This week</span>
+              <span class="settings-info-val">${weekCount} workout${weekCount !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="settings-row" style="cursor:default">
+              <span class="settings-row-label">Total logged</span>
+              <span class="settings-info-val">${sessions.length} workout${sessions.length !== 1 ? 's' : ''}</span>
+            </div>
           </div>
           <button id="reset-data-btn" class="settings-reset-btn">Reset All Data</button>
         </div>

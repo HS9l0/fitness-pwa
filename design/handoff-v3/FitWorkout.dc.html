@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  html, body { margin:0; height:100%; background:#0d0d0f; }
+  body { font-family:-apple-system,'SF Pro Display','SF Pro Text',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  button, a { background:none; border:none; font:inherit; color:inherit; cursor:pointer; text-decoration:none; -webkit-tap-highlight-color:transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition-property:opacity,background-color,background,color !important; transition-duration:150ms !important; }
+  }
+</style>
+</helmet>
+
+<div style="height:100dvh;width:100vw;display:flex;align-items:center;justify-content:center;background:#0d0d0f;overflow:hidden;">
+<div style="width:430px;height:932px;flex-shrink:0;transform:scale({{ scale }});transform-origin:center center;border-radius:52px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.07);display:flex;flex-direction:column;background:#000;--bg:#000000;--fill1:#1C1C1E;--fill2:#2C2C2E;--fill3:#3A3A3C;--sep:rgba(84,84,88,.5);--label:#FFFFFF;--label2:rgba(235,235,245,.60);--label3:rgba(235,235,245,.32);--accent:#A8E635;--onAccent:#182A04;--blue:#0A84FF;--e:cubic-bezier(0.32,0.72,0,1);">
+  <div style="flex:1;min-height:0;padding:54px 8px 8px;box-sizing:border-box;background:#000;">
+    <div style="height:100%;border-radius:24px;overflow:hidden;position:relative;background:var(--bg);color:var(--label);display:flex;flex-direction:column;">
+
+      <!-- Translucent nav bar -->
+      <div style="flex-shrink:0;background:rgba(20,20,22,.72);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);">
+        <div style="display:flex;align-items:center;gap:10px;padding:4px 12px;">
+          <button style="display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 10px 0 4px;font-size:17px;font-weight:400;color:var(--accent);flex-shrink:0;transition:opacity 240ms var(--e);" style-active="opacity:.4;transition:opacity 60ms var(--e)">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Home
+          </button>
+          <div style="flex:1;min-width:0;text-align:center;font-size:15px;font-weight:600;letter-spacing:-0.1px;white-space:nowrap;">Exercise 2 <span style="color:var(--label2);font-weight:400;">of 6</span></div>
+          <div style="flex-shrink:0;min-width:62px;text-align:right;padding-right:6px;font-size:19px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-0.3px;">12:45</div>
+        </div>
+        <div style="height:3px;background:var(--fill2);">
+          <div style="height:100%;width:33%;background:var(--accent);border-radius:0 2px 2px 0;"></div>
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
+
+        <!-- Exercise title -->
+        <div style="padding:22px 20px 18px;flex-shrink:0;">
+          <div style="font-size:32px;font-weight:700;letter-spacing:-0.9px;line-height:1.08;text-wrap:pretty;">Leg Extension<br>Machine</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-top:8px;">
+            <div style="font-size:15px;color:var(--label2);">Quads · front of thigh</div>
+            <div style="font-size:15px;font-weight:600;color:var(--label);white-space:nowrap;font-variant-numeric:tabular-nums;">3 × 12</div>
+          </div>
+        </div>
+
+        <div style="padding:0 20px 20px;flex:1;min-height:0;display:flex;flex-direction:column;">
+
+          <!-- Sets header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px 8px;flex-shrink:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.7px;">Sets</div>
+            <div style="font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums;">1 of 3 complete</div>
+          </div>
+
+          <!-- Sets card -->
+          <div style="border-radius:20px;overflow:hidden;background:var(--fill1);flex:1;min-height:0;display:flex;flex-direction:column;">
+
+            <!-- Set 1 — complete -->
+            <div style="flex:1;display:flex;align-items:center;gap:14px;padding:16px 18px;box-shadow:0 0.5px 0 var(--sep);">
+              <div style="width:26px;flex-shrink:0;font-size:19px;font-weight:600;color:var(--label3);font-variant-numeric:tabular-nums;text-align:center;">1</div>
+              <div style="flex:1;display:flex;align-items:baseline;gap:8px;color:var(--label3);">
+                <span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;">40</span><span style="font-size:14px;">kg</span>
+                <span style="font-size:15px;padding:0 2px;">×</span>
+                <span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;">12</span><span style="font-size:14px;">reps</span>
+              </div>
+              <div style="width:44px;height:44px;border-radius:22px;background:rgba(168,230,53,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+
+            <!-- Set 2 — active -->
+            <div style="padding:20px 18px;background:rgba(255,255,255,.045);box-shadow:inset 3px 0 0 var(--accent),0 0.5px 0 var(--sep);">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:26px;flex-shrink:0;font-size:19px;font-weight:700;color:var(--label);font-variant-numeric:tabular-nums;text-align:center;">2</div>
+                <div style="flex:1;display:flex;align-items:flex-end;gap:12px;">
+                  <div style="flex:1;">
+                    <div style="width:100%;box-sizing:border-box;padding:12px 6px;background:var(--fill2);border:1px solid rgba(255,255,255,.34);border-radius:13px;font-size:27px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-0.5px;">40</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--label2);text-align:center;text-transform:uppercase;letter-spacing:0.8px;margin-top:6px;">kg</div>
+                  </div>
+                  <div style="font-size:17px;color:var(--label3);padding-bottom:32px;">×</div>
+                  <div style="flex:1;">
+                    <div style="width:100%;box-sizing:border-box;padding:12px 6px;background:var(--fill2);border:1px solid rgba(255,255,255,.34);border-radius:13px;font-size:27px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-0.5px;">12</div>
+                    <div style="font-size:12px;font-weight:600;color:var(--label2);text-align:center;text-transform:uppercase;letter-spacing:0.8px;margin-top:6px;">reps</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:16px;">
+                <button style="width:92px;flex-shrink:0;min-height:50px;border-radius:14px;background:var(--fill2);border:1px solid rgba(255,255,255,.34);box-sizing:border-box;color:var(--label);font-size:16px;font-weight:500;transition:transform 260ms var(--e),background 200ms var(--e);" style-hover="background:var(--fill3)" style-active="transform:scale(.96);transition:transform 90ms var(--e)">Skip</button>
+                <button style="flex:1;min-height:50px;border-radius:14px;background:var(--accent);color:var(--onAccent);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 16px rgba(168,230,53,.26);transition:transform 260ms var(--e),opacity 200ms var(--e);" style-hover="opacity:.9" style-active="transform:scale(.96);transition:transform 90ms var(--e)">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Set 3 — upcoming -->
+            <div style="flex:1;display:flex;align-items:center;gap:14px;padding:16px 18px;">
+              <div style="width:26px;flex-shrink:0;font-size:19px;font-weight:600;color:var(--label3);font-variant-numeric:tabular-nums;text-align:center;">3</div>
+              <div style="flex:1;display:flex;align-items:baseline;gap:8px;color:var(--label3);">
+                <span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;">40</span><span style="font-size:14px;">kg</span>
+                <span style="font-size:15px;padding:0 2px;">×</span>
+                <span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;">12</span><span style="font-size:14px;">reps</span>
+              </div>
+              <div style="width:44px;height:44px;border-radius:22px;background:var(--fill2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tutorial -->
+          <a style="display:flex;align-items:center;justify-content:center;gap:9px;width:100%;box-sizing:border-box;min-height:50px;margin-top:14px;border-radius:14px;background:var(--fill1);color:var(--label);font-size:16px;font-weight:500;flex-shrink:0;transition:transform 260ms var(--e),background 200ms var(--e);" style-hover="background:var(--fill2)" style-active="transform:scale(.985);transition:transform 90ms var(--e)">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>Watch Tutorial
+          </a>
+
+          <!-- Next exercise peek -->
+          <div style="padding-top:14px;flex-shrink:0;">
+            <button style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:16px;background:var(--fill1);transition:transform 260ms var(--e),background 200ms var(--e);" style-hover="background:var(--fill2)" style-active="transform:scale(.985);transition:transform 90ms var(--e)">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:12px;font-weight:600;color:var(--label2);text-transform:uppercase;letter-spacing:0.9px;">Up Next</div>
+                <div style="font-size:17px;font-weight:600;letter-spacing:-0.2px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Romanian Deadlift · 3 × 10</div>
+              </div>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--label3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932}}">
+class Component extends DCLogic {
+  state = { scale: 1 };
+  componentDidMount() { this.fit(); this._h = () => this.fit(); window.addEventListener('resize', this._h); }
+  componentWillUnmount() { window.removeEventListener('resize', this._h); }
+  fit() {
+    this.setState({ scale: Math.min(1, (window.innerHeight - 24) / 932, (window.innerWidth - 24) / 430) });
+  }
+  renderVals() { return { scale: this.state.scale }; }
+}
+</script>
+</body>
+</html>
