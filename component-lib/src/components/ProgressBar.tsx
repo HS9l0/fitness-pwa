@@ -9,7 +9,7 @@ export interface ProgressBarProps {
   label?: string;
 }
 
-/** Sets progress bar — green fill, shows "current / total" count to the right. */
+/** Sets progress bar — blue (`--accent2`) fill, shows "current / total" count to the right. */
 export function ProgressBar({ current, total, label }: ProgressBarProps) {
   const pct = total > 0 ? Math.min(100, (current / total) * 100) : 0;
   return (

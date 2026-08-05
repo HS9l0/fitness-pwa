@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export interface ExerciseCardProps {
-  /** Sequential position in the workout (displayed in the blue circle) */
+  /** Sequential position in the workout (displayed in the lime circle) */
   number: number;
   name: string;
   /** Comma-separated muscle groups, e.g. "Chest, Triceps" */
