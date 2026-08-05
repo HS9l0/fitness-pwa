@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "description": "FitPlan design system — React components matching the fitness PWA visual language",
   "type": "module",
-  "main": "dist/_ds_bundle.js",
+  "main": "dist/index.es.js",
+  "module": "dist/index.es.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.es.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
   "scripts": {
     "build": "node build.mjs"
   },

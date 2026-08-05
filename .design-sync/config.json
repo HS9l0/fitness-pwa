@@ -1,0 +1,26 @@
+{
+  "projectId": "aad96f4d-5776-4f1f-bb15-45c69780dd52",
+  "shape": "package",
+  "pkg": "fitness-pwa-ds",
+  "globalName": "FitnessPWA",
+  "buildCmd": "npm run build",
+  "cssEntry": "dist/styles.css",
+  "docsDir": "docs",
+  "guidelinesGlob": [],
+  "overrides": {
+    "SettingsSheet": { "cardMode": "single", "viewport": "390x700" },
+    "DrumPicker": { "cardMode": "single", "viewport": "390x700" },
+    "RestTimer": { "cardMode": "single", "viewport": "390x420" },
+    "BottomNav": { "cardMode": "column" }
+  },
+  "componentSrcMap": {
+    "FitTheme": null
+  },
+  "provider": {
+    "component": "FitTheme"
+  },
+  "runtimeFontPrefixes": [
+    "SF Pro"
+  ],
+  "readmeHeader": ".design-sync/conventions.md"
+}

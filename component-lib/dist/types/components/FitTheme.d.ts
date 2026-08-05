@@ -1,9 +1,7 @@
 import React from 'react';
-
 export interface FitThemeProps {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }
-
 /**
  * FitTheme — root wrapper that establishes the dark canvas and base text colour.
  *
@@ -22,17 +20,4 @@ export interface FitThemeProps {
  * </FitTheme>
  * ```
  */
-export function FitTheme({ children }: FitThemeProps) {
-  return (
-    <div
-      style={{
-        fontFamily: "system-ui, 'Segoe UI', sans-serif",
-        background: 'var(--bg, #000000)',
-        color: 'var(--text, #f2f5fa)',
-        minHeight: '100%',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+export declare function FitTheme({ children }: FitThemeProps): React.JSX.Element;

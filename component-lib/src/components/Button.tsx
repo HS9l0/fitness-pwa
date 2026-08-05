@@ -13,7 +13,7 @@ export interface ButtonProps {
 }
 
 /**
- * Button — primary (filled blue) or ghost (bordered, muted).
+ * Button — primary (filled lime, `--accent`) or ghost (bordered, muted).
  *
  * Primary is full-width by default; use inside a container to constrain width.
  * Ghost is inline-flex and wraps its content.

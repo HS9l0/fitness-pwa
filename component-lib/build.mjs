@@ -1,35 +1,42 @@
 // @ts-check
+// Library build for the FitPlan design system.
+//
+// Emits what a consumer (and the design-sync converter) expects from a
+// published package: an ESM entry with React left external, a .d.ts tree for
+// the public API, and the stylesheet that carries the design tokens.
+//
+// React is deliberately NOT bundled here — the converter supplies its own
+// copy via _vendor/, and a second inlined React breaks hooks at render time.
 import { build } from 'esbuild';
-import { copyFileSync, mkdirSync, readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { copyFileSync, mkdirSync } from 'fs';
+import { execFileSync } from 'child_process';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'));
+process.chdir(__dirname);
 
-mkdirSync('dist/_vendor', { recursive: true });
-
-// Bundle the components into a self-contained IIFE with React inline.
-// The @ds-bundle header is required by the design-sync format.
-const header = `// @ds-bundle name="FitnessPWA" version="${pkg.version}" globalName="FitnessPWA"`;
+mkdirSync('dist', { recursive: true });
 
 await build({
   entryPoints: ['src/index.ts'],
   bundle: true,
-  format: 'iife',
-  globalName: 'FitnessPWA',
-  outfile: 'dist/_ds_bundle.js',
-  banner: { js: header },
+  format: 'esm',
+  outfile: 'dist/index.es.js',
+  external: ['react', 'react-dom', 'react/jsx-runtime'],
   minify: false,
   jsx: 'automatic',
   loader: { '.ts': 'ts', '.tsx': 'tsx' },
-  define: {
-    'process.env.NODE_ENV': '"production"',
-  },
   logLevel: 'info',
 });
 
-// Copy styles.css as the design token layer — designs receive only its @import closure
+// Declarations: the converter reads these to build each <Name>Props contract.
+execFileSync('node', ['node_modules/typescript/bin/tsc', '--emitDeclarationOnly'], {
+  stdio: 'inherit',
+});
+
+// The PWA's own stylesheet is the token layer — designs receive only the
+// @import closure of the styles.css that ships in the bundle.
 copyFileSync('../styles.css', 'dist/styles.css');
 
 console.log('Build complete → dist/');

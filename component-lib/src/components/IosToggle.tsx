@@ -6,7 +6,7 @@ export interface IosToggleProps {
   label?: string;
 }
 
-/** iOS-style toggle switch — green when on, grey when off. */
+/** iOS-style toggle switch — blue (`--accent2`) when on, grey when off. */
 export function IosToggle({ checked, onChange, label }: IosToggleProps) {
   const id = useId();
   return (

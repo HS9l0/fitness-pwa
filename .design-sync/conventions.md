@@ -2,7 +2,7 @@
 
 ## Wrapping and setup
 
-Wrap every canvas in `FitTheme` — it sets the dark background (`#080d14`) and ensures CSS custom properties resolve:
+Wrap every canvas in `FitTheme` — it sets the dark background (`var(--bg)`, `#000000`) and the base text colour:
 
 ```tsx
 import { FitTheme } from 'fitness-pwa-ds';
@@ -17,28 +17,42 @@ export default function App() {
 }
 ```
 
-Without `FitTheme` the CSS variables (`var(--bg)`, `var(--accent)`, etc.) resolve to nothing and all components render unstyled.
+`FitTheme` only paints the surface it is given — it is `minHeight: 100%`, so give it a parent with real height (or your own full-bleed wrapper) or the dark background will collapse to content height and leave the page white behind it.
+
+The tokens themselves come from `styles.css` (`:root`), which ships with the bundle — so `var(--accent)` resolves with or without `FitTheme`. What you lose without the wrapper is the dark canvas and the default text colour, which makes every component look like it is floating on white.
 
 ## Styling idiom
 
 This system uses **CSS custom properties + class names**. No Tailwind, no CSS-in-JS.
 
-Token reference (all resolve inside `FitTheme`):
+Token reference — every value below is read from `:root` in `styles.css`.
+
+**The accent is lime, not blue.** `--accent` (`#a8e635`) is the brand colour: CTAs, active states, completion. `--accent2` (`#72b4ea`) is a cool blue used as the *secondary* accent for metadata and specs. Getting these two the wrong way round is the single easiest way to produce an off-brand design.
 
 | Token | Value | Use for |
 |---|---|---|
-| `var(--bg)` | `#080d14` | Screen background |
-| `var(--surface)` | `#0f1825` | Card background |
-| `var(--surface-raised)` | `#162030` | Input, sets-list background |
-| `var(--border)` | `#1e2d44` | All borders |
-| `var(--accent)` | `#3b82f6` | Blue — active, CTA, timer |
-| `var(--accent-2)` | `#22c55e` | Green — done, complete |
-| `var(--accent-blue)` | `#06b6d4` | Cyan — install prompt |
-| `var(--text)` | `#e2eaf6` | Primary text |
-| `var(--text-muted)` | `#7a9bb5` | Secondary text |
-| `var(--text-dim)` | `#3a5070` | Placeholder, label text |
-| `var(--radius)` | `14px` | Card, button radius |
-| `var(--radius-sm)` | `8px` | Input, tag radius |
+| `var(--bg)` | `#000000` | Screen background — true black |
+| `var(--surface)` | `#0f1115` | Card background |
+| `var(--surface2)` / `var(--surface-raised)` | `#181b21` | Input, sets-list, raised fill |
+| `var(--border)` | `rgba(255,255,255,.10)` | All borders |
+| `var(--accent)` | `#a8e635` | **Lime** — primary CTA, active, done |
+| `var(--accentSoft)` | `rgba(168,230,53,.16)` | Tinted lime fill behind accents |
+| `var(--onAccent)` | `#16230b` | Text/icon colour on a lime fill |
+| `var(--accent2)` / `var(--accent-2)` / `var(--accent-blue)` | `#72b4ea` | Blue — secondary accent, set specs |
+| `var(--accent3)` | `#a78bfa` | Violet — third accent |
+| `var(--grad)` | `linear-gradient(135deg,#6a9e1c,#2f6db0)` | Header / hero gradient |
+| `var(--text)` | `#f2f5fa` | Primary text |
+| `var(--muted)` / `var(--text-muted)` | `rgba(232,238,247,.62)` | Secondary text |
+| `var(--dim)` / `var(--text-dim)` | `rgba(232,238,247,.38)` | Placeholder, label text |
+| `var(--field)` | `rgba(255,255,255,.05)` | Input field fill |
+| `var(--graySoft)` | `rgba(255,255,255,.09)` | Neutral button fill |
+| `var(--okSoft)` / `var(--okSoft2)` | `rgba(114,180,234,.12/.22)` | Blue tinted states |
+| `var(--seg)` | `#22262e` | Segmented-control track |
+| `var(--shadow)` | `0 1px 6px rgba(0,0,0,.6)` | Card shadow |
+| `var(--radius)` | `20px` | Card, button radius |
+| `var(--radius-sm)` | `10px` | Input, tag radius |
+| `var(--nav-h)` | `54px` | Bottom nav height |
+| `var(--safe-top)` / `var(--safe-bottom)` | `env(safe-area-inset-*)` | iOS safe-area insets |
 
 For layout glue between components, use inline styles with these tokens — e.g. `style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}`.
 
