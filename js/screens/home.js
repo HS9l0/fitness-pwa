@@ -3,12 +3,12 @@ import { getSessions, today } from '../store.js';
 
 const ICO_CHEVRON_R = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
 const ICO_CHECK_CIRCLE = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
-const ICO_CHECK_SM = `<svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_CHECK_SM = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICO_CHECK_CIRCLE_SM = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><polyline points="8.5 12 11 14.5 15.5 9.5"/></svg>`;
 const ICO_CLOCK = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 14.5 14.5"/></svg>`;
 const ICO_DUMBBELL = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 const ICO_MOON = `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 const ICO_DUMBBELL_LG = `<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
-const ICO_DUMBBELL_LOGO = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#16230b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v10M7 5v14M17 5v14M20 7v10"/><line x1="7" y1="12" x2="17" y2="12"/></svg>`;
 
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -39,7 +39,6 @@ export function renderHome(container, navigate) {
 
   const sessionDates = new Set(sessions.map(s => s.date));
 
-  const WHEN_LABELS = ['Monday', 'Wednesday', 'Friday'];
   const dateLabel = `${DAY_NAMES[dow]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
   const doneToday = todayDay !== null && sessions.some(s => s.date === todayStr && s.day === todayDay);
 
@@ -58,30 +57,60 @@ export function renderHome(container, navigate) {
     return d.toISOString().slice(0, 10);
   });
 
+  // Day strip at the handoff's scale: 34px circles, 14px numerals, 12px
+  // labels. A completed day is a filled accent circle carrying a check
+  // rather than its date; today is an accent ring around its date.
   const dotsHtml = streakDays.map(dateStr => {
     const d = new Date(dateStr + 'T12:00:00');
     const label = ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()];
     const done = sessionDates.has(dateStr);
     const isToday = dateStr === todayStr;
+    const base = 'width:34px;height:34px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;';
     let dotStyle, lblStyle, dotContent;
     if (done) {
-      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--accent);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--onAccent);"`;
-      lblStyle = `style="font-size:8px;color:var(--dim);text-transform:uppercase;"`;
+      dotStyle = `style="${base}background:var(--accent);color:var(--onAccent);"`;
+      lblStyle = `style="font-size:12px;font-weight:600;color:var(--label2);"`;
       dotContent = ICO_CHECK_SM;
     } else if (isToday) {
-      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--accentSoft);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent);"`;
-      lblStyle = `style="font-size:8px;color:var(--accent);text-transform:uppercase;"`;
+      dotStyle = `style="${base}background:transparent;box-shadow:inset 0 0 0 2px var(--accent);font-size:14px;font-weight:700;color:var(--accent);"`;
+      lblStyle = `style="font-size:12px;font-weight:600;color:var(--accent);"`;
       dotContent = d.getDate();
     } else {
-      dotStyle = `style="width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--dim);"`;
-      lblStyle = `style="font-size:8px;color:var(--dim);text-transform:uppercase;"`;
+      dotStyle = `style="${base}background:var(--fill2);font-size:14px;font-weight:600;color:var(--label3);"`;
+      lblStyle = `style="font-size:12px;font-weight:600;color:var(--label3);"`;
       dotContent = d.getDate();
     }
-    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
       <div ${dotStyle}>${dotContent}</div>
       <div ${lblStyle}>${label}</div>
     </div>`;
   }).join('');
+
+  // Most recent completed session other than today's — the handoff's
+  // "last session" row, which pushes to History.
+  const priorSessions = sessions
+    .filter(s => s.date !== todayStr)
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  const lastSession = priorSessions[0] ?? null;
+  let lastSessionHtml = '';
+  if (lastSession) {
+    const ls = new Date(lastSession.date + 'T12:00:00');
+    const lsLabel = WORKOUTS[lastSession.day - 1]?.label ?? `Day ${lastSession.day}`;
+    const lsDate = `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][ls.getDay()]}, ${MONTH_NAMES[ls.getMonth()].slice(0, 3)} ${ls.getDate()}`;
+    const lsCount = lastSession.exercises?.length ?? 0;
+    const bits = [lsDate];
+    if (lastSession.durationMin) bits.push(`${lastSession.durationMin} min`);
+    if (lsCount) bits.push(`${lsCount} exercise${lsCount === 1 ? '' : 's'}`);
+    lastSessionHtml = `
+      <button type="button" class="last-session-row" id="last-session-btn">
+        <span class="last-session-icon">${ICO_CHECK_CIRCLE_SM}</span>
+        <span class="last-session-text">
+          <span class="last-session-title">${lsLabel}</span>
+          <span class="last-session-sub">${bits.join(' · ')}</span>
+        </span>
+        ${ICO_CHEVRON_R}
+      </button>`;
+  }
 
   // Next-up / done-today / rest-day card
   let nextCardHtml;
@@ -99,14 +128,14 @@ export function renderHome(container, navigate) {
       <div class="card next-card" style="margin-bottom:8px">
         <div class="next-gradient">
           <div class="next-dumbbell-icon">${ICO_DUMBBELL_LG}</div>
-          <div class="next-when-lbl">Today · ${WHEN_LABELS[todayDay - 1]}</div>
+          <div class="next-when-lbl">Today's Session</div>
           <div class="next-workout-name">${workout.label}</div>
         </div>
         <div class="next-body">
           <div class="next-focus-txt">${workout.focus}</div>
           <div class="next-meta-row">
-            <div class="next-meta-item">${ICO_CLOCK} <span>~${workout.durationMin}</span> min</div>
-            <div class="next-meta-item">${ICO_DUMBBELL} <span>${workout.exercises.length}</span> exercises</div>
+            <div class="next-meta-item">${ICO_CLOCK}<div><span>${workout.durationMin}</span><em> min</em></div></div>
+            <div class="next-meta-item">${ICO_DUMBBELL}<div><span>${workout.exercises.length}</span><em> exercises</em></div></div>
           </div>
         </div>
       </div>`;
@@ -121,10 +150,9 @@ export function renderHome(container, navigate) {
 
   container.innerHTML = `
     <div class="hig-title-row">
-      <div class="hig-logo-badge">${ICO_DUMBBELL_LOGO}</div>
       <div class="hig-masthead-text">
         <div class="hig-date-label">${dateLabel}</div>
-        <div class="hig-large-title">FitPlan</div>
+        <div class="hig-large-title">Today</div>
       </div>
     </div>
 
@@ -167,6 +195,8 @@ export function renderHome(container, navigate) {
         </button>
       </div>
 
+      ${lastSessionHtml}
+
       ${todayDay && !doneToday ? `
         <div class="home-cta-wrap">
           <button class="hig-btn-primary" id="start-workout-btn">Start Workout ${ICO_CHEVRON_R}</button>
@@ -177,4 +207,5 @@ export function renderHome(container, navigate) {
 
   container.querySelector('#start-workout-btn')?.addEventListener('click', () => navigate('workout'));
   container.querySelector('#view-history-btn')?.addEventListener('click', () => navigate('history'));
+  container.querySelector('#last-session-btn')?.addEventListener('click', () => navigate('history'));
 }

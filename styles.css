@@ -1184,7 +1184,7 @@ body { overscroll-behavior: none; }
 #screen-home { padding-bottom: 0; }
 
 .hig-title-row {
-  display: flex; align-items: center; gap: 11px;
+  display: flex; align-items: flex-end; gap: 16px;
   /* Bottom padding keeps the This Week card clear of the 44px fixed
      cogwheel, which is anchored at the same safe-area top. */
   padding: max(12px, env(safe-area-inset-top,0px)) 20px 14px;
@@ -1213,9 +1213,9 @@ body { overscroll-behavior: none; }
 /* Merged "This Week" card */
 .week-card { padding: 0; overflow: hidden; }
 .week-dots-row {
-  display: flex; gap: 5px; justify-content: space-between;
-  padding: 14px 20px 18px;
-  border-top: 1px solid var(--border);
+  display: flex; gap: 6px; justify-content: space-between;
+  padding: 0 16px 18px;
+  border-top: none;
   width: 100%; background: none; border-left: none; border-right: none; border-bottom: none;
   text-align: left; cursor: pointer;
 }
@@ -1224,7 +1224,7 @@ body { overscroll-behavior: none; }
 /* Activity ring row (inside week-card) */
 .ring-card {
   display: flex; align-items: center; gap: 18px;
-  padding: 18px 20px;
+  padding: 20px 20px 18px;
 }
 .ring-wrap {
   position: relative; width: 84px; height: 84px; flex-shrink: 0;
@@ -1267,7 +1267,7 @@ body { overscroll-behavior: none; }
 }
 .next-gradient {
   background: var(--grad);
-  padding: 18px 20px 20px; position: relative;
+  padding: 20px 20px 22px; position: relative;
   min-height: 96px;
 }
 .next-dumbbell-icon {
@@ -1275,16 +1275,16 @@ body { overscroll-behavior: none; }
   opacity: 0.28;
 }
 .next-when-lbl {
-  font-size: 12px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 1.3px; color: rgba(255,255,255,0.78); margin-bottom: 6px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.3px; color: rgba(255,255,255,.82); margin-bottom: 7px;
 }
 .next-workout-name {
-  font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -0.7px;
-  line-height: 1.08;
+  font-size: 27px; font-weight: 700; color: #fff; letter-spacing: -0.6px;
+  line-height: 1.1;
 }
-.next-body { padding: 14px 16px 16px; }
+.next-body { padding: 16px 20px 18px; }
 .next-focus-txt {
-  font-size: 15px; color: var(--text-muted); margin-bottom: 12px;
+  font-size: 15px; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px;
 }
 .next-meta-row {
   display: flex; gap: 10px;
@@ -1292,18 +1292,18 @@ body { overscroll-behavior: none; }
 /* v3 meta pills: filled --fill2 chips rather than loose inline text, so
    duration and exercise count read as two discrete facts. */
 .next-meta-item {
-  display: flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; gap: 8px;
   flex: 1; min-width: 0;
-  padding: 11px 14px;
+  padding: 11px 13px;
   background: var(--fill2);
   border-radius: 12px;
-  font-size: 15px; color: var(--text-muted); font-weight: 400;
 }
 .next-meta-item svg { color: var(--accent); flex-shrink: 0; }
 .next-meta-item span {
-  color: var(--text); font-weight: 600;
+  font-size: 17px; color: var(--text); font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+.next-meta-item em { font-size: 13px; color: var(--text-muted); font-style: normal; }
 .hig-btn-primary {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 12px;
@@ -1429,3 +1429,56 @@ body { overscroll-behavior: none; }
 .set-sum-target { font-size: 17px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .set-sum-target strong { color: var(--text-muted); font-weight: 600; }
 .set-sum-x { color: var(--text-dim); margin: 0 2px; }
+
+/* ── FitHome.dc.html — handoff-exact Home ───────────────── */
+/* Cards carry the handoff's 22px radius and 14px rhythm rather than the
+   global --radius/8px used elsewhere in the app. */
+#screen-home .home-section > .card,
+#screen-home .last-session-row {
+  border-radius: 22px;
+  margin-bottom: 14px;
+}
+#screen-home .next-card { box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+#screen-home .week-card { border: none; box-shadow: none; background: var(--fill1); }
+
+/* Last session — pushes to History. */
+.last-session-row {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; text-align: left;
+  padding: 16px 18px;
+  background: var(--fill1);
+  border: none;
+  flex-shrink: 0;
+}
+.last-session-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 20px; background: var(--fill2);
+}
+.last-session-icon svg { width: 20px; height: 20px; }
+.last-session-text { flex: 1; min-width: 0; display: block; }
+.last-session-title {
+  display: block;
+  font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.2px;
+}
+.last-session-sub {
+  display: block;
+  font-size: 13px; color: var(--text-muted); margin-top: 3px;
+}
+.last-session-row > svg { color: var(--label3); flex-shrink: 0; }
+
+/* Action bar: a translucent layer with a hairline, not a gradient fade. */
+#screen-home .home-cta-wrap {
+  margin-top: auto; position: sticky; bottom: 0;
+  padding: 14px 20px 18px;
+  margin-left: -20px; margin-right: -20px;
+  background: rgba(10,10,12,.72);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  box-shadow: 0 -0.5px 0 var(--sep);
+}
+#screen-home .home-cta-wrap .hig-btn-primary {
+  min-height: 54px; border-radius: 16px;
+  font-size: 18px; font-weight: 600; letter-spacing: -0.2px;
+  box-shadow: 0 6px 20px rgba(168,230,53,.24);
+}
