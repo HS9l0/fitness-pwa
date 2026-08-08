@@ -32,8 +32,11 @@
   --seg:            rgba(118,118,128,.24);    /* segmented / search track */
   --shadow:         0 1px 6px rgba(0,0,0,.6);
   --chrome:         rgba(20,20,22,.72);       /* translucent bar backing */
-  --blur:           blur(24px) saturate(180%);
+  /* Both consumers sit sticky over a scrolling ancestor, so this is
+     recomputed per scroll frame. Kept cheap: smaller radius, no saturate. */
+  --blur:           blur(16px);
   --e:              cubic-bezier(0.32,0.72,0,1);
+  --e-bounce:       cubic-bezier(0.16,1,0.3,1);  /* springier — pops, celebrations */
   --radius:         20px;
   --radius-sm:      10px;
   --nav-h:          54px;
@@ -183,7 +186,7 @@ a { color: inherit; text-decoration: none; }
   82%  { transform: scale(1.02); }
   100% { background: var(--accent2); transform: scale(1); box-shadow: none; }
 }
-#finish-btn.finishing { animation: finish-flash 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: none; }
+#finish-btn.finishing { animation: finish-flash 0.65s var(--e-bounce) forwards; pointer-events: none; }
 
 /* ── Screen header ──────────────────────────────────────── */
 .screen-header {
@@ -258,7 +261,7 @@ a { color: inherit; text-decoration: none; }
   white-space: nowrap; flex-shrink: 0;
 }
 .ex-meta    { font-size: 0.78rem; color: var(--accent2); font-weight: 700; white-space: nowrap; }
-.ex-chevron { color: var(--text-dim); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); flex-shrink: 0; }
+.ex-chevron { color: var(--text-dim); transition: transform 0.3s var(--e-bounce); flex-shrink: 0; }
 .exercise-card.open .ex-chevron { transform: rotate(90deg); }
 @media (max-width: 479px) { .ex-chevron { display: none; } }
 
@@ -266,7 +269,7 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 0.42s cubic-bezier(0.16,1,0.3,1),
+  transition: grid-template-rows 0.42s var(--e-bounce),
               opacity 0.3s ease;
 }
 .exercise-card.open .ex-body-outer {
@@ -277,7 +280,7 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   padding: 0 16px;
   border-top: 1px solid transparent;
-  transition: padding 0.42s cubic-bezier(0.16,1,0.3,1), border-color 0.25s ease;
+  transition: padding 0.42s var(--e-bounce), border-color 0.25s ease;
 }
 .exercise-card.open .ex-body { padding: 0 16px 16px; border-top-color: var(--border); }
 
@@ -287,7 +290,12 @@ a { color: inherit; text-decoration: none; }
 
 .sets-progress       { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .sets-progress-bar   { flex: 1; height: 4px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
-.sets-progress-fill  { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); }
+.sets-progress-fill  { height: 100%; background: var(--accent); border-radius: 2px;
+  /* scaleX rather than width: width is a layout property and was being
+     animated on every logged set. transform-origin pins the growth to the
+     left edge so it still reads as filling rather than expanding. */
+  width: 100%; transform-origin: left; transform: scaleX(0);
+  transition: transform 250ms var(--e); }
 .sets-progress-txt   { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* ── Set rows — iOS grouped list style ──────────────────── */
@@ -411,13 +419,13 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.15s, transform 0.1s;
 }
 .set-skip-btn:active { opacity: 0.7; transform: scale(0.95); }
-.set-skip-btn.pop { animation: check-pop 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+.set-skip-btn.pop { animation: check-pop 0.35s var(--e-bounce) forwards; }
 
 @keyframes finish-appear {
   from { opacity: 0; transform: translateY(8px) scale(0.97); }
   to   { opacity: 1; transform: none; }
 }
-.finish-reveal { animation: finish-appear 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+.finish-reveal { animation: finish-appear 0.45s var(--e-bounce) both; }
 
 .set-check-btn {
   flex: 1; height: 44px;
@@ -426,8 +434,7 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
   transition: background 0.2s, color 0.2s, transform 0.1s;
 }
-.set-check-btn:active { transform: scale(0.97); }
-.set-check-btn.pop { animation: check-pop 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+.set-check-btn.pop { animation: check-pop 0.4s var(--e-bounce) forwards; }
 /* Tinted lime when set is logged — the only row-level indicator */
 .set-row.done .set-check-btn { background: var(--accentSoft); color: var(--accent); }
 
@@ -445,7 +452,7 @@ a { color: inherit; text-decoration: none; }
 }
 .exercise-card.ex-complete .ex-num {
   background: var(--accent);
-  animation: ex-num-pop 0.55s cubic-bezier(0.16,1,0.3,1) both;
+  animation: ex-num-pop 0.55s var(--e-bounce) both;
 }
 .exercise-card.ex-complete .ex-header {
   border-left: 3px solid var(--accent);
@@ -482,7 +489,7 @@ a { color: inherit; text-decoration: none; }
 .cardio-done-btn.done {
   /* Disabled/completed — neutral, no tint */
   background: rgba(120,120,128,.14); color: var(--text-muted);
-  animation: cardio-done-pop 0.5s cubic-bezier(0.16,1,0.3,1);
+  animation: cardio-done-pop 0.5s var(--e-bounce);
 }
 .cardio-done-btn:disabled { pointer-events: none; opacity: 0.5; }
 @keyframes cardio-timing-pulse {
@@ -635,7 +642,8 @@ a { color: inherit; text-decoration: none; }
 }
 .pwkt-prog-fill {
   height: 100%; background: var(--accent);
-  transition: width 0.45s cubic-bezier(0.32,0.72,0,1);
+  width: 100%; transform-origin: left; transform: scaleX(0);
+  transition: transform 250ms var(--e);
 }
 
 .pwkt-stage {
@@ -735,7 +743,7 @@ body { overscroll-behavior: none; }
   bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
   left: 50%; transform: translateX(-50%);
   z-index: 500;
-  animation: rest-appear 0.45s cubic-bezier(0.16,1,0.3,1) both;
+  animation: rest-appear 0.45s var(--e-bounce) both;
 }
 .rest-card {
   background: var(--surface);
@@ -779,7 +787,7 @@ body { overscroll-behavior: none; }
   70%  { transform: scale(0.98); opacity: 0.8; }
   100% { opacity: 0; transform: scale(0.82) translateY(14px); box-shadow: none; }
 }
-.rest-card.rest-done { animation: rest-done 1s cubic-bezier(0.16,1,0.3,1) forwards; }
+.rest-card.rest-done { animation: rest-done 1s var(--e-bounce) forwards; }
 
 @keyframes rest-nudge {
   0%   { transform: scale(1); }
@@ -819,7 +827,7 @@ body { overscroll-behavior: none; }
   background: var(--surface);
   border-radius: 22px 22px 0 0;
   padding-bottom: max(var(--safe-bottom), 16px);
-  animation: drum-rise 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
+  animation: drum-rise 0.38s var(--e-bounce) forwards;
 }
 .drum-sheet.drum-leaving .drum-panel {
   animation: drum-fall 0.28s cubic-bezier(0.4,0,1,1) forwards;
@@ -1067,10 +1075,9 @@ body { overscroll-behavior: none; }
      (design handoff v2 — FitHome pins it in a flex-shrink:0 footer) */
   margin-top: auto;
   position: sticky; bottom: 0;
-  /* Only the home-indicator inset — #screen-home drops its own bottom
-     padding so these two don't stack into a dead black band. */
-  padding: 6px 0 max(10px, var(--safe-bottom));
-  background: linear-gradient(to top, var(--bg) 65%, transparent);
+  /* Padding and background live on #screen-home .home-cta-wrap, which is the
+     only place this class is ever rendered. Declaring them here too left a
+     gradient that could never paint. */
 }
 
 /* ── Workout history bottom sheet ───────────────────────── */
@@ -1385,6 +1392,10 @@ body { overscroll-behavior: none; }
   .set-skip-btn:active,
   .yt-search-btn:active,
   .unit-seg-btn:active { transform: none; }
+
+  /* The settings sheet slides 460ms on transform — movement introduced
+     alongside this block and originally left unguarded. */
+  .settings-panel { transition: none; }
 }
 
 /* ── v3 workout: sets card fills the column ─────────────── */

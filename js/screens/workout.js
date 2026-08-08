@@ -153,7 +153,7 @@ function renderPhoneWorkout(container, workout, navigate) {
         </div>
         <div class="pwkt-hdr-timer" id="pwkt-elapsed">0:00</div>
       </div>
-      <div class="pwkt-prog-track"><div class="pwkt-prog-fill" id="pwkt-prog-fill" style="width:${(100 / exCount).toFixed(2)}%"></div></div>
+      <div class="pwkt-prog-track"><div class="pwkt-prog-fill" id="pwkt-prog-fill" style="transform:scaleX(${(1 / exCount).toFixed(4)})"></div></div>
       <div class="pwkt-stage" id="pwkt-stage">
         ${workout.exercises.map((ex, i) => renderExerciseCard(ex, i + 1, getLastWeights(ex.name))).join('')}
       </div>
@@ -168,7 +168,7 @@ function renderPhoneWorkout(container, workout, navigate) {
 
   function updateProgress(idx) {
     if (excountEl)  excountEl.textContent = `${idx + 1} of ${exCount}`;
-    if (progFillEl) progFillEl.style.width = `${(((idx + 1) / exCount) * 100).toFixed(2)}%`;
+    if (progFillEl) progFillEl.style.transform = `scaleX(${((idx + 1) / exCount).toFixed(4)})`;
   }
 
   function goToSlide(idx, dir = 'next') {
@@ -302,7 +302,7 @@ function renderSetRows(ex, lastWeights) {
 
   return `
     <div class="sets-progress" id="sets-progress-${exId}">
-      <div class="sets-progress-bar"><div class="sets-progress-fill" style="width:0%"></div></div>
+      <div class="sets-progress-bar"><div class="sets-progress-fill" style="transform:scaleX(0)"></div></div>
       <span class="sets-progress-txt">0 / ${ex.defaultSets}</span>
     </div>
     <div class="sets-list">${rows}</div>
@@ -405,7 +405,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const totalSets = exSession.sets.length;
       const fill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
       const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
-      if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
+      if (fill) fill.style.transform = `scaleX(${totalSets ? doneSets / totalSets : 0})`;
       if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
 
       if (doneSets === totalSets) {
@@ -480,7 +480,7 @@ function wireWorkoutEvents(container, session, workout, { incDone, getTotalSets,
       const totalSets = exSession.sets.length;
       const fill = container.querySelector(`#sets-progress-${exId} .sets-progress-fill`);
       const txt  = container.querySelector(`#sets-progress-${exId} .sets-progress-txt`);
-      if (fill) fill.style.width = `${(doneSets / totalSets) * 100}%`;
+      if (fill) fill.style.transform = `scaleX(${totalSets ? doneSets / totalSets : 0})`;
       if (txt)  txt.textContent  = `${doneSets} / ${totalSets}`;
 
       incDone();
